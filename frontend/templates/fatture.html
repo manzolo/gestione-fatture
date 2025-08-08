@@ -43,7 +43,7 @@
                             <label for="data_fattura" class="form-label">Data Fattura</label>
                             <input type="date" class="form-control" id="data_fattura" name="data_fattura" value="{{ now.strftime('%Y-%m-%d') }}" required>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3 hidden">
                             <label for="importo_prestazione" class="form-label">Importo (es. €)</label>
                             <input type="number" step="0.01" class="form-control" id="importo_prestazione" name="importo_prestazione" value="58.82" required>
                         </div>
@@ -63,7 +63,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="data_pagamento" class="form-label">Data Pagamento</label>
-                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento">
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ now.strftime('%Y-%m-%d') }}">
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Aggiungi Fattura</button>

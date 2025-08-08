@@ -13,6 +13,8 @@ class Cliente(db.Model):
     cognome = db.Column(db.String(100), nullable=False)
     codice_fiscale = db.Column(db.String(16), unique=True, nullable=False)
     indirizzo = db.Column(db.String(200))
+    citta = db.Column(db.String(255))
+    cap = db.Column(db.String(5))
 
 class Fattura(db.Model):
     id = db.Column(db.Integer, primary_key=True)

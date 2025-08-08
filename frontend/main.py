@@ -32,7 +32,9 @@ def add_client():
         'nome': request.form['nome'],
         'cognome': request.form['cognome'],
         'codice_fiscale': request.form['codice_fiscale'],
-        'indirizzo': request.form['indirizzo']
+        'indirizzo': request.form['indirizzo'],
+        'citta': request.form['citta'],
+        'cap': request.form['cap']
     }
     try:
         response = requests.post(f"{BACKEND_URL}/api/clients", json=data)

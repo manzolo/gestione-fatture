@@ -7,7 +7,7 @@ from docxtpl import DocxTemplate
 from sqlalchemy import text
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_SQLALCHEMY_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_SQLALCHEMY_URL') or 'sqlite:///test.db'
 db.init_app(app)
 
 # Creazione della directory temporanea se non esiste
@@ -16,11 +16,52 @@ if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
 
 # --- Voci e parametri predefiniti ---
-DEFAULT_PRESTAZIONE_COSTO = 58.82
-CONTRIBUTO_PERCENTAGE = 0.02
-BOLLO_COSTO = 2.0
-BOLLO_SOGLIA = 70.00
 METODI_PAGAMENTO = ["Carta di credito/debito", "Bonifico", "Contanti"]
+# Parametri fissi
+PRESTAZIONE_BASE = 58.82     # Prezzo base senza contributo
+CONTRIBUTO_FISSO_PER_SEDUTA = 1.18 # Contributo fisso per ogni seduta
+BOLLO_COSTO = 2.00
+BOLLO_SOGLIA = 70.00
+
+def calculate_invoice_totals(numero_sedute: int):
+    """
+    Calcola i totali usando la logica desiderata.
+    """
+    if numero_sedute < 0:
+        numero_sedute = 0
+
+    # Calcolo dei valori per singola seduta
+    prezzo_base_unitario = PRESTAZIONE_BASE
+    
+    # Usa il contributo fisso, non la percentuale che è stata rimossa
+    contributo_unitario = CONTRIBUTO_FISSO_PER_SEDUTA
+    
+    totale_unitario = round(prezzo_base_unitario + contributo_unitario, 2)
+
+    # Calcolo dei totali
+    subtotale_base = round(prezzo_base_unitario * numero_sedute, 2)
+    contributo = round(contributo_unitario * numero_sedute, 2)
+    totale_imponibile = round(subtotale_base + contributo, 2)
+
+    # Bollo: si applica se il totale imponibile supera la soglia
+    bollo_flag = totale_imponibile > BOLLO_SOGLIA
+    bollo_importo = BOLLO_COSTO if bollo_flag else 0.0
+
+    # Totale finale
+    totale = round(totale_imponibile + bollo_importo, 2)
+
+    return {
+        'numero_sedute': numero_sedute,
+        'importo_unitario': prezzo_base_unitario,
+        'contributo_unitario': contributo_unitario,
+        'totale_unitario': totale_unitario,
+        'subtotale_base': subtotale_base,
+        'contributo': contributo,
+        'bollo_flag': bollo_flag,
+        'bollo_importo': bollo_importo,
+        'totale_imponibile': totale_imponibile,
+        'totale': totale
+    }
 
 # --- API Clients ---
 @app.route('/api/clients', methods=['GET'])
@@ -42,7 +83,10 @@ def add_client():
         nome=data['nome'],
         cognome=data['cognome'],
         codice_fiscale=data['codice_fiscale'],
-        indirizzo=data.get('indirizzo')
+        indirizzo=data.get('indirizzo'),
+        # Aggiungi i nuovi campi se presenti
+        citta=data.get('citta'),
+        cap=data.get('cap')
     )
     db.session.add(new_client)
     db.session.commit()
@@ -52,17 +96,20 @@ def add_client():
 def edit_client(client_id):
     client = Cliente.query.get_or_404(client_id)
     data = request.get_json()
-    client.nome = data['nome']
-    client.cognome = data['cognome']
-    client.codice_fiscale = data['codice_fiscale']
-    client.indirizzo = data.get('indirizzo')
+    client.nome = data.get('nome', client.nome)
+    client.cognome = data.get('cognome', client.cognome)
+    client.codice_fiscale = data.get('codice_fiscale', client.codice_fiscale)
+    client.indirizzo = data.get('indirizzo', client.indirizzo)
+    client.citta = data.get('citta', getattr(client, 'citta', None))
+    client.cap = data.get('cap', getattr(client, 'cap', None))
     db.session.commit()
     return jsonify({'message': 'Cliente aggiornato con successo!'})
 
 @app.route('/api/clients/<int:client_id>', methods=['DELETE'])
 def delete_client(client_id):
     client = Cliente.query.get_or_404(client_id)
-    if client.fatture:
+    # assumiamo relazione .fatture o .invoices; adattare se nome diverso
+    if getattr(client, 'fatture', None) and len(client.fatture) > 0:
         return jsonify({'message': 'Impossibile eliminare un cliente con fatture associate.'}), 400
     db.session.delete(client)
     db.session.commit()
@@ -77,16 +124,34 @@ def get_invoices():
         'data_fattura': i.data_fattura.strftime('%Y-%m-%d'),
         'data_pagamento': i.data_pagamento.strftime('%Y-%m-%d') if i.data_pagamento else None,
         'metodo_pagamento': i.metodo_pagamento,
-        'cliente': f"{i.cliente.nome} {i.cliente.cognome}",
+        'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
         'descrizione': i.descrizione,
         'totale': f"{i.totale:.2f}"
     } for i in invoices]
     return jsonify(invoices_list)
 
+# Nuovo endpoint per calcolare anteprima totali
+@app.route('/api/calculate-totals', methods=['POST'])
+def calculate_totals():
+    data = request.get_json() or {}
+    numero_sedute = int(data.get('numero_sedute', 1))
+    
+    calcoli = calculate_invoice_totals(numero_sedute)
+    
+    return jsonify({
+        'numero_sedute': calcoli['numero_sedute'],
+        'importo_unitario': f"€{calcoli['totale_unitario']:.2f}", # Mostra il prezzo unitario totale (base + contributo)
+        'subtotale_prestazioni': f"€{calcoli['subtotale_base']:.2f}", # Subtotale delle prestazioni di base
+        'contributo': f"€{calcoli['contributo']:.2f}",
+        'totale_imponibile': f"€{calcoli['totale_imponibile']:.2f}", # Nuovo campo per il totale prima del bollo
+        'bollo_applicato': calcoli['bollo_flag'],
+        'bollo_importo': f"€{calcoli['bollo_importo']:.2f}",
+        'totale': f"€{calcoli['totale']:.2f}"
+    })
+
 @app.route('/api/invoices', methods=['POST'])
 def add_invoice():
     data = request.get_json()
-    
     current_year = datetime.now().year
     
     # Recupera il prossimo numero progressivo per l'anno corrente
@@ -99,49 +164,33 @@ def add_invoice():
     progressivo = progressivo_entry.last_progressivo + 1
     
     # Prepara i dati della fattura
-    importo_prestazione_unitario = data['importo_prestazione']
-    numero_sedute = data['numero_sedute']
+    numero_sedute = int(data.get('numero_sedute', 1))
 
-    # --- LOGICA DI CALCOLO AGGIORNATA ---
-    # Calcolo del subtotale basato sul numero di sedute
-    subtotale_prestazioni = importo_prestazione_unitario * numero_sedute
+    # Usa la funzione di utilità per i calcoli
+    calcoli = calculate_invoice_totals(numero_sedute)
     
-    # Calcolo del contributo previdenziale sul subtotale
-    contributo = subtotale_prestazioni * CONTRIBUTO_PERCENTAGE
-    
-    # Totale senza bollo
-    totale_senza_bollo = subtotale_prestazioni + contributo
-    
-    # Calcolo del bollo
-    bollo_flag = totale_senza_bollo >= BOLLO_SOGLIA
-    
-    # Calcolo del totale finale
-    totale = totale_senza_bollo + (BOLLO_COSTO if bollo_flag else 0)
-    # --- FINE LOGICA AGGIORNATA ---
-    
-    descrizione = f"n. {numero_sedute} di Seduta di consulenza psicologica"
+    descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
     
     nuova_fattura = Fattura(
         anno=current_year,
         progressivo=progressivo,
-        data_fattura=datetime.strptime(data['data_fattura'], '%Y-%m-%d').date(),
+        data_fattura=datetime.strptime(data['data_fattura'], '%Y-%m-%d').date() if data.get('data_fattura') else datetime.now().date(),
         data_pagamento=datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None,
         metodo_pagamento=data.get('metodo_pagamento'),
         cliente_id=data['cliente_id'],
-        importo_prestazione=importo_prestazione_unitario,
-        bollo=bollo_flag,
+        importo_prestazione=PRESTAZIONE_BASE, # Salva il prezzo unitario base
+        bollo=calcoli['bollo_flag'],
         descrizione=descrizione,
-        totale=totale,
+        totale=calcoli['totale'],
         numero_sedute=numero_sedute
     )
     
     db.session.add(nuova_fattura)
-    
-    # Aggiorna il numero progressivo
     progressivo_entry.last_progressivo = progressivo
     db.session.commit()
     
     return jsonify({'message': 'Fattura aggiunta con successo!', 'id': nuova_fattura.id}), 201
+
 
 @app.route('/api/invoices/<int:invoice_id>/download', methods=['GET'])
 def download_invoice_docx(invoice_id):
@@ -149,14 +198,22 @@ def download_invoice_docx(invoice_id):
         fattura = Fattura.query.get_or_404(invoice_id)
         cliente = Cliente.query.get_or_404(fattura.cliente_id)
 
-        # Assicurati che il file template esista e sia nella cartella corretta
         template_path = os.path.join(app.root_path, 'templates', 'invoice_template.docx')
         if not os.path.exists(template_path):
             return jsonify({"error": "Template file not found"}), 404
         
         doc = DocxTemplate(template_path)
-
-        # Dati da passare al template
+        
+        # Ricalcola i totali basandosi su numero_sedute salvato
+        calcoli = calculate_invoice_totals(fattura.numero_sedute)
+        
+        # Gestione del testo condizionale per bollo e descrizione
+        descrizione_prestazione = f"n. {calcoli['numero_sedute']} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
+        
+        # Variabili per il bollo: se il bollo non si applica, le stringhe saranno vuote
+        bollo_descrizione = "Imposta di Bollo - Esc. Art. 15" if calcoli['bollo_flag'] else ""
+        bollo_importo_formattato = f"€{calcoli['bollo_importo']:.2f}".replace('.', ',') if calcoli['bollo_flag'] else ""
+        
         context = {
             'numero_fattura': f"{fattura.progressivo}/{fattura.anno}",
             'data_fattura': fattura.data_fattura.strftime('%d/%m/%Y'),
@@ -164,28 +221,37 @@ def download_invoice_docx(invoice_id):
             'cliente_cognome': cliente.cognome,
             'cliente_codice_fiscale': cliente.codice_fiscale,
             'cliente_indirizzo': cliente.indirizzo,
-            'descrizione': fattura.descrizione,
-            'totale': f"€{fattura.totale:.2f}",
+            'cliente_citta': getattr(cliente, 'citta', ''),
+            'cliente_cap': getattr(cliente, 'cap', ''),
+            'descrizione': descrizione_prestazione,
+            'numero_sedute': calcoli['numero_sedute'],
+            'subtotale_prestazioni': f"€{calcoli['subtotale_base']:.2f}".replace('.', ','),
+            'contributo': f"€{calcoli['contributo']:.2f}".replace('.', ','),
+            'totale_imponibile': f"€{calcoli['totale_imponibile']:.2f}".replace('.', ','),
+            'bollo_descrizione': bollo_descrizione,
+            'bollo_importo_formattato': bollo_importo_formattato,
+            'totale': f"€{calcoli['totale']:.2f}".replace('.', ','),
             'metodo_pagamento': fattura.metodo_pagamento,
             'data_pagamento': fattura.data_pagamento.strftime('%d/%m/%Y') if fattura.data_pagamento else 'Non pagato',
         }
         
         doc.render(context)
         
-        # Salvataggio temporaneo del file nella directory 'temp'
-        file_path = os.path.join(temp_dir, f"fattura_{fattura.id}.docx")
+        file_path = os.path.join(app.root_path, 'temp', f"fattura_{fattura.id}.docx")
         doc.save(file_path)
         
-        # Invio del file al frontend e eliminazione del file temporaneo
         return_data = send_file(file_path, as_attachment=True)
-        #os.remove(file_path)  # Elimina il file dopo l'invio
-        
+        try:
+            os.remove(file_path)
+        except OSError:
+            pass
+            
         return return_data
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Endpoint di health check (rimane invariato)
+# Endpoint di health check
 @app.route('/health')
 def health_check():
     try:
