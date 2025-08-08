@@ -111,3 +111,17 @@ def download_invoice(invoice_id):
     except requests.exceptions.RequestException as e:
         flash(f"Errore durante il download: {e}", 'danger')
         return redirect(url_for('fatture'))
+    
+def format_date_italian(value):
+    if value is None:
+        return None
+    # Assuming the date is in 'YYYY-MM-DD' format from the backend
+    try:
+        # Convert it to a datetime object
+        date_obj = datetime.strptime(value, '%Y-%m-%d')
+        # Format it to 'DD/MM/YYYY'
+        return date_obj.strftime('%d/%m/%Y')
+    except (ValueError, TypeError):
+        return value # Return original value if conversion fails
+
+app.jinja_env.filters['to_italian_date'] = format_date_italian

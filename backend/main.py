@@ -123,8 +123,10 @@ def get_invoices():
     invoices_list = [{
         'id': i.id,
         'numero_fattura': f"{i.progressivo}/{i.anno}",
-        'data_fattura': i.data_fattura.strftime('%Y-%m-%d'),
-        'data_pagamento': i.data_pagamento.strftime('%Y-%m-%d') if i.data_pagamento else None,
+        # Formatta la data in gg/mm/aaaa
+        'data_fattura': i.data_fattura.strftime('%d/%m/%Y'),
+        # Formatta la data di pagamento, se esiste
+        'data_pagamento': i.data_pagamento.strftime('%d/%m/%Y') if i.data_pagamento else None,
         'metodo_pagamento': i.metodo_pagamento,
         'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
         'descrizione': i.descrizione,
@@ -249,7 +251,7 @@ def download_invoice_docx(invoice_id):
         bollo_importo_formattato = f"€{calcoli['bollo_importo']:.2f}".replace('.', ',') if calcoli['bollo_flag'] else ""
         
         context = {
-            'numero_fattura': f"{fattura.progressivo}/{fattura.anno}",
+            'numero_fattura': f"{fattura.progressivo}",
             'data_fattura': fattura.data_fattura.strftime('%d/%m/%Y'),
             'cliente_nome': cliente.nome,
             'cliente_cognome': cliente.cognome,

@@ -85,8 +85,8 @@
                 {% for invoice in invoices %}
                     <tr>
                         <td>{{ invoice.numero_fattura }}</td>
-                        <td>{{ invoice.data_fattura }}</td>
-                        <td>{{ invoice.data_pagamento if invoice.data_pagamento else 'N/D' }}</td>
+                        <td>{{ invoice.data_fattura | to_italian_date }}</td>
+                        <td>{{ invoice.data_pagamento | to_italian_date if invoice.data_pagamento else 'N/D' }}</td>
                         <td>{{ invoice.metodo_pagamento if invoice.metodo_pagamento else 'N/D' }}</td>
                         <td>{{ invoice.cliente }}</td>
                         <td>{{ invoice.descrizione }}</td>
