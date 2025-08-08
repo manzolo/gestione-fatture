@@ -1,16 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 import requests
 import os
 from datetime import datetime
+from io import BytesIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'una-chiave-segreta-molto-complessa'
-BACKEND_URL = os.getenv("BACKEND_URL", "http://invoice_backend:8900")
+
+# Correggi l'URL del backend per usare la porta interna 5000
+BACKEND_URL = os.getenv("BACKEND_URL", "http://invoice_backend:5000")
 
 @app.route('/')
 def home():
-    """Rotta principale che reindirizza alla pagina dei clienti."""
-    return redirect(url_for('clienti'))
+    return redirect(url_for('fatture'))
 
 @app.route('/clienti')
 def clienti():
@@ -22,28 +24,8 @@ def clienti():
     except requests.exceptions.RequestException as e:
         flash(f"Errore di connessione al backend: {e}", 'danger')
         clients = []
-    
-    return render_template('clienti.html', clients=clients)
 
-@app.route('/add_client', methods=['POST'])
-def add_client():
-    """Rotta per aggiungere un nuovo cliente."""
-    data = {
-        'nome': request.form['nome'],
-        'cognome': request.form['cognome'],
-        'codice_fiscale': request.form['codice_fiscale'],
-        'indirizzo': request.form['indirizzo'],
-        'citta': request.form['citta'],
-        'cap': request.form['cap']
-    }
-    try:
-        response = requests.post(f"{BACKEND_URL}/api/clients", json=data)
-        response.raise_for_status()
-        flash("Cliente aggiunto con successo!", 'success')
-    except requests.exceptions.RequestException as e:
-        flash(f"Errore durante l'aggiunta del cliente: {e}", 'danger')
-    
-    return redirect(url_for('clienti'))
+    return render_template('clienti.html', clients=clients)
 
 @app.route('/fatture')
 def fatture():
@@ -52,7 +34,7 @@ def fatture():
         clients_response = requests.get(f"{BACKEND_URL}/api/clients")
         clients_response.raise_for_status()
         clients = clients_response.json()
-        
+
         invoices_response = requests.get(f"{BACKEND_URL}/api/invoices")
         invoices_response.raise_for_status()
         invoices = invoices_response.json()
@@ -60,41 +42,72 @@ def fatture():
         flash(f"Errore di connessione al backend: {e}", 'danger')
         clients = []
         invoices = []
-    
+
     return render_template('fatture.html', clients=clients, invoices=invoices, now=datetime.now())
 
-@app.route('/add_invoice', methods=['POST'])
-def add_invoice():
-    """Rotta per aggiungere una nuova fattura."""
-    data = {
-        'cliente_id': request.form['cliente_id'],
-        'data_fattura': request.form['data_fattura'],
-        'data_pagamento': request.form.get('data_pagamento'),
-        'metodo_pagamento': request.form.get('metodo_pagamento'),
-        'importo_prestazione': float(request.form['importo_prestazione']),
-        'numero_sedute': int(request.form['numero_sedute'])
-    }
+# --- Proxy API per le fatture (aggiunte) ---
+@app.route('/api/invoices', methods=['POST'])
+def add_invoice_proxy():
+    """Proxy per la creazione di una nuova fattura."""
+    data = request.get_json()
     try:
         response = requests.post(f"{BACKEND_URL}/api/invoices", json=data)
         response.raise_for_status()
+
+        # Aggiungi un flash message di successo
         flash("Fattura aggiunta con successo!", 'success')
+
+        return jsonify(response.json()), response.status_code
     except requests.exceptions.RequestException as e:
-        flash(f"Errore durante l'aggiunta della fattura: {e}", 'danger')
+        # Aggiungi un flash message di errore
+        flash(f"Errore durante l'aggiunta: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
+
+@app.route('/api/invoices/<int:invoice_id>', methods=['GET'])
+def get_invoice_proxy(invoice_id):
+    """Proxy per ottenere i dati di una singola fattura."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/invoices/{invoice_id}")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'message': f"Errore: {e}"}), 500
+
+@app.route('/api/invoices/<int:invoice_id>', methods=['PUT'])
+def edit_invoice_proxy(invoice_id):
+    """Proxy per la modifica di una fattura."""
+    data = request.get_json()
+    try:
+        response = requests.put(f"{BACKEND_URL}/api/invoices/{invoice_id}", json=data)
+        response.raise_for_status()
         
-    return redirect(url_for('fatture'))
+        # Aggiungi un flash message di successo
+        flash("Fattura aggiornata con successo!", 'success')
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        # Aggiungi un flash message di errore
+        flash(f"Errore durante la modifica: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
 
 @app.route('/download_invoice/<int:invoice_id>')
 def download_invoice(invoice_id):
-    """Rotta per scaricare un file DOCX di fattura."""
+    """
+    Rotta per scaricare un file DOCX di fattura, proxato dal backend.
+    """
     try:
+        # CORREZIONE: Usa il percorso API corretto del backend.
         response = requests.get(f"{BACKEND_URL}/api/invoices/{invoice_id}/download")
         response.raise_for_status()
-        
-        filename = f"fattura_{invoice_id}.docx"
-        with open(filename, 'wb') as f:
-            f.write(response.content)
-            
-        return send_file(filename, as_attachment=True)
+
+        # Usa BytesIO per avvolgere il contenuto binario
+        file_object = BytesIO(response.content)
+
+        return send_file(
+            file_object,
+            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            as_attachment=True,
+            download_name=f"fattura_{invoice_id}.docx"
+        )
     except requests.exceptions.RequestException as e:
         flash(f"Errore durante il download: {e}", 'danger')
         return redirect(url_for('fatture'))

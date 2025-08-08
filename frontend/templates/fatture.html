@@ -27,7 +27,7 @@
                 Aggiungi una nuova Fattura
             </div>
             <div class="card-body">
-                <form action="/add_invoice" method="post">
+                <form id="addInvoiceForm">
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="cliente_id" class="form-label">Seleziona Cliente</label>
@@ -42,10 +42,6 @@
                         <div class="col-md-4 mb-3">
                             <label for="data_fattura" class="form-label">Data Fattura</label>
                             <input type="date" class="form-control" id="data_fattura" name="data_fattura" value="{{ now.strftime('%Y-%m-%d') }}" required>
-                        </div>
-                        <div class="col-md-4 mb-3 hidden">
-                            <label for="importo_prestazione" class="form-label">Importo (es. €)</label>
-                            <input type="number" step="0.01" class="form-control" id="importo_prestazione" name="importo_prestazione" value="58.82" required>
                         </div>
                     </div>
                     <div class="row">
@@ -82,7 +78,7 @@
                     <th>Cliente</th>
                     <th>Descrizione</th>
                     <th>Totale</th>
-                    <th>Azione</th>
+                    <th>Azioni</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,7 +92,8 @@
                         <td>{{ invoice.descrizione }}</td>
                         <td>€{{ invoice.totale }}</td>
                         <td>
-                            <a href="/download_invoice/{{ invoice.id }}" class="btn btn-success btn-sm">Fattura</a>
+                            <a href="{{ url_for('download_invoice', invoice_id=invoice.id) }}" class="btn btn-success btn-sm">Scarica</a>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openEditModal({{ invoice.id }})">Modifica</button>
                         </td>
                     </tr>
                 {% else %}
@@ -108,5 +105,117 @@
         </table>
         <a href="/clienti" class="btn btn-secondary">Vai a Clienti</a>
     </div>
+
+    <div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editInvoiceModalLabel">Modifica Fattura</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editInvoiceForm">
+                        <input type="hidden" id="edit-invoice-id">
+                        <div class="mb-3">
+                            <label for="edit-data_fattura" class="form-label">Data Fattura</label>
+                            <input type="date" class="form-control" id="edit-data_fattura" name="data_fattura" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-numero_sedute" class="form-label">Numero di Sedute</label>
+                            <input type="number" class="form-control" id="edit-numero_sedute" name="numero_sedute" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-metodo_pagamento" class="form-label">Metodo Pagamento</label>
+                            <select class="form-control" id="edit-metodo_pagamento" name="metodo_pagamento" required>
+                                <option value="Bonifico">Bonifico</option>
+                                <option value="Carta di credito/debito">Carta di credito/debito</option>
+                                <option value="Contanti">Contanti</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-data_pagamento" class="form-label">Data Pagamento</label>
+                            <input type="date" class="form-control" id="edit-data_pagamento" name="data_pagamento">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                            <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('addInvoiceForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+
+        fetch('/api/invoices', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Errore durante l\'aggiunta della fattura.');
+            }
+            // Reindirizza alla pagina delle fatture dopo l'aggiunta
+            window.location.href = '/fatture';
+        })
+        .catch(error => {
+            console.error('Errore:', error);
+            alert('Si è verificato un errore durante l\'aggiunta della fattura.');
+        });
+    });
+
+    function openEditModal(invoiceId) {
+        fetch(`/api/invoices/${invoiceId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit-invoice-id').value = data.id;
+                document.getElementById('edit-data_fattura').value = data.data_fattura;
+                document.getElementById('edit-numero_sedute').value = data.numero_sedute;
+                document.getElementById('edit-metodo_pagamento').value = data.metodo_pagamento;
+                document.getElementById('edit-data_pagamento').value = data.data_pagamento;
+                
+                var editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
+                editModal.show();
+            });
+    }
+
+    document.getElementById('editInvoiceForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const invoiceId = document.getElementById('edit-invoice-id').value;
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch(`/api/invoices/${invoiceId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Errore durante la modifica della fattura.');
+        }
+        // Chiudi il modale e reindirizza, non serve un alert qui
+        var editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
+        editModal.hide();
+        window.location.href = '/fatture';
+    })
+    .catch(error => {
+        console.error('Errore:', error);
+        alert('Si è verificato un errore durante la modifica della fattura.');
+    });
+});
+</script>
 </body>
 </html>

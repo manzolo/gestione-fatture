@@ -10,10 +10,14 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_SQLALCHEMY_URL') or 'sqlite:///test.db'
 db.init_app(app)
 
-# Creazione della directory temporanea se non esiste
+# Creazione delle directory se non esistono
 temp_dir = os.path.join(app.root_path, 'temp')
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
+    
+invoices_dir = os.path.join(app.root_path, 'invoices')
+if not os.path.exists(invoices_dir):
+    os.makedirs(invoices_dir)
 
 # --- Voci e parametri predefiniti ---
 METODI_PAGAMENTO = ["Carta di credito/debito", "Bonifico", "Contanti"]
@@ -32,10 +36,7 @@ def calculate_invoice_totals(numero_sedute: int):
 
     # Calcolo dei valori per singola seduta
     prezzo_base_unitario = PRESTAZIONE_BASE
-    
-    # Usa il contributo fisso, non la percentuale che è stata rimossa
     contributo_unitario = CONTRIBUTO_FISSO_PER_SEDUTA
-    
     totale_unitario = round(prezzo_base_unitario + contributo_unitario, 2)
 
     # Calcolo dei totali
@@ -72,7 +73,9 @@ def get_clients():
         'nome': c.nome,
         'cognome': c.cognome,
         'codice_fiscale': c.codice_fiscale,
-        'indirizzo': c.indirizzo
+        'indirizzo': c.indirizzo,
+        'citta': c.citta,
+        'cap': c.cap
     } for c in clients]
     return jsonify(clients_list)
 
@@ -84,7 +87,6 @@ def add_client():
         cognome=data['cognome'],
         codice_fiscale=data['codice_fiscale'],
         indirizzo=data.get('indirizzo'),
-        # Aggiungi i nuovi campi se presenti
         citta=data.get('citta'),
         cap=data.get('cap')
     )
@@ -108,13 +110,13 @@ def edit_client(client_id):
 @app.route('/api/clients/<int:client_id>', methods=['DELETE'])
 def delete_client(client_id):
     client = Cliente.query.get_or_404(client_id)
-    # assumiamo relazione .fatture o .invoices; adattare se nome diverso
     if getattr(client, 'fatture', None) and len(client.fatture) > 0:
         return jsonify({'message': 'Impossibile eliminare un cliente con fatture associate.'}), 400
     db.session.delete(client)
     db.session.commit()
     return jsonify({'message': 'Cliente eliminato con successo!'})
 
+# --- API Invoices ---
 @app.route('/api/invoices', methods=['GET'])
 def get_invoices():
     invoices = Fattura.query.order_by(Fattura.anno.desc(), Fattura.progressivo.desc()).all()
@@ -130,20 +132,18 @@ def get_invoices():
     } for i in invoices]
     return jsonify(invoices_list)
 
-# Nuovo endpoint per calcolare anteprima totali
 @app.route('/api/calculate-totals', methods=['POST'])
 def calculate_totals():
     data = request.get_json() or {}
     numero_sedute = int(data.get('numero_sedute', 1))
-    
     calcoli = calculate_invoice_totals(numero_sedute)
     
     return jsonify({
         'numero_sedute': calcoli['numero_sedute'],
-        'importo_unitario': f"€{calcoli['totale_unitario']:.2f}", # Mostra il prezzo unitario totale (base + contributo)
-        'subtotale_prestazioni': f"€{calcoli['subtotale_base']:.2f}", # Subtotale delle prestazioni di base
+        'importo_unitario': f"€{calcoli['totale_unitario']:.2f}",
+        'subtotale_prestazioni': f"€{calcoli['subtotale_base']:.2f}",
         'contributo': f"€{calcoli['contributo']:.2f}",
-        'totale_imponibile': f"€{calcoli['totale_imponibile']:.2f}", # Nuovo campo per il totale prima del bollo
+        'totale_imponibile': f"€{calcoli['totale_imponibile']:.2f}",
         'bollo_applicato': calcoli['bollo_flag'],
         'bollo_importo': f"€{calcoli['bollo_importo']:.2f}",
         'totale': f"€{calcoli['totale']:.2f}"
@@ -154,7 +154,6 @@ def add_invoice():
     data = request.get_json()
     current_year = datetime.now().year
     
-    # Recupera il prossimo numero progressivo per l'anno corrente
     progressivo_entry = FatturaProgressivo.query.filter_by(anno=current_year).first()
     if not progressivo_entry:
         progressivo_entry = FatturaProgressivo(anno=current_year, last_progressivo=0)
@@ -163,10 +162,7 @@ def add_invoice():
     
     progressivo = progressivo_entry.last_progressivo + 1
     
-    # Prepara i dati della fattura
     numero_sedute = int(data.get('numero_sedute', 1))
-
-    # Usa la funzione di utilità per i calcoli
     calcoli = calculate_invoice_totals(numero_sedute)
     
     descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
@@ -174,11 +170,11 @@ def add_invoice():
     nuova_fattura = Fattura(
         anno=current_year,
         progressivo=progressivo,
-        data_fattura=datetime.strptime(data['data_fattura'], '%Y-%m-%d').date() if data.get('data_fattura') else datetime.now().date(),
+        data_fattura=datetime.strptime(data['data_fattura'], '%Y-%m-%d').date(),
         data_pagamento=datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None,
         metodo_pagamento=data.get('metodo_pagamento'),
         cliente_id=data['cliente_id'],
-        importo_prestazione=PRESTAZIONE_BASE, # Salva il prezzo unitario base
+        importo_prestazione=PRESTAZIONE_BASE,
         bollo=calcoli['bollo_flag'],
         descrizione=descrizione,
         totale=calcoli['totale'],
@@ -191,6 +187,48 @@ def add_invoice():
     
     return jsonify({'message': 'Fattura aggiunta con successo!', 'id': nuova_fattura.id}), 201
 
+@app.route('/api/invoices/<int:invoice_id>', methods=['GET'])
+def get_invoice(invoice_id):
+    fattura = Fattura.query.get_or_404(invoice_id)
+    calcoli = calculate_invoice_totals(fattura.numero_sedute)
+
+    return jsonify({
+        'id': fattura.id,
+        'numero_fattura': f"{fattura.progressivo}/{fattura.anno}",
+        'data_fattura': fattura.data_fattura.strftime('%Y-%m-%d'),
+        'data_pagamento': fattura.data_pagamento.strftime('%Y-%m-%d') if fattura.data_pagamento else '',
+        'metodo_pagamento': fattura.metodo_pagamento,
+        'cliente_id': fattura.cliente_id,
+        'numero_sedute': fattura.numero_sedute,
+        'totale': f"{fattura.totale:.2f}",
+        'bollo_applicato': fattura.bollo,
+        'descrizione': fattura.descrizione,
+        'calcoli': {
+            'subtotale_prestazioni': f"{calcoli['subtotale_base']:.2f}",
+            'contributo': f"{calcoli['contributo']:.2f}",
+            'totale_imponibile': f"{calcoli['totale_imponibile']:.2f}",
+            'bollo_importo': f"{calcoli['bollo_importo']:.2f}"
+        }
+    })
+
+@app.route('/api/invoices/<int:invoice_id>', methods=['PUT'])
+def edit_invoice(invoice_id):
+    fattura = Fattura.query.get_or_404(invoice_id)
+    data = request.get_json()
+
+    fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
+    fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
+    fattura.metodo_pagamento = data.get('metodo_pagamento')
+    fattura.numero_sedute = int(data.get('numero_sedute', fattura.numero_sedute))
+    
+    calcoli = calculate_invoice_totals(fattura.numero_sedute)
+    fattura.totale = calcoli['totale']
+    fattura.bollo = calcoli['bollo_flag']
+    fattura.descrizione = f"n. {fattura.numero_sedute} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
+
+    db.session.commit()
+    
+    return jsonify({'message': 'Fattura aggiornata con successo!'})
 
 @app.route('/api/invoices/<int:invoice_id>/download', methods=['GET'])
 def download_invoice_docx(invoice_id):
@@ -204,13 +242,9 @@ def download_invoice_docx(invoice_id):
         
         doc = DocxTemplate(template_path)
         
-        # Ricalcola i totali basandosi su numero_sedute salvato
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
-        
-        # Gestione del testo condizionale per bollo e descrizione
         descrizione_prestazione = f"n. {calcoli['numero_sedute']} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
         
-        # Variabili per il bollo: se il bollo non si applica, le stringhe saranno vuote
         bollo_descrizione = "Imposta di Bollo - Esc. Art. 15" if calcoli['bollo_flag'] else ""
         bollo_importo_formattato = f"€{calcoli['bollo_importo']:.2f}".replace('.', ',') if calcoli['bollo_flag'] else ""
         
@@ -237,13 +271,10 @@ def download_invoice_docx(invoice_id):
         
         doc.render(context)
         
-        # Salva il file nella nuova directory "invoices"
         file_path = os.path.join(app.root_path, 'invoices', f"fattura_{fattura.progressivo}_{fattura.anno}.docx")
         doc.save(file_path)
         
         return_data = send_file(file_path, as_attachment=True)
-        # La riga per la rimozione del file è stata rimossa
-            
         return return_data
 
     except Exception as e:
