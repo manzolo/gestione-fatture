@@ -65,172 +65,158 @@ def calculate_invoice_totals(numero_sedute: int):
     }
 
 # --- API Clients ---
-@app.route('/api/clients', methods=['GET'])
-def get_clients():
-    clients = Cliente.query.all()
-    clients_list = [{
-        'id': c.id,
-        'nome': c.nome,
-        'cognome': c.cognome,
-        'codice_fiscale': c.codice_fiscale,
-        'indirizzo': c.indirizzo,
-        'citta': c.citta,
-        'cap': c.cap
-    } for c in clients]
-    return jsonify(clients_list)
+@app.route('/api/clients', methods=['GET', 'POST'])
+def clients_api():
+    if request.method == 'POST':
+        data = request.get_json()
+        new_client = Cliente(
+            nome=data['nome'],
+            cognome=data['cognome'],
+            codice_fiscale=data['codice_fiscale'],
+            indirizzo=data.get('indirizzo'),
+            citta=data.get('citta'),
+            cap=data.get('cap')
+        )
+        db.session.add(new_client)
+        db.session.commit()
+        return jsonify({"message": "Cliente aggiunto con successo!", "id": new_client.id}), 201
+    else: # GET
+        clients = Cliente.query.all()
+        clients_list = [{
+            'id': c.id,
+            'nome': c.nome,
+            'cognome': c.cognome,
+            'codice_fiscale': c.codice_fiscale,
+            'indirizzo': c.indirizzo,
+            'citta': c.citta,
+            'cap': c.cap
+        } for c in clients]
+        return jsonify(clients_list)
 
-@app.route('/api/clients', methods=['POST'])
-def add_client():
-    data = request.get_json()
-    new_client = Cliente(
-        nome=data['nome'],
-        cognome=data['cognome'],
-        codice_fiscale=data['codice_fiscale'],
-        indirizzo=data.get('indirizzo'),
-        citta=data.get('citta'),
-        cap=data.get('cap')
-    )
-    db.session.add(new_client)
-    db.session.commit()
-    return jsonify({'message': 'Cliente aggiunto con successo!'}), 201
-
-@app.route('/api/clients/<int:client_id>', methods=['PUT'])
-def edit_client(client_id):
+@app.route('/api/clients/<int:client_id>', methods=['GET', 'PUT', 'DELETE'])
+def client_api_detail(client_id):
     client = Cliente.query.get_or_404(client_id)
-    data = request.get_json()
-    client.nome = data.get('nome', client.nome)
-    client.cognome = data.get('cognome', client.cognome)
-    client.codice_fiscale = data.get('codice_fiscale', client.codice_fiscale)
-    client.indirizzo = data.get('indirizzo', client.indirizzo)
-    client.citta = data.get('citta', getattr(client, 'citta', None))
-    client.cap = data.get('cap', getattr(client, 'cap', None))
-    db.session.commit()
-    return jsonify({'message': 'Cliente aggiornato con successo!'})
 
-@app.route('/api/clients/<int:client_id>', methods=['DELETE'])
-def delete_client(client_id):
-    client = Cliente.query.get_or_404(client_id)
-    if getattr(client, 'fatture', None) and len(client.fatture) > 0:
-        return jsonify({'message': 'Impossibile eliminare un cliente con fatture associate.'}), 400
-    db.session.delete(client)
-    db.session.commit()
-    return jsonify({'message': 'Cliente eliminato con successo!'})
+    if request.method == 'GET':
+        return jsonify({
+            'id': client.id,
+            'nome': client.nome,
+            'cognome': client.cognome,
+            'codice_fiscale': client.codice_fiscale,
+            'indirizzo': client.indirizzo,
+            'citta': client.citta,
+            'cap': client.cap
+        })
+    elif request.method == 'PUT':
+        data = request.get_json()
+        client.nome = data.get('nome', client.nome)
+        client.cognome = data.get('cognome', client.cognome)
+        client.codice_fiscale = data.get('codice_fiscale', client.codice_fiscale)
+        client.indirizzo = data.get('indirizzo', client.indirizzo)
+        client.citta = data.get('citta', client.citta)
+        client.cap = data.get('cap', client.cap)
+        db.session.commit()
+        return jsonify({"message": "Cliente aggiornato con successo!"}), 200
+    elif request.method == 'DELETE':
+        if getattr(client, 'fatture', None) and len(client.fatture) > 0:
+            return jsonify({'message': 'Impossibile eliminare un cliente con fatture associate.'}), 400
+        db.session.delete(client)
+        db.session.commit()
+        return jsonify({"message": "Cliente eliminato con successo!"}), 200
 
 # --- API Invoices ---
-@app.route('/api/invoices', methods=['GET'])
-def get_invoices():
-    invoices = Fattura.query.order_by(Fattura.anno.desc(), Fattura.progressivo.desc()).all()
-    invoices_list = [{
-        'id': i.id,
-        'numero_fattura': f"{i.progressivo}/{i.anno}",
-        # Formatta la data in gg/mm/aaaa
-        'data_fattura': i.data_fattura.strftime('%d/%m/%Y'),
-        # Formatta la data di pagamento, se esiste
-        'data_pagamento': i.data_pagamento.strftime('%d/%m/%Y') if i.data_pagamento else None,
-        'metodo_pagamento': i.metodo_pagamento,
-        'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
-        'descrizione': i.descrizione,
-        'totale': f"{i.totale:.2f}"
-    } for i in invoices]
-    return jsonify(invoices_list)
-
-@app.route('/api/calculate-totals', methods=['POST'])
-def calculate_totals():
-    data = request.get_json() or {}
-    numero_sedute = int(data.get('numero_sedute', 1))
-    calcoli = calculate_invoice_totals(numero_sedute)
-    
-    return jsonify({
-        'numero_sedute': calcoli['numero_sedute'],
-        'importo_unitario': f"€{calcoli['totale_unitario']:.2f}",
-        'subtotale_prestazioni': f"€{calcoli['subtotale_base']:.2f}",
-        'contributo': f"€{calcoli['contributo']:.2f}",
-        'totale_imponibile': f"€{calcoli['totale_imponibile']:.2f}",
-        'bollo_applicato': calcoli['bollo_flag'],
-        'bollo_importo': f"€{calcoli['bollo_importo']:.2f}",
-        'totale': f"€{calcoli['totale']:.2f}"
-    })
-
-@app.route('/api/invoices', methods=['POST'])
-def add_invoice():
-    data = request.get_json()
-    current_year = datetime.now().year
-    
-    progressivo_entry = FatturaProgressivo.query.filter_by(anno=current_year).first()
-    if not progressivo_entry:
-        progressivo_entry = FatturaProgressivo(anno=current_year, last_progressivo=0)
-        db.session.add(progressivo_entry)
+@app.route('/api/invoices', methods=['GET', 'POST'])
+def invoices_api():
+    if request.method == 'POST':
+        data = request.get_json()
+        current_year = datetime.now().year
+        
+        progressivo_entry = FatturaProgressivo.query.filter_by(anno=current_year).first()
+        if not progressivo_entry:
+            progressivo_entry = FatturaProgressivo(anno=current_year, last_progressivo=0)
+            db.session.add(progressivo_entry)
+            db.session.commit()
+        
+        progressivo = progressivo_entry.last_progressivo + 1
+        
+        numero_sedute = int(data.get('numero_sedute', 1))
+        calcoli = calculate_invoice_totals(numero_sedute)
+        
+        descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
+        
+        nuova_fattura = Fattura(
+            anno=current_year,
+            progressivo=progressivo,
+            data_fattura=datetime.strptime(data['data_fattura'], '%Y-%m-%d').date(),
+            data_pagamento=datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None,
+            metodo_pagamento=data.get('metodo_pagamento'),
+            cliente_id=data['cliente_id'],
+            importo_prestazione=PRESTAZIONE_BASE,
+            bollo=calcoli['bollo_flag'],
+            descrizione=descrizione,
+            totale=calcoli['totale'],
+            numero_sedute=numero_sedute
+        )
+        
+        db.session.add(nuova_fattura)
+        progressivo_entry.last_progressivo = progressivo
         db.session.commit()
-    
-    progressivo = progressivo_entry.last_progressivo + 1
-    
-    numero_sedute = int(data.get('numero_sedute', 1))
-    calcoli = calculate_invoice_totals(numero_sedute)
-    
-    descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
-    
-    nuova_fattura = Fattura(
-        anno=current_year,
-        progressivo=progressivo,
-        data_fattura=datetime.strptime(data['data_fattura'], '%Y-%m-%d').date(),
-        data_pagamento=datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None,
-        metodo_pagamento=data.get('metodo_pagamento'),
-        cliente_id=data['cliente_id'],
-        importo_prestazione=PRESTAZIONE_BASE,
-        bollo=calcoli['bollo_flag'],
-        descrizione=descrizione,
-        totale=calcoli['totale'],
-        numero_sedute=numero_sedute
-    )
-    
-    db.session.add(nuova_fattura)
-    progressivo_entry.last_progressivo = progressivo
-    db.session.commit()
-    
-    return jsonify({'message': 'Fattura aggiunta con successo!', 'id': nuova_fattura.id}), 201
+        
+        return jsonify({'message': 'Fattura aggiunta con successo!', 'id': nuova_fattura.id}), 201
+    else: # GET
+        invoices = Fattura.query.order_by(Fattura.anno.desc(), Fattura.progressivo.desc()).all()
+        invoices_list = [{
+            'id': i.id,
+            'numero_fattura': f"{i.progressivo}/{i.anno}",
+            'data_fattura': i.data_fattura.strftime('%d/%m/%Y'),
+            'data_pagamento': i.data_pagamento.strftime('%d/%m/%Y') if i.data_pagamento else None,
+            'metodo_pagamento': i.metodo_pagamento,
+            'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
+            'descrizione': i.descrizione,
+            'totale': f"{i.totale:.2f}"
+        } for i in invoices]
+        return jsonify(invoices_list)
 
-@app.route('/api/invoices/<int:invoice_id>', methods=['GET'])
-def get_invoice(invoice_id):
+@app.route('/api/invoices/<int:invoice_id>', methods=['GET', 'PUT'])
+def invoice_api_detail(invoice_id):
     fattura = Fattura.query.get_or_404(invoice_id)
-    calcoli = calculate_invoice_totals(fattura.numero_sedute)
-
-    return jsonify({
-        'id': fattura.id,
-        'numero_fattura': f"{fattura.progressivo}/{fattura.anno}",
-        'data_fattura': fattura.data_fattura.strftime('%Y-%m-%d'),
-        'data_pagamento': fattura.data_pagamento.strftime('%Y-%m-%d') if fattura.data_pagamento else '',
-        'metodo_pagamento': fattura.metodo_pagamento,
-        'cliente_id': fattura.cliente_id,
-        'numero_sedute': fattura.numero_sedute,
-        'totale': f"{fattura.totale:.2f}",
-        'bollo_applicato': fattura.bollo,
-        'descrizione': fattura.descrizione,
-        'calcoli': {
-            'subtotale_prestazioni': f"{calcoli['subtotale_base']:.2f}",
-            'contributo': f"{calcoli['contributo']:.2f}",
-            'totale_imponibile': f"{calcoli['totale_imponibile']:.2f}",
-            'bollo_importo': f"{calcoli['bollo_importo']:.2f}"
-        }
-    })
-
-@app.route('/api/invoices/<int:invoice_id>', methods=['PUT'])
-def edit_invoice(invoice_id):
-    fattura = Fattura.query.get_or_404(invoice_id)
-    data = request.get_json()
-
-    fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
-    fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
-    fattura.metodo_pagamento = data.get('metodo_pagamento')
-    fattura.numero_sedute = int(data.get('numero_sedute', fattura.numero_sedute))
     
-    calcoli = calculate_invoice_totals(fattura.numero_sedute)
-    fattura.totale = calcoli['totale']
-    fattura.bollo = calcoli['bollo_flag']
-    fattura.descrizione = f"n. {fattura.numero_sedute} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
+    if request.method == 'GET':
+        calcoli = calculate_invoice_totals(fattura.numero_sedute)
+        return jsonify({
+            'id': fattura.id,
+            'numero_fattura': f"{fattura.progressivo}/{fattura.anno}",
+            'data_fattura': fattura.data_fattura.strftime('%Y-%m-%d'),
+            'data_pagamento': fattura.data_pagamento.strftime('%Y-%m-%d') if fattura.data_pagamento else '',
+            'metodo_pagamento': fattura.metodo_pagamento,
+            'cliente_id': fattura.cliente_id,
+            'numero_sedute': fattura.numero_sedute,
+            'totale': f"{fattura.totale:.2f}",
+            'bollo_applicato': fattura.bollo,
+            'descrizione': fattura.descrizione,
+            'calcoli': {
+                'subtotale_prestazioni': f"{calcoli['subtotale_base']:.2f}",
+                'contributo': f"{calcoli['contributo']:.2f}",
+                'totale_imponibile': f"{calcoli['totale_imponibile']:.2f}",
+                'bollo_importo': f"{calcoli['bollo_importo']:.2f}"
+            }
+        })
+    elif request.method == 'PUT':
+        data = request.get_json()
 
-    db.session.commit()
-    
-    return jsonify({'message': 'Fattura aggiornata con successo!'})
+        fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
+        fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
+        fattura.metodo_pagamento = data.get('metodo_pagamento')
+        fattura.numero_sedute = int(data.get('numero_sedute', fattura.numero_sedute))
+        
+        calcoli = calculate_invoice_totals(fattura.numero_sedute)
+        fattura.totale = calcoli['totale']
+        fattura.bollo = calcoli['bollo_flag']
+        fattura.descrizione = f"n. {fattura.numero_sedute} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
+
+        db.session.commit()
+        
+        return jsonify({'message': 'Fattura aggiornata con successo!'})
 
 @app.route('/api/invoices/<int:invoice_id>/download', methods=['GET'])
 def download_invoice_docx(invoice_id):
