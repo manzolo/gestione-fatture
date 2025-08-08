@@ -237,14 +237,12 @@ def download_invoice_docx(invoice_id):
         
         doc.render(context)
         
-        file_path = os.path.join(app.root_path, 'temp', f"fattura_{fattura.id}.docx")
+        # Salva il file nella nuova directory "invoices"
+        file_path = os.path.join(app.root_path, 'invoices', f"fattura_{fattura.progressivo}_{fattura.anno}.docx")
         doc.save(file_path)
         
         return_data = send_file(file_path, as_attachment=True)
-        try:
-            os.remove(file_path)
-        except OSError:
-            pass
+        # La riga per la rimozione del file è stata rimossa
             
         return return_data
 

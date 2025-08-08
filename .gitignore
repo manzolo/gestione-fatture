@@ -3,6 +3,7 @@
 /*/*/.venv/
 
 postgres_data/*
+invoices_data/*
 
 .env
 

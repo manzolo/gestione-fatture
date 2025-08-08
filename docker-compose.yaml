@@ -15,6 +15,8 @@ services:
       PGUSER: ${POSTGRES_USER}
       PGDATABASE: ${POSTGRES_DB}
       BACKEND_PORT: ${BACKEND_PORT}
+    volumes:
+      - ./invoices_data:/app/backend/invoices
     depends_on:
       invoice_postgres_db:
         condition: service_healthy
