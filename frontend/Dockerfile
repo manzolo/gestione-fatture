@@ -17,4 +17,6 @@ EXPOSE 80
 # Comando per avviare l'applicazione Uvicorn
 # --host 0.0.0.0 rende l'applicazione accessibile da tutte le interfacce di rete
 # --port 80 ascolta sulla porta 80 all'interno del container
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+
+# Avvia l'applicazione Flask con Waitress
+CMD ["waitress-serve", "--listen=0.0.0.0:80", "main:app"]

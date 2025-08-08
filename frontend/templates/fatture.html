@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestione Fatture</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { padding: 20px; }
+        .container { max-width: 1200px; }
+        .card { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Gestione Fatture</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div class="card-header">
+                Aggiungi una nuova Fattura
+            </div>
+            <div class="card-body">
+                <form action="/add_invoice" method="post">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="cliente_id" class="form-label">Seleziona Cliente</label>
+                            <select class="form-control" id="cliente_id" name="cliente_id" required>
+                                {% for client in clients %}
+                                    <option value="{{ client.id }}">{{ client.nome }} {{ client.cognome }}</option>
+                                {% else %}
+                                    <option value="" disabled>Nessun cliente disponibile</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="data_fattura" class="form-label">Data Fattura</label>
+                            <input type="date" class="form-control" id="data_fattura" name="data_fattura" value="{{ now.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="importo_prestazione" class="form-label">Importo (es. €)</label>
+                            <input type="number" step="0.01" class="form-control" id="importo_prestazione" name="importo_prestazione" value="58.82" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="numero_sedute" class="form-label">Numero di Sedute</label>
+                            <input type="number" class="form-control" id="numero_sedute" name="numero_sedute" value="1" min="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="metodo_pagamento" class="form-label">Metodo Pagamento</label>
+                            <select class="form-control" id="metodo_pagamento" name="metodo_pagamento" required>
+                                <option value="Bonifico">Bonifico</option>
+                                <option value="Carta di credito/debito">Carta di credito/debito</option>
+                                <option value="Contanti">Contanti</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="data_pagamento" class="form-label">Data Pagamento</label>
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Aggiungi Fattura</button>
+                </form>
+            </div>
+        </div>
+
+        <h2 class="mt-5">Fatture Emesse</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Numero Fattura</th>
+                    <th>Data Fattura</th>
+                    <th>Data Pagamento</th>
+                    <th>Metodo Pagamento</th>
+                    <th>Cliente</th>
+                    <th>Descrizione</th>
+                    <th>Totale</th>
+                    <th>Azione</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                    <tr>
+                        <td>{{ invoice.numero_fattura }}</td>
+                        <td>{{ invoice.data_fattura }}</td>
+                        <td>{{ invoice.data_pagamento if invoice.data_pagamento else 'N/D' }}</td>
+                        <td>{{ invoice.metodo_pagamento if invoice.metodo_pagamento else 'N/D' }}</td>
+                        <td>{{ invoice.cliente }}</td>
+                        <td>{{ invoice.descrizione }}</td>
+                        <td>€{{ invoice.totale }}</td>
+                        <td>
+                            <a href="/download_invoice/{{ invoice.id }}" class="btn btn-success btn-sm">Scarica DOCX</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8">Nessuna fattura emessa.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/clienti" class="btn btn-secondary">Vai a Clienti</a>
+    </div>
+</body>
+</html>

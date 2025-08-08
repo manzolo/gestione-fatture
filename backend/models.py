@@ -1,49 +1,38 @@
-from sqlalchemy import Column, Integer, ForeignKey, Float, Boolean, String, DateTime, Text, Enum
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy import func
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
-import enum # Import the enum module
 
-Base = declarative_base()
+db = SQLAlchemy()
 
-from sqlalchemy import Column, Integer, BigInteger, Boolean, String, DateTime, Text, Enum
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy import func
-from sqlalchemy.ext.declarative import declarative_base
-import enum # Import the enum module
+# Base è necessaria per Alembic
+Base = db.Model 
 
-Base = declarative_base()
+class Cliente(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    cognome = db.Column(db.String(100), nullable=False)
+    codice_fiscale = db.Column(db.String(16), unique=True, nullable=False)
+    indirizzo = db.Column(db.String(200))
 
-# Database model definition for requests
-class Client(Base):
-    __tablename__ = "client"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(128), nullable=False)
-    address = Column(String(256))
-    tax_code = Column(String(64))
-    email = Column(String(128))
-    phone = Column(String(64))
-    invoice_id = Column(Integer, ForeignKey("invoice.id"), nullable=True)
+class Fattura(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    anno = db.Column(db.Integer, nullable=False)
+    progressivo = db.Column(db.Integer, nullable=False)
+    # Aggiunti nuovi campi
+    data_fattura = db.Column(db.Date, nullable=False, default=datetime.now)
+    data_pagamento = db.Column(db.Date)
+    metodo_pagamento = db.Column(db.String(50))
+    cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'), nullable=False)
+    importo_prestazione = db.Column(db.Float, nullable=False)
+    bollo = db.Column(db.Boolean, default=False)
+    descrizione = db.Column(db.String(255), nullable=False)
+    totale = db.Column(db.Float, nullable=False)
+    numero_sedute = db.Column(db.Integer, nullable=False)
+    
+    cliente = db.relationship('Cliente', backref=db.backref('fatture', lazy=True))
 
-class Invoice(Base):
-    __tablename__ = "invoice"
-    id = Column(Integer, primary_key=True)
-    client_id = Column(Integer, ForeignKey('client.id'), nullable=False)
-    number = Column(String(64), nullable=False, unique=True)
-    date = Column(String(20), nullable=False)
-    due_date = Column(String(20))
-    description = Column(Text, nullable=False)
-    amount = Column(Float, nullable=False)
-    tax_amount = Column(Float, default=0.0)
-    total_amount = Column(Float, nullable=False)
-    is_paid = Column(Boolean, default=False)
-    item_id = Column(Integer, ForeignKey("invoice_item.id"), nullable=True)
-
-class InvoiceItem(Base):
-    __tablename__ = "invoice_item"
-    id = Column(Integer, primary_key=True)
-    invoice_id = Column(Integer, ForeignKey('invoice.id'), nullable=False)
-    description = Column(String(256), nullable=False)
-    quantity = Column(Float, nullable=False)
-    unit_price = Column(Float, nullable=False)
-    total_price = Column(Float, nullable=False)
+# Nuovo modello per gestire il progressivo annuale delle fatture
+class FatturaProgressivo(db.Model):
+    __tablename__ = 'fattura_progressivo'
+    anno = db.Column(db.Integer, primary_key=True)
+    last_progressivo = db.Column(db.Integer, default=0)

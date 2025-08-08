@@ -43,5 +43,7 @@ python -m alembic upgrade head
 echo "Alembic migrations completed."
 
 # Start the FastAPI application
-echo "Starting FastAPI application..."
-exec uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+#echo "Starting FastAPI application..."
+#exec uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+echo "Starting Flask application with Gunicorn..."
+exec gunicorn -b 0.0.0.0:8000 "backend.main:app"
