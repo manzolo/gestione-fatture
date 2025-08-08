@@ -1,0 +1,6 @@
+
+source backend/.venv/bin/activate
+export PYTHONPATH=$PWD/backend:$PYTHONPATH
+export DATABASE_SQLALCHEMY_URL=postgresql://user:password@localhost/backend_db
+alembic -c backend/alembic.ini revision --autogenerate -m "Add Clients name"
+alembic -c backend/alembic.ini upgrade head

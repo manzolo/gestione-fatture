@@ -1,0 +1,13 @@
+# Python virtual environment
+/*/.venv/
+/*/*/.venv/
+
+postgres_data/*
+
+.env
+
+# Python
+*.pyc
+__pycache__/
+.pytest_cache/ # Se usi pytest, anche questa cartella è generata automaticamente
+.mypy_cache/   # Se usi mypy per il type checking

@@ -1,0 +1,19 @@
+curl -X POST -H "Content-Type: application/json" -d '{"engine": "python", "operation": "simple_sum_py", "data": {"value1": 10, "value2": 20}, "email": "a.manzi@ifac.cnr.it"}' http://localhost:8000/calculate
+
+curl -X POST -H "Content-Type: application/json" -d '{"engine": "python", "operation": "generate_file_py", "data": {"filename_prefix": "my_report", "content_template": "This is a custom report for {request_id}."}, "email": "your_email@domain.it"}' http://localhost:8000/calculate
+
+curl -X POST -H "Content-Type: application/json" -d '{"engine": "matlab", "operation": "matrix_multiplication", "data": {"matrix1": [[1,2],[3,4]], "matrix2": [[5,6],[7,8]]}, "email": "a.manzi@ifac.cnr.it"}' http://localhost:8000/calculate
+
+curl -X POST -H "Content-Type: application/json" -d '{"engine": "fortran", "operation": "simple_sum", "data": {"value1": 10, "value2": 20}, "email": "a.manzi@ifac.cnr.it"}' http://localhost:8000/calculate
+curl -X POST -H "Content-Type: application/json" -d '{"engine": "fortran", "operation": "simple_multiply", "data": {"value1": 5, "value2": 6}, "email": "a.manzi@ifac.cnr.it"}' http://localhost:8000/calculate
+curl -X POST -H "Content-Type: application/json" -d '{"engine": "fortran", "operation": "unknown_operation", "data": {"value1": 1, "value2": 2}, "email": "a.manzi@ifac.cnr.it"}' http://localhost:8000/calculate
+
+curl http://localhost:8000/status/85ac5cc4-b2f2-49ad-ac99-1a8633f20ff6
+
+
+curl -X GET "http://localhost:8000/operations/" \
+-H "Authorization: Bearer <LA_TUA_API_KEY_REALE>"
+
+docker compose logs emm_gateway
+docker compose logs emm_python_worker
+docker compose logs emm_rabbitmq
