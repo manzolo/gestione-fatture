@@ -29,7 +29,7 @@ METODI_PAGAMENTO = ["Carta di credito/debito", "Bonifico", "Contanti"]
 PRESTAZIONE_BASE = 58.82     # Prezzo base senza contributo
 CONTRIBUTO_FISSO_PER_SEDUTA = 1.18 # Contributo fisso per ogni seduta
 BOLLO_COSTO = 2.00
-BOLLO_SOGLIA = 70.00
+BOLLO_SOGLIA = 77.47
 
 def calculate_invoice_totals(numero_sedute: int):
     """
@@ -270,8 +270,15 @@ def download_invoice_docx(invoice_id):
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
         descrizione_prestazione = f"n. {calcoli['numero_sedute']} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
         
-        bollo_descrizione = "Imposta di Bollo - Esc. Art. 15" if calcoli['bollo_flag'] else ""
-        bollo_importo_formattato = f"€{calcoli['bollo_importo']:.2f}".replace('.', ',') if calcoli['bollo_flag'] else ""
+                # Gestisci qui la logica della descrizione del bollo
+        bollo_descrizione_estesa = ""
+        bollo_descrizione_semplice = ""
+        bollo_importo_formattato = ""
+
+        if calcoli['bollo_flag']:
+            bollo_descrizione_estesa = "Imposta di bollo da 2 euro assolta sull’originale per importi maggiori di 77,47 euro"
+            bollo_descrizione_semplice = "Imposta di Bollo - Esc. Art. 15"
+            bollo_importo_formattato = f"€{calcoli['bollo_importo']:.2f}".replace('.', ',')
         
         context = {
             'numero_fattura': f"{fattura.progressivo}",
@@ -287,7 +294,8 @@ def download_invoice_docx(invoice_id):
             'subtotale_prestazioni': f"€{calcoli['subtotale_base']:.2f}".replace('.', ','),
             'contributo': f"€{calcoli['contributo']:.2f}".replace('.', ','),
             'totale_imponibile': f"€{calcoli['totale_imponibile']:.2f}".replace('.', ','),
-            'bollo_descrizione': bollo_descrizione,
+            'bollo_descrizione_estesa': bollo_descrizione_estesa,
+            'bollo_descrizione_semplice': bollo_descrizione_semplice,
             'bollo_importo_formattato': bollo_importo_formattato,
             'totale': f"€{calcoli['totale']:.2f}".replace('.', ','),
             'metodo_pagamento': fattura.metodo_pagamento,
