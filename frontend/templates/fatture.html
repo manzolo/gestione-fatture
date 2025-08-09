@@ -66,8 +66,8 @@
                         <div class="col-md-4 mb-3">
                             <label for="metodo_pagamento" class="form-label">Metodo Pagamento</label>
                             <select class="form-control" id="metodo_pagamento" name="metodo_pagamento" required>
-                                <option value="Bonifico">Bonifico</option>
                                 <option value="Carta di credito/debito">Carta di credito/debito</option>
+                                <option value="Bonifico">Bonifico</option>
                                 <option value="Contanti">Contanti</option>
                             </select>
                         </div>
@@ -175,6 +175,16 @@
                         <form id="editInvoiceForm">
                             <input type="hidden" id="edit-invoice-id">
                             <div class="mb-3">
+                                <label for="edit-cliente_id" class="form-label">Seleziona Cliente</label>
+                                <select class="form-control" id="edit-cliente_id" name="cliente_id" required>
+                                    {% for client in clients %}
+                                    <option value="{{ client.id }}">{{ client.nome }} {{ client.cognome }}</option>
+                                    {% else %}
+                                    <option value="" disabled>Nessun cliente disponibile</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label for="edit-data_fattura" class="form-label">Data Fattura</label>
                                 <input type="date" class="form-control" id="edit-data_fattura" name="data_fattura"
                                     required>
@@ -217,9 +227,11 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script>
-            // Inizializza Select2 sul tuo elemento select
             $(document).ready(function () {
                 $('#cliente_id').select2();
+                $('#edit-cliente_id').select2({
+                    dropdownParent: $('#editInvoiceModal')
+                });
             });
 
             document.getElementById('addInvoiceForm').addEventListener('submit', function (event) {
@@ -238,7 +250,6 @@
                         if (!response.ok) {
                             throw new Error('Errore durante l\'aggiunta della fattura.');
                         }
-                        // Reindirizza alla pagina delle fatture dopo l'aggiunta
                         window.location.href = '/fatture';
                     })
                     .catch(error => {
@@ -252,11 +263,13 @@
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('edit-invoice-id').value = data.id;
+                        // Imposta il cliente selezionato usando Select2
+                        $('#edit-cliente_id').val(data.cliente_id).trigger('change');
                         document.getElementById('edit-data_fattura').value = data.data_fattura;
                         document.getElementById('edit-numero_sedute').value = data.numero_sedute;
                         document.getElementById('edit-metodo_pagamento').value = data.metodo_pagamento;
                         document.getElementById('edit-data_pagamento').value = data.data_pagamento;
-                        document.getElementById('edit-inviata-sns').checked = data.inviata_sns; // Imposta la checkbox
+                        document.getElementById('edit-inviata-sns').checked = data.inviata_sns;
 
                         var editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
                         editModal.show();
@@ -281,7 +294,6 @@
                         if (!response.ok) {
                             throw new Error('Errore durante la modifica della fattura.');
                         }
-                        // Chiudi il modale e reindirizza, non serve un alert qui
                         var editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
                         editModal.hide();
                         window.location.href = '/fatture';
@@ -291,6 +303,7 @@
                         alert('Si è verificato un errore durante la modifica della fattura.');
                     });
             });
+
             // Funzione per filtrare la tabella delle fatture
             document.getElementById('invoiceSearch').addEventListener('keyup', function () {
                 const searchText = this.value.toLowerCase();
@@ -324,7 +337,6 @@
                         }
                     });
 
-                    // Mostra/nascondi l'elemento dell'accordion e apri/chiudi il contenuto
                     if (searchText === '') {
                         item.style.display = "";
                         const isFirst = item.querySelector('.accordion-button').getAttribute('aria-expanded') === 'true';
@@ -335,9 +347,9 @@
                         }
                     } else if (cardHasVisibleRows) {
                         item.style.display = "";
-                        collapse.show(); // Mostra il contenuto se ci sono corrispondenze
+                        collapse.show();
                     } else {
-                        item.style.display = "none"; // Nasconde l'intero anno se non ci sono corrispondenze
+                        item.style.display = "none";
                         collapse.hide();
                     }
                 });

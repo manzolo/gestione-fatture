@@ -215,7 +215,7 @@ def invoice_api_detail(invoice_id):
             'data_fattura': fattura.data_fattura.strftime('%Y-%m-%d'),
             'data_pagamento': fattura.data_pagamento.strftime('%Y-%m-%d') if fattura.data_pagamento else '',
             'metodo_pagamento': fattura.metodo_pagamento,
-            'cliente_id': fattura.cliente_id,
+            'cliente_id': fattura.cliente_id, # <--- Aggiungi questa riga
             'numero_sedute': fattura.numero_sedute,
             'totale': f"{fattura.totale:.2f}",
             'bollo_applicato': fattura.bollo,
@@ -231,6 +231,9 @@ def invoice_api_detail(invoice_id):
     elif request.method == 'PUT':
         data = request.get_json()
 
+        # Aggiorna il cliente
+        fattura.cliente_id = data.get('cliente_id', fattura.cliente_id) # <-- Aggiungi questa riga
+
         # Conversione esplicita del valore del checkbox in booleano
         inviata_sns_value = data.get('inviata_sns', False)
         if inviata_sns_value == 'on':
@@ -238,9 +241,6 @@ def invoice_api_detail(invoice_id):
         else:
             fattura.inviata_sns = False
             
-        # Potrebbe essere anche più semplice con una sola riga
-        # fattura.inviata_sns = data.get('inviata_sns') == 'on'
-
         fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
         fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
         fattura.metodo_pagamento = data.get('metodo_pagamento')
