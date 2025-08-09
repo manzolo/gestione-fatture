@@ -1,26 +1,39 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <title>Gestione Clienti</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        body { padding: 20px; }
-        .container { max-width: 1200px; }
-        .card { margin-bottom: 20px; }
-        .client-item { transition: all 0.3s ease; }
+        body {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .client-item {
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1 class="mb-4">Gestione Clienti</h1>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
 
         <div class="card">
@@ -68,30 +81,35 @@
         <h2 class="mt-5">Clienti Esistenti</h2>
         <div class="mb-3">
             <label for="clientSearch" class="form-label">Cerca Cliente</label>
-            <input type="text" class="form-control" id="clientSearch" placeholder="Digita nome, cognome o codice fiscale...">
+            <input type="text" class="form-control" id="clientSearch"
+                placeholder="Digita nome, cognome o codice fiscale...">
         </div>
-        
+
         <div id="clientListContainer">
             <ul class="list-group mb-4" id="clientList">
                 {% for client in clients %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center client-item"
-                        data-search="{{ client.nome.lower() }} {{ client.cognome.lower() }} {{ client.codice_fiscale.lower() }} {{ client.indirizzo.lower() if client.indirizzo else '' }} {{ client.citta.lower() if client.citta else '' }} {{ client.cap if client.cap else '' }}">
-                        <div>
-                            <strong>{{ client.nome }} {{ client.cognome }}</strong> - CF: {{ client.codice_fiscale }} - Indirizzo: {{ client.indirizzo or 'N/D' }}, {{ client.citta or 'N/D' }} ({{ client.cap or 'N/D' }})
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-warning btn-sm me-2" onclick="openEditModal({{ client.id }})">Modifica</button>
-                        </div>
-                    </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center client-item">
+                    <div>
+                        <strong>{{ client.nome }} {{ client.cognome }}</strong> - CF: {{ client.codice_fiscale }} -
+                        Indirizzo: {{ client.indirizzo or 'N/D' }}, {{ client.citta or 'N/D' }} ({{ client.cap or 'N/D' }})
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-warning btn-sm me-2"
+                            onclick="openEditModal({{ client.id }})">Modifica</button>
+                        <button type="button" class="btn btn-danger btn-sm"
+                            onclick="confirmDelete({{ client.id }})">Elimina</button>
+                    </div>
+                </li>
                 {% else %}
-                    <li class="list-group-item">Nessun cliente registrato.</li>
+                <li class="list-group-item no-clients">Nessun cliente registrato.</li>
                 {% endfor %}
             </ul>
         </div>
     </div>
 
     <!-- Modale Modifica Cliente -->
-    <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editClientModal" tabindex="-1" aria-labelledby="editClientModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -111,7 +129,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit-codice_fiscale" class="form-label">Codice Fiscale</label>
-                            <input type="text" class="form-control" id="edit-codice_fiscale" name="codice_fiscale" required>
+                            <input type="text" class="form-control" id="edit-codice_fiscale" name="codice_fiscale"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="edit-indirizzo" class="form-label">Indirizzo</label>
@@ -157,7 +176,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Aggiunta nuovo cliente
-        document.getElementById('addClientForm').addEventListener('submit', function(event) {
+        document.getElementById('addClientForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
@@ -169,16 +188,16 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore durante l\'aggiunta del cliente.');
-                }
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                alert('Si è verificato un errore durante l\'aggiunta del cliente: ' + error.message);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante l\'aggiunta del cliente.');
+                    }
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante l\'aggiunta del cliente: ' + error.message);
+                });
         });
 
         // Apertura modale modifica
@@ -204,7 +223,7 @@
         }
 
         // Salvataggio modifiche cliente
-        document.getElementById('editClientForm').addEventListener('submit', function(event) {
+        document.getElementById('editClientForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const clientId = document.getElementById('edit-client-id').value;
             const formData = new FormData(event.target);
@@ -217,86 +236,107 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message); });
-                }
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                alert(error.message);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message); });
+                    }
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert(error.message);
+                });
         });
 
         // Conferma eliminazione cliente
         let clientToDelete = null;
-        
+
         function confirmDelete(clientId) {
             clientToDelete = clientId;
             const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
             deleteModal.show();
         }
 
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
             if (!clientToDelete) return;
-            
+
             fetch(`/api/clients/${clientToDelete}`, {
                 method: 'DELETE'
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore durante l\'eliminazione del cliente.');
-                }
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                alert(error.message);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante l\'eliminazione del cliente.');
+                    }
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert(error.message);
+                });
         });
 
-        // Ricerca clienti
-        document.getElementById('clientSearch').addEventListener('input', function() {
+        // RICERCA CLIENTI - VERSIONE CON CLASSI CSS
+        document.getElementById('clientSearch').addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase().trim();
+            //console.log('Cercando:', searchTerm); // Debug
+            
             const clientItems = document.querySelectorAll('.client-item');
-            let hasResults = false;
-            const emptyMessage = document.getElementById('noResultsMessage');
+            const noClientsMessage = document.querySelector('.no-clients');
+            let visibleCount = 0;
 
-            clientItems.forEach(item => {
-                const searchData = item.getAttribute('data-search');
-                if (searchTerm === '' || searchData.includes(searchTerm)) {
-                    item.style.display = 'flex';
-                    hasResults = true;
+            //console.log('Trovati', clientItems.length, 'elementi client-item'); // Debug
+
+            // Nascondi il messaggio "Nessun cliente registrato" durante la ricerca
+            if (noClientsMessage && searchTerm !== '') {
+                noClientsMessage.classList.add('d-none');
+            }
+
+            // Filtra i clienti
+            clientItems.forEach((item, index) => {
+                // Estrae il testo completo dell'elemento
+                const itemText = item.textContent.toLowerCase();
+                //console.log('Cliente', index + 1, ':', itemText.substring(0, 50) + '...'); // Debug limitato
+                
+                if (searchTerm === '' || itemText.includes(searchTerm)) {
+                    item.classList.remove('d-none');
+                    item.style.display = ''; // Reset dello style inline
+                    visibleCount++;
+                    //console.log('Mostrato cliente', index + 1); // Debug
                 } else {
-                    item.style.display = 'none';
+                    item.classList.add('d-none');
+                    //console.log('Nascosto cliente', index + 1); // Debug
                 }
             });
 
-            // Gestione messaggio "nessun risultato"
-            if (!hasResults && searchTerm !== '') {
-                if (!emptyMessage) {
-                    const list = document.getElementById('clientList');
-                    const msg = document.createElement('li');
-                    msg.className = 'list-group-item';
-                    msg.id = 'noResultsMessage';
-                    msg.textContent = 'Nessun cliente trovato';
-                    list.appendChild(msg);
-                }
-            } else if (emptyMessage) {
-                emptyMessage.remove();
-            }
+            //console.log('Clienti visibili:', visibleCount); // Debug
 
-            // Mostra messaggio se la lista è vuota
-            const emptyList = document.querySelector('.list-group-item:not(.client-item)');
-            if (emptyList) {
-                if (hasResults && searchTerm !== '') {
-                    emptyList.style.display = 'none';
-                } else {
-                    emptyList.style.display = 'block';
+            // Gestisci messaggio "nessun risultato trovato"
+            let noResultsMsg = document.getElementById('noResultsMsg');
+            
+            if (visibleCount === 0 && searchTerm !== '') {
+                // Nessun risultato trovato
+                if (!noResultsMsg) {
+                    const list = document.getElementById('clientList');
+                    noResultsMsg = document.createElement('li');
+                    noResultsMsg.className = 'list-group-item text-center text-muted';
+                    noResultsMsg.id = 'noResultsMsg';
+                    noResultsMsg.textContent = 'Nessun cliente trovato con i criteri di ricerca inseriti.';
+                    list.appendChild(noResultsMsg);
+                }
+                noResultsMsg.classList.remove('d-none');
+            } else {
+                // Ci sono risultati o la ricerca è vuota
+                if (noResultsMsg) {
+                    noResultsMsg.classList.add('d-none');
+                }
+                
+                // Ripristina il messaggio originale se non ci sono clienti e la ricerca è vuota
+                if (searchTerm === '' && clientItems.length === 0 && noClientsMessage) {
+                    noClientsMessage.classList.remove('d-none');
                 }
             }
         });
     </script>
 </body>
+
 </html>
