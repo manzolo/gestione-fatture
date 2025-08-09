@@ -144,6 +144,10 @@ def invoices_api():
         
         descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
         
+        # Converte il valore del checkbox in un booleano per il database
+        inviata_sns_value = data.get('inviata_sns')
+        inviata_sns_bool = True if inviata_sns_value == 'on' else False
+
         nuova_fattura = Fattura(
             anno=current_year,
             progressivo=progressivo,
@@ -155,7 +159,8 @@ def invoices_api():
             bollo=calcoli['bollo_flag'],
             descrizione=descrizione,
             totale=calcoli['totale'],
-            numero_sedute=numero_sedute
+            numero_sedute=numero_sedute,
+            inviata_sns=inviata_sns_bool # Usa il valore booleano convertito
         )
         
         db.session.add(nuova_fattura)
@@ -173,7 +178,8 @@ def invoices_api():
             'metodo_pagamento': i.metodo_pagamento,
             'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
             'descrizione': i.descrizione,
-            'totale': f"{i.totale:.2f}"
+            'totale': f"{i.totale:.2f}",
+            'inviata_sns': i.inviata_sns
         } for i in invoices]
         return jsonify(invoices_list)
 
@@ -194,6 +200,7 @@ def invoice_api_detail(invoice_id):
             'totale': f"{fattura.totale:.2f}",
             'bollo_applicato': fattura.bollo,
             'descrizione': fattura.descrizione,
+            'inviata_sns': fattura.inviata_sns,
             'calcoli': {
                 'subtotale_prestazioni': f"{calcoli['subtotale_base']:.2f}",
                 'contributo': f"{calcoli['contributo']:.2f}",
@@ -204,11 +211,21 @@ def invoice_api_detail(invoice_id):
     elif request.method == 'PUT':
         data = request.get_json()
 
+        # Conversione esplicita del valore del checkbox in booleano
+        inviata_sns_value = data.get('inviata_sns', False)
+        if inviata_sns_value == 'on':
+            fattura.inviata_sns = True
+        else:
+            fattura.inviata_sns = False
+            
+        # Potrebbe essere anche più semplice con una sola riga
+        # fattura.inviata_sns = data.get('inviata_sns') == 'on'
+
         fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
         fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
         fattura.metodo_pagamento = data.get('metodo_pagamento')
         fattura.numero_sedute = int(data.get('numero_sedute', fattura.numero_sedute))
-        
+
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
         fattura.totale = calcoli['totale']
         fattura.bollo = calcoli['bollo_flag']

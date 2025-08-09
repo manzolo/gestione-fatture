@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <title>Gestione Fatture</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
-        body { padding: 20px; }
-        .container { max-width: 1200px; }
-        .card { margin-bottom: 20px; }
+        body {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1 class="mb-4">Gestione Fatture</h1>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
 
         <div class="card">
@@ -35,21 +45,23 @@
                             <label for="cliente_id" class="form-label">Seleziona Cliente</label>
                             <select class="form-control" id="cliente_id" name="cliente_id" required>
                                 {% for client in clients %}
-                                    <option value="{{ client.id }}">{{ client.nome }} {{ client.cognome }}</option>
+                                <option value="{{ client.id }}">{{ client.nome }} {{ client.cognome }}</option>
                                 {% else %}
-                                    <option value="" disabled>Nessun cliente disponibile</option>
+                                <option value="" disabled>Nessun cliente disponibile</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="data_fattura" class="form-label">Data Fattura</label>
-                            <input type="date" class="form-control" id="data_fattura" name="data_fattura" value="{{ now.strftime('%Y-%m-%d') }}" required>
+                            <input type="date" class="form-control" id="data_fattura" name="data_fattura"
+                                value="{{ now.strftime('%Y-%m-%d') }}" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label for="numero_sedute" class="form-label">Numero di Sedute</label>
-                            <input type="number" class="form-control" id="numero_sedute" name="numero_sedute" value="1" min="1" required>
+                            <input type="number" class="form-control" id="numero_sedute" name="numero_sedute" value="1"
+                                min="1" required>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="metodo_pagamento" class="form-label">Metodo Pagamento</label>
@@ -61,7 +73,14 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="data_pagamento" class="form-label">Data Pagamento</label>
-                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" value="{{ now.strftime('%Y-%m-%d') }}">
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento"
+                                value="{{ now.strftime('%Y-%m-%d') }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3 form-check">
+                            <input class="form-check-input" type="checkbox" id="inviata_sns" name="inviata_sns">
+                            <label class="form-check-label" for="inviata_sns">Inviata a Sistema Sanitario</label>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Aggiungi Fattura</button>
@@ -70,7 +89,7 @@
         </div>
 
         <h2 class="mt-5">Fatture Emesse</h2>
-        <table class="table table-striped">
+        <table class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>Numero Fattura</th>
@@ -80,34 +99,43 @@
                     <th>Cliente</th>
                     <th>Descrizione</th>
                     <th>Totale</th>
+                    <th>Inviata</th>
                     <th>Azioni</th>
                 </tr>
             </thead>
             <tbody>
                 {% for invoice in invoices %}
-                    <tr>
-                        <td>{{ invoice.numero_fattura }}</td>
-                        <td>{{ invoice.data_fattura | to_italian_date }}</td>
-                        <td>{{ invoice.data_pagamento | to_italian_date if invoice.data_pagamento else 'N/D' }}</td>
-                        <td>{{ invoice.metodo_pagamento if invoice.metodo_pagamento else 'N/D' }}</td>
-                        <td>{{ invoice.cliente }}</td>
-                        <td>{{ invoice.descrizione }}</td>
-                        <td>€{{ invoice.totale }}</td>
-                        <td>
-                            <a href="{{ url_for('download_invoice', invoice_id=invoice.id) }}" class="btn btn-success btn-sm">Scarica</a>
-                            <button type="button" class="btn btn-primary btn-sm" onclick="openEditModal({{ invoice.id }})">Modifica</button>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ invoice.numero_fattura }}</td>
+                    <td>{{ invoice.data_fattura | to_italian_date }}</td>
+                    <td>{{ invoice.data_pagamento | to_italian_date if invoice.data_pagamento else 'N/D' }}</td>
+                    <td>{{ invoice.metodo_pagamento if invoice.metodo_pagamento else 'N/D' }}</td>
+                    <td>{{ invoice.cliente }}</td>
+                    <td>{{ invoice.descrizione }}</td>
+                    <td>€{{ invoice.totale }}</td>
+                    <td class="text-center">
+                        {% if invoice.inviata_sns %}
+                        <span class="text-success">&#10004;</span> {% else %}
+                        <span class="text-danger">&#10006;</span> {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('download_invoice', invoice_id=invoice.id) }}"
+                            class="btn btn-success btn-sm">Scarica</a>
+                        <button type="button" class="btn btn-primary btn-sm"
+                            onclick="openEditModal({{ invoice.id }})">Modifica</button>
+                    </td>
+                </tr>
                 {% else %}
-                    <tr>
-                        <td colspan="8">Nessuna fattura emessa.</td>
-                    </tr>
+                <tr>
+                    <td colspan="9">Nessuna fattura emessa.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -123,7 +151,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit-numero_sedute" class="form-label">Numero di Sedute</label>
-                            <input type="number" class="form-control" id="edit-numero_sedute" name="numero_sedute" min="1" required>
+                            <input type="number" class="form-control" id="edit-numero_sedute" name="numero_sedute"
+                                min="1" required>
                         </div>
                         <div class="mb-3">
                             <label for="edit-metodo_pagamento" class="form-label">Metodo Pagamento</label>
@@ -136,6 +165,10 @@
                         <div class="mb-3">
                             <label for="edit-data_pagamento" class="form-label">Data Pagamento</label>
                             <input type="date" class="form-control" id="edit-data_pagamento" name="data_pagamento">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input class="form-check-input" type="checkbox" id="edit-inviata-sns" name="inviata_sns">
+                            <label class="form-check-label" for="edit-inviata-sns">Inviata a Sistema Sanitario</label>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
@@ -152,11 +185,11 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         // Inizializza Select2 sul tuo elemento select
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#cliente_id').select2();
         });
 
-        document.getElementById('addInvoiceForm').addEventListener('submit', function(event) {
+        document.getElementById('addInvoiceForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
@@ -168,17 +201,17 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore durante l\'aggiunta della fattura.');
-                }
-                // Reindirizza alla pagina delle fatture dopo l'aggiunta
-                window.location.href = '/fatture';
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                alert('Si è verificato un errore durante l\'aggiunta della fattura.');
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante l\'aggiunta della fattura.');
+                    }
+                    // Reindirizza alla pagina delle fatture dopo l'aggiunta
+                    window.location.href = '/fatture';
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante l\'aggiunta della fattura.');
+                });
         });
 
         function openEditModal(invoiceId) {
@@ -190,13 +223,14 @@
                     document.getElementById('edit-numero_sedute').value = data.numero_sedute;
                     document.getElementById('edit-metodo_pagamento').value = data.metodo_pagamento;
                     document.getElementById('edit-data_pagamento').value = data.data_pagamento;
-                    
+                    document.getElementById('edit-inviata-sns').checked = data.inviata_sns; // Imposta la checkbox
+
                     var editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
                     editModal.show();
                 });
         }
 
-        document.getElementById('editInvoiceForm').addEventListener('submit', function(event) {
+        document.getElementById('editInvoiceForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
             const invoiceId = document.getElementById('edit-invoice-id').value;
@@ -210,20 +244,21 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore durante la modifica della fattura.');
-                }
-                // Chiudi il modale e reindirizza, non serve un alert qui
-                var editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
-                editModal.hide();
-                window.location.href = '/fatture';
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                alert('Si è verificato un errore durante la modifica della fattura.');
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore durante la modifica della fattura.');
+                    }
+                    // Chiudi il modale e reindirizza, non serve un alert qui
+                    var editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
+                    editModal.hide();
+                    window.location.href = '/fatture';
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante la modifica della fattura.');
+                });
         });
     </script>
 </body>
+
 </html>
