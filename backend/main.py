@@ -5,7 +5,7 @@ import os
 import json
 from docx import Document
 from docxtpl import DocxTemplate
-from sqlalchemy import text
+from sqlalchemy import text, func, extract
 from collections import defaultdict
 from itertools import groupby
 from operator import itemgetter
@@ -148,9 +148,8 @@ def invoices_api():
         
         descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
         
-        # Converte il valore del checkbox in un booleano per il database
-        inviata_sns_value = data.get('inviata_sns')
-        inviata_sns_bool = True if inviata_sns_value == 'on' else False
+        # LOGICA CORRETTA PER IL POST: utilizza .get() per gestire la mancanza della chiave
+        inviata_sns_bool = data.get('inviata_sns', False)
 
         nuova_fattura = Fattura(
             anno=current_year,
@@ -164,7 +163,7 @@ def invoices_api():
             descrizione=descrizione,
             totale=calcoli['totale'],
             numero_sedute=numero_sedute,
-            inviata_sns=inviata_sns_bool # Usa il valore booleano convertito
+            inviata_sns=inviata_sns_bool
         )
         
         db.session.add(nuova_fattura)
@@ -174,7 +173,7 @@ def invoices_api():
         return jsonify({'message': 'Fattura aggiunta con successo!', 'id': nuova_fattura.id}), 201
     else:  
         # GET
-                # Recupera tutte le fatture e le ordina per anno in modo decrescente
+        # Recupera tutte le fatture e le ordina per anno in modo decrescente
         invoices = Fattura.query.order_by(Fattura.anno.desc(), Fattura.progressivo.desc()).all()
         
         grouped_invoices = defaultdict(list)
@@ -215,7 +214,7 @@ def invoice_api_detail(invoice_id):
             'data_fattura': fattura.data_fattura.strftime('%Y-%m-%d'),
             'data_pagamento': fattura.data_pagamento.strftime('%Y-%m-%d') if fattura.data_pagamento else '',
             'metodo_pagamento': fattura.metodo_pagamento,
-            'cliente_id': fattura.cliente_id, # <--- Aggiungi questa riga
+            'cliente_id': fattura.cliente_id,
             'numero_sedute': fattura.numero_sedute,
             'totale': f"{fattura.totale:.2f}",
             'bollo_applicato': fattura.bollo,
@@ -232,14 +231,10 @@ def invoice_api_detail(invoice_id):
         data = request.get_json()
 
         # Aggiorna il cliente
-        fattura.cliente_id = data.get('cliente_id', fattura.cliente_id) # <-- Aggiungi questa riga
+        fattura.cliente_id = data.get('cliente_id', fattura.cliente_id)
 
-        # Conversione esplicita del valore del checkbox in booleano
-        inviata_sns_value = data.get('inviata_sns', False)
-        if inviata_sns_value == 'on':
-            fattura.inviata_sns = True
-        else:
-            fattura.inviata_sns = False
+        # LOGICA CORRETTA PER IL PUT: usa il valore booleano inviato dal frontend
+        inviata_sns_bool = data.get('inviata_sns', False)
             
         fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
         fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
@@ -249,6 +244,7 @@ def invoice_api_detail(invoice_id):
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
         fattura.totale = calcoli['totale']
         fattura.bollo = calcoli['bollo_flag']
+        fattura.inviata_sns = inviata_sns_bool
         fattura.descrizione = f"n. {fattura.numero_sedute} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
 
         db.session.commit()
@@ -270,7 +266,7 @@ def download_invoice_docx(invoice_id):
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
         descrizione_prestazione = f"n. {calcoli['numero_sedute']} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
         
-                # Gestisci qui la logica della descrizione del bollo
+        # Gestisci qui la logica della descrizione del bollo
         bollo_descrizione_estesa = ""
         bollo_descrizione_semplice = ""
         bollo_importo_formattato = ""
@@ -309,6 +305,49 @@ def download_invoice_docx(invoice_id):
         
         return_data = send_file(file_path, as_attachment=True)
         return return_data
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/invoices/stats', methods=['GET'])
+def get_invoice_stats():
+    """
+    Restituisce statistiche aggregate sulle fatture per la dashboard.
+    """
+    try:
+        current_year = datetime.now().year
+
+        # Statistiche generali
+        total_invoices = db.session.query(Fattura).filter(Fattura.anno == current_year).count()
+        total_amount = db.session.query(func.sum(Fattura.totale)).filter(Fattura.anno == current_year).scalar() or 0.0
+        unique_clients = db.session.query(Fattura.cliente_id).filter(Fattura.anno == current_year).distinct().count()
+
+        # Dati per grafico mensile (bar chart)
+        monthly_stats = db.session.query(
+            extract('month', Fattura.data_fattura).label('mese'),
+            func.count(Fattura.id).label('conteggio'),
+            func.sum(Fattura.totale).label('totale')
+        ).filter(Fattura.anno == current_year).group_by('mese').order_by('mese').all()
+
+        # Dati per grafico clienti (pie chart)
+        client_stats = db.session.query(
+            Cliente.nome,
+            Cliente.cognome,
+            func.count(Fattura.id).label('conteggio'),
+            func.sum(Fattura.totale).label('totale')
+        ).join(Fattura, Cliente.id == Fattura.cliente_id).filter(Fattura.anno == current_year).group_by(Cliente.id).order_by(func.count(Fattura.id).desc()).all()
+
+        # Preparazione dei dati per la risposta JSON
+        monthly_data = [{'mese': f'Mese {int(s.mese)}', 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in monthly_stats]
+        client_data = [{'cliente': f'{s.nome} {s.cognome}', 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in client_stats]
+
+        return jsonify({
+            'totale_fatture': total_invoices,
+            'totale_annuo': total_amount,
+            'clienti_con_fatture': unique_clients,
+            'per_mese': monthly_data,
+            'per_cliente': client_data
+        })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

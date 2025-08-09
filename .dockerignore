@@ -1,0 +1,59 @@
+# Python virtual environments
+**/.venv/
+**/.venv/*
+venv/
+venv/*
+
+# Database and data directories
+postgres_data/
+invoices_data/
+backups/
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Python compiled and cache files
+*.py[cod]
+__pycache__/
+*.so
+.Python
+
+# Testing and development
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Editor and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log files
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker files
+docker-compose.override.yml
+docker-compose.*.yml

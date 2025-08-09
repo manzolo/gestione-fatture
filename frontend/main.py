@@ -162,3 +162,13 @@ def download_invoice(invoice_id):
     except requests.exceptions.RequestException as e:
         flash(f"Errore durante il download: {e}", 'danger')
         return redirect(url_for('fatture'))
+    
+@app.route('/api/invoices/stats', methods=['GET'])
+def get_invoices_stats_proxy():
+    """Proxy per ottenere le statistiche delle fatture dal backend."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/invoices/stats")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'message': f"Errore nella richiesta al backend: {e}"}), 500
