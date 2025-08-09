@@ -89,176 +89,260 @@
         </div>
 
         <h2 class="mt-5">Fatture Emesse</h2>
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th>Numero Fattura</th>
-                    <th>Data Fattura</th>
-                    <th>Data Pagamento</th>
-                    <th>Metodo Pagamento</th>
-                    <th>Cliente</th>
-                    <th>Descrizione</th>
-                    <th>Totale</th>
-                    <th>Inviata</th>
-                    <th>Azioni</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for invoice in invoices %}
-                <tr>
-                    <td>{{ invoice.numero_fattura }}</td>
-                    <td>{{ invoice.data_fattura | to_italian_date }}</td>
-                    <td>{{ invoice.data_pagamento | to_italian_date if invoice.data_pagamento else 'N/D' }}</td>
-                    <td>{{ invoice.metodo_pagamento if invoice.metodo_pagamento else 'N/D' }}</td>
-                    <td>{{ invoice.cliente }}</td>
-                    <td>{{ invoice.descrizione }}</td>
-                    <td>€{{ invoice.totale }}</td>
-                    <td class="text-center">
-                        {% if invoice.inviata_sns %}
-                        <span class="text-success">&#10004;</span> {% else %}
-                        <span class="text-danger">&#10006;</span> {% endif %}
-                    </td>
-                    <td>
-                        <a href="{{ url_for('download_invoice', invoice_id=invoice.id) }}"
-                            class="btn btn-success btn-sm">Scarica</a>
-                        <button type="button" class="btn btn-primary btn-sm"
-                            onclick="openEditModal({{ invoice.id }})">Modifica</button>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="9">Nessuna fattura emessa.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <div class="mb-3">
+            <input type="text" id="invoiceSearch" class="form-control"
+                placeholder="Filtra per cliente, descrizione o numero fattura...">
+        </div>
+        {% if invoices %}
+        <div class="accordion" id="invoicesAccordion">
+            {% for anno, fatture_anno in invoices.items() %}
+            {% set loop_index = loop.index %}
+            {% set is_first = loop.first %}
 
-    <div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editInvoiceModalLabel">Modifica Fattura</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="accordion-item" id="invoicesTable-{{ anno }}">
+                <h2 class="accordion-header" id="heading-{{ anno }}">
+                    <button class="accordion-button {% if not is_first %}collapsed{% endif %}" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#collapse-{{ anno }}"
+                        aria-expanded="{% if is_first %}true{% else %}false{% endif %}"
+                        aria-controls="collapse-{{ anno }}">
+                        Anno {{ anno }}
+                    </button>
+                </h2>
+                <div id="collapse-{{ anno }}" class="accordion-collapse collapse {% if is_first %}show{% endif %}"
+                    aria-labelledby="heading-{{ anno }}" data-bs-parent="#invoicesAccordion">
+                    <div class="accordion-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Numero Fattura</th>
+                                        <th>Data Fattura</th>
+                                        <th>Data Pagamento</th>
+                                        <th>Metodo Pagamento</th>
+                                        <th>Cliente</th>
+                                        <th>Descrizione</th>
+                                        <th>Totale</th>
+                                        <th>Inviata</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for invoice in fatture_anno %}
+                                    <tr>
+                                        <td>{{ invoice.numero_fattura }}</td>
+                                        <td>{{ invoice.data_fattura | to_italian_date }}</td>
+                                        <td>{{ invoice.data_pagamento | to_italian_date if invoice.data_pagamento else
+                                            'N/D' }}</td>
+                                        <td>{{ invoice.metodo_pagamento if invoice.metodo_pagamento else 'N/D' }}</td>
+                                        <td>{{ invoice.cliente }}</td>
+                                        <td>{{ invoice.descrizione }}</td>
+                                        <td>€{{ invoice.totale }}</td>
+                                        <td class="text-center">
+                                            {% if invoice.inviata_sns %}
+                                            <span class="text-success">&#10004;</span> {% else %}
+                                            <span class="text-danger">&#10006;</span> {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('download_invoice', invoice_id=invoice.id) }}"
+                                                class="btn btn-success btn-sm">Scarica</a>
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                onclick="openEditModal({{ invoice.id }})">Modifica</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form id="editInvoiceForm">
-                        <input type="hidden" id="edit-invoice-id">
-                        <div class="mb-3">
-                            <label for="edit-data_fattura" class="form-label">Data Fattura</label>
-                            <input type="date" class="form-control" id="edit-data_fattura" name="data_fattura" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-numero_sedute" class="form-label">Numero di Sedute</label>
-                            <input type="number" class="form-control" id="edit-numero_sedute" name="numero_sedute"
-                                min="1" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-metodo_pagamento" class="form-label">Metodo Pagamento</label>
-                            <select class="form-control" id="edit-metodo_pagamento" name="metodo_pagamento" required>
-                                <option value="Bonifico">Bonifico</option>
-                                <option value="Carta di credito/debito">Carta di credito/debito</option>
-                                <option value="Contanti">Contanti</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit-data_pagamento" class="form-label">Data Pagamento</label>
-                            <input type="date" class="form-control" id="edit-data_pagamento" name="data_pagamento">
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input class="form-check-input" type="checkbox" id="edit-inviata-sns" name="inviata_sns">
-                            <label class="form-check-label" for="edit-inviata-sns">Inviata a Sistema Sanitario</label>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                            <button type="submit" class="btn btn-primary">Salva Modifiche</button>
-                        </div>
-                    </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Nessuna fattura emessa.</p>
+        {% endif %}
+
+
+        <div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editInvoiceModalLabel">Modifica Fattura</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editInvoiceForm">
+                            <input type="hidden" id="edit-invoice-id">
+                            <div class="mb-3">
+                                <label for="edit-data_fattura" class="form-label">Data Fattura</label>
+                                <input type="date" class="form-control" id="edit-data_fattura" name="data_fattura"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-numero_sedute" class="form-label">Numero di Sedute</label>
+                                <input type="number" class="form-control" id="edit-numero_sedute" name="numero_sedute"
+                                    min="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-metodo_pagamento" class="form-label">Metodo Pagamento</label>
+                                <select class="form-control" id="edit-metodo_pagamento" name="metodo_pagamento"
+                                    required>
+                                    <option value="Bonifico">Bonifico</option>
+                                    <option value="Carta di credito/debito">Carta di credito/debito</option>
+                                    <option value="Contanti">Contanti</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit-data_pagamento" class="form-label">Data Pagamento</label>
+                                <input type="date" class="form-control" id="edit-data_pagamento" name="data_pagamento">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input class="form-check-input" type="checkbox" id="edit-inviata-sns"
+                                    name="inviata_sns">
+                                <label class="form-check-label" for="edit-inviata-sns">Inviata a Sistema
+                                    Sanitario</label>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                                <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        // Inizializza Select2 sul tuo elemento select
-        $(document).ready(function () {
-            $('#cliente_id').select2();
-        });
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script>
+            // Inizializza Select2 sul tuo elemento select
+            $(document).ready(function () {
+                $('#cliente_id').select2();
+            });
 
-        document.getElementById('addInvoiceForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData.entries());
+            document.getElementById('addInvoiceForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const data = Object.fromEntries(formData.entries());
 
-            fetch('/api/invoices', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Errore durante l\'aggiunta della fattura.');
-                    }
-                    // Reindirizza alla pagina delle fatture dopo l'aggiunta
-                    window.location.href = '/fatture';
+                fetch('/api/invoices', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
                 })
-                .catch(error => {
-                    console.error('Errore:', error);
-                    alert('Si è verificato un errore durante l\'aggiunta della fattura.');
-                });
-        });
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Errore durante l\'aggiunta della fattura.');
+                        }
+                        // Reindirizza alla pagina delle fatture dopo l'aggiunta
+                        window.location.href = '/fatture';
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Si è verificato un errore durante l\'aggiunta della fattura.');
+                    });
+            });
 
-        function openEditModal(invoiceId) {
-            fetch(`/api/invoices/${invoiceId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('edit-invoice-id').value = data.id;
-                    document.getElementById('edit-data_fattura').value = data.data_fattura;
-                    document.getElementById('edit-numero_sedute').value = data.numero_sedute;
-                    document.getElementById('edit-metodo_pagamento').value = data.metodo_pagamento;
-                    document.getElementById('edit-data_pagamento').value = data.data_pagamento;
-                    document.getElementById('edit-inviata-sns').checked = data.inviata_sns; // Imposta la checkbox
+            function openEditModal(invoiceId) {
+                fetch(`/api/invoices/${invoiceId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('edit-invoice-id').value = data.id;
+                        document.getElementById('edit-data_fattura').value = data.data_fattura;
+                        document.getElementById('edit-numero_sedute').value = data.numero_sedute;
+                        document.getElementById('edit-metodo_pagamento').value = data.metodo_pagamento;
+                        document.getElementById('edit-data_pagamento').value = data.data_pagamento;
+                        document.getElementById('edit-inviata-sns').checked = data.inviata_sns; // Imposta la checkbox
 
-                    var editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
-                    editModal.show();
-                });
-        }
+                        var editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
+                        editModal.show();
+                    });
+            }
 
-        document.getElementById('editInvoiceForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+            document.getElementById('editInvoiceForm').addEventListener('submit', function (event) {
+                event.preventDefault();
 
-            const invoiceId = document.getElementById('edit-invoice-id').value;
-            const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData.entries());
+                const invoiceId = document.getElementById('edit-invoice-id').value;
+                const formData = new FormData(event.target);
+                const data = Object.fromEntries(formData.entries());
 
-            fetch(`/api/invoices/${invoiceId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Errore durante la modifica della fattura.');
-                    }
-                    // Chiudi il modale e reindirizza, non serve un alert qui
-                    var editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
-                    editModal.hide();
-                    window.location.href = '/fatture';
+                fetch(`/api/invoices/${invoiceId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
                 })
-                .catch(error => {
-                    console.error('Errore:', error);
-                    alert('Si è verificato un errore durante la modifica della fattura.');
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Errore durante la modifica della fattura.');
+                        }
+                        // Chiudi il modale e reindirizza, non serve un alert qui
+                        var editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
+                        editModal.hide();
+                        window.location.href = '/fatture';
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Si è verificato un errore durante la modifica della fattura.');
+                    });
+            });
+            // Funzione per filtrare la tabella delle fatture
+            document.getElementById('invoiceSearch').addEventListener('keyup', function () {
+                const searchText = this.value.toLowerCase();
+                const accordionItems = document.querySelectorAll('.accordion-item');
+
+                accordionItems.forEach(item => {
+                    const collapseElement = item.querySelector('.accordion-collapse');
+                    const collapse = new bootstrap.Collapse(collapseElement, {
+                        toggle: false
+                    });
+                    const rows = item.querySelectorAll('tbody tr');
+                    let cardHasVisibleRows = false;
+
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        let found = false;
+
+                        for (let j = 0; j < cells.length - 1; j++) {
+                            const cellText = cells[j].textContent || cells[j].innerText;
+                            if (cellText.toLowerCase().indexOf(searchText) > -1) {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found) {
+                            row.style.display = "";
+                            cardHasVisibleRows = true;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+
+                    // Mostra/nascondi l'elemento dell'accordion e apri/chiudi il contenuto
+                    if (searchText === '') {
+                        item.style.display = "";
+                        const isFirst = item.querySelector('.accordion-button').getAttribute('aria-expanded') === 'true';
+                        if (isFirst) {
+                            collapse.show();
+                        } else {
+                            collapse.hide();
+                        }
+                    } else if (cardHasVisibleRows) {
+                        item.style.display = "";
+                        collapse.show(); // Mostra il contenuto se ci sono corrispondenze
+                    } else {
+                        item.style.display = "none"; // Nasconde l'intero anno se non ci sono corrispondenze
+                        collapse.hide();
+                    }
                 });
-        });
-    </script>
+            });
+        </script>
 </body>
 
 </html>

@@ -1,6 +1,7 @@
 
 services:
   invoice_backend:
+    image: docker-registry.manzolo.it/manzolo/invoice_backend
     build:
       context: .
       dockerfile: ./backend/Dockerfile
@@ -30,6 +31,7 @@ services:
       - invoice_network
 
   invoice_frontend:
+    image: docker-registry.manzolo.it/manzolo/invoice_frontend
     build: ./frontend
     container_name: invoice_frontend
     ports:

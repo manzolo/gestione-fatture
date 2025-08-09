@@ -4,6 +4,7 @@
 
 postgres_data/*
 invoices_data/*
+backups/*
 
 .env
 

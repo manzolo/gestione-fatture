@@ -1,4 +1,12 @@
 COMPOSE_FILE := docker-compose.yaml
+DB_SERVICE := invoice_postgres_db
+BACKUP_DIR := ./backups
+
+include .env
+export $(shell grep -v '^\s*#' .env | cut -d= -f1)
+
+# Crea la directory dei backup se non esiste
+$(shell mkdir -p $(BACKUP_DIR))
 
 stop:
 	docker compose -f $(COMPOSE_FILE) down
@@ -19,14 +27,28 @@ rebuild:
 logs:
 	docker compose -f $(COMPOSE_FILE) logs -f
 
-#enter:
-#	docker compose -f $(COMPOSE_FILE) exec ${WORKSPACE_SERVICE} /bin/bash
-#root:
-#	docker compose -f $(COMPOSE_FILE) exec -u root ${WORKSPACE_SERVICE} /bin/bash
+backupdb:
+	@echo "Creating PostgreSQL backup..."
+	@docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
+		pg_dump -U $(POSTGRES_USER) $(POSTGRES_DB) > $(BACKUP_DIR)/backup_$(shell date +%Y%m%d_%H%M%S).sql
+	@echo "Backup created in $(BACKUP_DIR)"
 
-#backupdb:
-#	docker compose -f $(COMPOSE_FILE) exec $(DB_SERVICE) /bin/bash -c 'mysqldump -h$${DB_HOST} -uroot -p$${DB_ROOT_PASSWORD} $${DB_DATABASE} > /tmp/backup_$$(date +%Y%m%d_%H%M%S).sql'
-# docker compose run --remove-orphans -it $(DB_SERVICE)-backup bash -c 'mysqldump -h${DB_HOST} -uroot -p${DB_ROOT_PASSWORD} ${DB_DATABASE} > /backups/backup_$(date +%Y%m%d_%H%M%S).sql'
-# docker compose run --remove-orphans -it $(DB_SERVICE)-backup bash -c 'mysql -h${DB_HOST} -uroot -p${DB_ROOT_PASSWORD} ${DB_DATABASE} < /backups/backup_YOUR_TIMESTAMP.sql'
-#restoredb:
-#	docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) /bin/bash -c 'mysql -h${DB_HOST} -u${DB_USERNAME} -p${DB_PASSWORD} ${DB_DATABASE}' < "${BACKUP_FILE}"
+restoredb:
+	@if [ -z "$(BACKUP_FILE)" ]; then \
+		echo "Usage: make restoredb BACKUP_FILE=path/to/backup.sql"; \
+		exit 1; \
+	fi
+	@echo "Restoring PostgreSQL database from $(BACKUP_FILE)..."
+	@docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
+		psql -U $(POSTGRES_USER) $(POSTGRES_DB) -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+	@docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
+		psql -U $(POSTGRES_USER) $(POSTGRES_DB) < $(BACKUP_FILE)
+	@echo "Database restored successfully"
+
+list-backups:
+	@echo "Available backups:"
+	@ls -lh $(BACKUP_DIR)/*.sql
+
+# Comando per entrare nel container del database
+db-shell:
+	docker compose -f $(COMPOSE_FILE) exec $(DB_SERVICE) psql -U $(POSTGRES_USER) -d $(POSTGRES_DB)

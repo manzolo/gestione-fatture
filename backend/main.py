@@ -1,10 +1,14 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, Response
 from .models import db, Cliente, Fattura, FatturaProgressivo
 from datetime import datetime
 import os
+import json
 from docx import Document
 from docxtpl import DocxTemplate
 from sqlalchemy import text
+from collections import defaultdict
+from itertools import groupby
+from operator import itemgetter
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_SQLALCHEMY_URL') or 'sqlite:///test.db'
@@ -168,20 +172,36 @@ def invoices_api():
         db.session.commit()
         
         return jsonify({'message': 'Fattura aggiunta con successo!', 'id': nuova_fattura.id}), 201
-    else: # GET
+    else:  
+        # GET
+                # Recupera tutte le fatture e le ordina per anno in modo decrescente
         invoices = Fattura.query.order_by(Fattura.anno.desc(), Fattura.progressivo.desc()).all()
-        invoices_list = [{
-            'id': i.id,
-            'numero_fattura': f"{i.progressivo}/{i.anno}",
-            'data_fattura': i.data_fattura.strftime('%d/%m/%Y'),
-            'data_pagamento': i.data_pagamento.strftime('%d/%m/%Y') if i.data_pagamento else None,
-            'metodo_pagamento': i.metodo_pagamento,
-            'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
-            'descrizione': i.descrizione,
-            'totale': f"{i.totale:.2f}",
-            'inviata_sns': i.inviata_sns
-        } for i in invoices]
-        return jsonify(invoices_list)
+        
+        grouped_invoices = defaultdict(list)
+        for i in invoices:
+            grouped_invoices[i.anno].append({
+                'id': i.id,
+                'numero_fattura': f"{i.progressivo}/{i.anno}",
+                'data_fattura': i.data_fattura.strftime('%Y-%m-%d'),
+                'data_pagamento': i.data_pagamento.strftime('%Y-%m-%d') if i.data_pagamento else None,
+                'metodo_pagamento': i.metodo_pagamento,
+                'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
+                'descrizione': i.descrizione,
+                'totale': f"{i.totale:.2f}",
+                'inviata_sns': i.inviata_sns
+            })
+
+        # Ordina le chiavi (gli anni) in ordine decrescente
+        sorted_years = sorted(grouped_invoices.keys(), reverse=True)
+        
+        # Crea un nuovo dizionario che manterrà l'ordine
+        sorted_grouped_invoices = {year: grouped_invoices[year] for year in sorted_years}
+
+        # Serializza manualmente il dizionario in JSON per preservare l'ordine
+        json_output = json.dumps(sorted_grouped_invoices)
+        
+        # Restituisce la risposta con il contenuto e l'intestazione corretta
+        return Response(json_output, mimetype='application/json')
 
 @app.route('/api/invoices/<int:invoice_id>', methods=['GET', 'PUT'])
 def invoice_api_detail(invoice_id):
