@@ -178,6 +178,16 @@ if (clientSearch) {
 // ===========================
 // ====== FATTURE CRUD =======
 // ===========================
+// Sincronizza la data della fattura con la data del pagamento
+const dataFatturaInput = document.getElementById('data_fattura');
+const dataPagamentoInput = document.getElementById('data_pagamento');
+
+if (dataFatturaInput && dataPagamentoInput) {
+    dataFatturaInput.addEventListener('change', function() {
+        dataPagamentoInput.value = this.value;
+    });
+}
+
 // Resetta il form della nuova fattura quando la modale viene aperta
 const addInvoiceModal = document.getElementById('addInvoiceModal');
 const addInvoiceForm = document.getElementById('addInvoiceForm');
@@ -377,7 +387,6 @@ function fetchDashboardStats(year = null) {
                 `;
             }
 
-            // Aspetta un po' prima di renderizzare i grafici per dare tempo al DOM di aggiornarsi
             setTimeout(() => {
                 renderCharts(data);
             }, 100);
@@ -392,24 +401,20 @@ function fetchDashboardStats(year = null) {
 }
 
 function renderCharts(data) {
-    // Controlla se Chart.js è disponibile
     if (typeof Chart === 'undefined') {
         console.error('Chart.js non è caricato!');
         return;
     }
     
-    // Determina se stiamo visualizzando un anno specifico o tutti gli anni
     const isSpecificYear = data.anno_selezionato !== null && data.anno_selezionato !== undefined;
     
-    // Aggiorna il titolo del grafico nel DOM
     const chartTitle = document.getElementById('chartPerMeseTitle');
     if (chartTitle) {
         chartTitle.textContent = isSpecificYear 
-            ? `Fatturato per Mese - ${data.anno_selezionato}`
-            : 'Fatturato per Anno';
+            ? `Totale Fatturato per Mese - ${data.anno_selezionato}`
+            : 'Totale Fatturato per Anno';
     }
     
-    // Grafico per mese/anno
     const chartPerMese = document.getElementById('chartPerMese');
     
     if (chartPerMese && data.per_mese && Array.isArray(data.per_mese)) {
@@ -420,10 +425,8 @@ function renderCharts(data) {
             
             const labels = data.per_mese.map(item => {
                 if (isSpecificYear) {
-                    // Per anno specifico, mostra i mesi
                     return MESE_MAPPINGS[item.mese] || `Mese ${item.mese}`;
                 } else {
-                    // Per tutti gli anni, mostra gli anni
                     return `${item.mese}`;
                 }
             });
@@ -432,7 +435,7 @@ function renderCharts(data) {
                 return parseFloat(item.totale) || 0;
             });
             
-            const chartTitle = isSpecificYear ? 'Fatturato per Mese' : 'Fatturato per Anno';
+            const dynamicChartTitle = isSpecificYear ? 'Fatturato per Mese' : 'Fatturato per Anno';
             
             chartPerMeseInstance = new Chart(chartPerMese, {
                 type: 'bar',
@@ -451,7 +454,7 @@ function renderCharts(data) {
                     plugins: {
                         title: {
                             display: true,
-                            text: chartTitle
+                            text: dynamicChartTitle
                         }
                     },
                     scales: {
@@ -466,7 +469,6 @@ function renderCharts(data) {
         }
     }
 
-    // Grafico per cliente
     const chartPerCliente = document.getElementById('chartPerCliente');
     
     if (chartPerCliente && data.per_cliente && Array.isArray(data.per_cliente)) {
@@ -580,13 +582,8 @@ function populateYearSelector() {
 document.addEventListener('DOMContentLoaded', function() {
     // Controlla se il tab dashboard è già attivo
     const dashboardTab = document.getElementById('dashboard-tab');
-    if (dashboardTab && dashboardTab.classList.contains('active')) {
-        initializeDashboard();
-    }
-    
-    // Oppure carica sempre le statistiche se esiste il container
     const statsContainer = document.getElementById('dashboard-stats');
-    if (statsContainer) {
+    if ((dashboardTab && dashboardTab.classList.contains('active')) || statsContainer) {
         initializeDashboard();
     }
 });
