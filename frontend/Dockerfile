@@ -6,17 +6,18 @@ WORKDIR /app
 COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia il codice dell'applicazione
-COPY main.py ./main.py
+# Crea la cartella del pacchetto e copia i file al suo interno
+WORKDIR /app/invoice_frontend
+COPY main.py ./
+COPY cliente_routes.py ./
+COPY fattura_routes.py ./
 COPY templates ./templates
 COPY static ./static
+COPY __init__.py ./
 
-# Espone la porta su cui gira l'applicazione (Uvicorn per FastAPI)
-EXPOSE 80
-
-# Comando per avviare l'applicazione Uvicorn
-# --host 0.0.0.0 rende l'applicazione accessibile da tutte le interfacce di rete
-# --port 80 ascolta sulla porta 80 all'interno del container
+# Torna alla directory principale per impostare il comando CMD
+WORKDIR /app
 
 # Avvia l'applicazione Flask con Waitress
-CMD ["waitress-serve", "--listen=0.0.0.0:80", "main:app"]
+# Il comando ora funziona perché 'invoice_frontend' è un pacchetto riconosciuto
+CMD ["waitress-serve", "--listen=0.0.0.0:80", "invoice_frontend.main:app"]
