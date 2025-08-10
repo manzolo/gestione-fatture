@@ -34,15 +34,15 @@ backupdb:
 	@echo "Backup created in $(BACKUP_DIR)"
 
 restoredb:
-	@if [ -z "$(BACKUP_FILE)" ]; then \
-		echo "Usage: make restoredb BACKUP_FILE=path/to/backup.sql"; \
+	@if [ ! -f "$(BACKUP_DIR)/backup.sql" ]; then \
+		echo "Errore: $(BACKUP_DIR)/backup.sql non trovato."; \
 		exit 1; \
 	fi
-	@echo "Restoring PostgreSQL database from $(BACKUP_FILE)..."
+	@echo "Restoring PostgreSQL database from $(BACKUP_DIR)/backup.sql..."
 	@docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
 		psql -U $(POSTGRES_USER) $(POSTGRES_DB) -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 	@docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
-		psql -U $(POSTGRES_USER) $(POSTGRES_DB) < $(BACKUP_FILE)
+		psql -U $(POSTGRES_USER) $(POSTGRES_DB) < $(BACKUP_DIR)/backup.sql
 	@echo "Database restored successfully"
 
 list-backups:
