@@ -22,11 +22,6 @@ def format_date_italian(value):
 
 app.jinja_env.filters['to_italian_date'] = format_date_italian
 
-
-@app.route('/')
-def home():
-    return redirect(url_for('fatture'))
-
 @app.route('/clienti')
 def clienti():
     """Rotta per la gestione dei clienti."""
@@ -40,7 +35,7 @@ def clienti():
 
     return render_template('clienti.html', clients=clients)
 
-@app.route('/fatture')
+@app.route('/')
 def fatture():
     """Rotta per la gestione delle fatture."""
     try:
@@ -56,7 +51,7 @@ def fatture():
         clients = []
         invoices = []
 
-    return render_template('fatture.html', clients=clients, invoices=invoices, now=datetime.now())
+    return render_template('index.html', clients=clients, invoices=invoices, now=datetime.now())
 
 # --- Proxy API per i clienti (aggiunte) ---
 @app.route('/api/clients', methods=['POST'])

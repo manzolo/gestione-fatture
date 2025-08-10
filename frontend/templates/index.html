@@ -105,8 +105,18 @@
                                                 <td>{{ invoice.data_fattura | to_italian_date }}</td>
                                                 <td>{{ invoice.data_pagamento | to_italian_date if
                                                     invoice.data_pagamento else 'N/D' }}</td>
-                                                <td>{{ invoice.metodo_pagamento if invoice.metodo_pagamento else 'N/D'
-                                                    }}</td>
+                                                <td>
+                                                    {% if invoice.metodo_pagamento == 'Carta di credito/debito' %}
+                                                    <i class="fas fa-credit-card text-primary"
+                                                        title="Carta di credito/debito"></i>
+                                                    {% elif invoice.metodo_pagamento == 'Bonifico' %}
+                                                    <i class="fas fa-university text-success" title="Bonifico"></i>
+                                                    {% elif invoice.metodo_pagamento == 'Contanti' %}
+                                                    <i class="fas fa-money-bill-wave text-warning" title="Contanti"></i>
+                                                    {% else %}
+                                                    <span class="text-muted">N/D</span>
+                                                    {% endif %}
+                                                </td>
                                                 <td>{{ invoice.cliente }}</td>
                                                 <td>{{ invoice.descrizione }}</td>
                                                 <td>€{{ invoice.totale }}</td>
@@ -119,7 +129,7 @@
                                                 </td>
                                                 <td>
                                                     <a href="{{ url_for('download_invoice', invoice_id=invoice.id) }}"
-                                                        class="btn btn-success btn-sm" title="Scarica"><i
+                                                        class="btn btn-success btn-sm" title="Scarica fattura"><i
                                                             class="fas fa-download"></i></a>
                                                     <button type="button" class="btn btn-primary btn-sm"
                                                         onclick="openEditInvoiceModal({{ invoice.id }})"
@@ -167,7 +177,7 @@
                                 <button type="button" class="btn btn-warning btn-sm me-2"
                                     onclick="openEditClientModal({{ client.id }})">Modifica</button>
                                 <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="confirmDeleteClient({{ client.id }})">Elimina</button>
+                                    onclick="confirmDeleteClient({{ client.id }})" disabled>Elimina</button>
                             </div>
                         </li>
                         {% else %}
