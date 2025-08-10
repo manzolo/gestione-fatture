@@ -3,7 +3,16 @@ export function initializeClients() {
     let clientToDelete = null;
 
     // Aggiunta nuovo cliente
+    // Resetta il form di aggiunta cliente quando la modale viene aperta
+    const addClientModal = document.getElementById('addClientModal');
     const addClientForm = document.getElementById('addClientForm');
+
+    if (addClientModal && addClientForm) {
+        addClientModal.addEventListener('show.bs.modal', function () {
+            // Resetta il form
+            addClientForm.reset();
+        });
+    }
     if (addClientForm) {
         addClientForm.addEventListener('submit', function (event) {
             event.preventDefault();
