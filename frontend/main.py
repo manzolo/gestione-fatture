@@ -163,11 +163,32 @@ def download_invoice(invoice_id):
         flash(f"Errore durante il download: {e}", 'danger')
         return redirect(url_for('fatture'))
     
+# Aggiungi questi due nuovi endpoint al tuo file frontend
+
+@app.route('/api/invoices/years', methods=['GET'])
+def get_invoices_years_proxy():
+    """Proxy per ottenere gli anni disponibili delle fatture dal backend."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/invoices/years")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'message': f"Errore nella richiesta al backend: {e}"}), 500
+
 @app.route('/api/invoices/stats', methods=['GET'])
 def get_invoices_stats_proxy():
-    """Proxy per ottenere le statistiche delle fatture dal backend."""
+    """Proxy per ottenere le statistiche delle fatture dal backend (con supporto per parametro year)."""
     try:
-        response = requests.get(f"{BACKEND_URL}/api/invoices/stats")
+        # Passa tutti i parametri della query string al backend
+        year_param = request.args.get('year')
+        backend_url = f"{BACKEND_URL}/api/invoices/stats"
+        
+        # Se c'è il parametro year, aggiungilo alla richiesta
+        params = {}
+        if year_param:
+            params['year'] = year_param
+            
+        response = requests.get(backend_url, params=params)
         response.raise_for_status()
         return jsonify(response.json()), response.status_code
     except requests.exceptions.RequestException as e:

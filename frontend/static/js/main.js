@@ -326,8 +326,9 @@ const MESE_MAPPINGS = {
     7: 'Lug', 8: 'Ago', 9: 'Set', 10: 'Ott', 11: 'Nov', 12: 'Dic'
 };
 
-function fetchDashboardStats() {
-    fetch('/api/invoices/stats')
+function fetchDashboardStats(year = null) {
+    const url = year ? `/api/invoices/stats?year=${year}` : '/api/invoices/stats';
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 return response.json().then(err => { 
@@ -339,6 +340,9 @@ function fetchDashboardStats() {
         .then(data => {
             const statsContainer = document.getElementById('dashboard-stats');
             if (statsContainer) {
+                const selectedYear = year || 'tutti gli anni';
+                const yearText = year ? `Anno ${year}` : 'Tutti gli anni';
+                
                 statsContainer.innerHTML = `
                     <div class="col-md-4">
                         <div class="card stat-card text-center">
@@ -346,6 +350,7 @@ function fetchDashboardStats() {
                                 <i class="fas fa-file-invoice-dollar stat-icon"></i>
                                 <h5 class="card-title mt-2">Totale Fatture</h5>
                                 <p class="card-text fs-4">${data.totale_fatture}</p>
+                                <small class="text-muted">${yearText}</small>
                             </div>
                         </div>
                     </div>
@@ -353,8 +358,9 @@ function fetchDashboardStats() {
                         <div class="card stat-card text-center">
                             <div class="card-body">
                                 <i class="fas fa-euro-sign stat-icon"></i>
-                                <h5 class="card-title mt-2">Totale Annuo</h5>
+                                <h5 class="card-title mt-2">Totale ${year ? 'Annuo' : 'Complessivo'}</h5>
                                 <p class="card-text fs-4">€${data.totale_annuo.toFixed(2)}</p>
+                                <small class="text-muted">${yearText}</small>
                             </div>
                         </div>
                     </div>
@@ -364,6 +370,7 @@ function fetchDashboardStats() {
                                 <i class="fas fa-users stat-icon"></i>
                                 <h5 class="card-title mt-2">Clienti Fatturati</h5>
                                 <p class="card-text fs-4">${data.clienti_con_fatture}</p>
+                                <small class="text-muted">${yearText}</small>
                             </div>
                         </div>
                     </div>
@@ -391,7 +398,18 @@ function renderCharts(data) {
         return;
     }
     
-    // Grafico per mese
+    // Determina se stiamo visualizzando un anno specifico o tutti gli anni
+    const isSpecificYear = data.anno_selezionato !== null && data.anno_selezionato !== undefined;
+    
+    // Aggiorna il titolo del grafico nel DOM
+    const chartTitle = document.getElementById('chartPerMeseTitle');
+    if (chartTitle) {
+        chartTitle.textContent = isSpecificYear 
+            ? `Fatturato per Mese - ${data.anno_selezionato}`
+            : 'Fatturato per Anno';
+    }
+    
+    // Grafico per mese/anno
     const chartPerMese = document.getElementById('chartPerMese');
     
     if (chartPerMese && data.per_mese && Array.isArray(data.per_mese)) {
@@ -401,12 +419,20 @@ function renderCharts(data) {
             }
             
             const labels = data.per_mese.map(item => {
-                return MESE_MAPPINGS[item.mese] || `Mese ${item.mese}`;
+                if (isSpecificYear) {
+                    // Per anno specifico, mostra i mesi
+                    return MESE_MAPPINGS[item.mese] || `Mese ${item.mese}`;
+                } else {
+                    // Per tutti gli anni, mostra gli anni
+                    return `${item.mese}`;
+                }
             });
             
             const values = data.per_mese.map(item => {
                 return parseFloat(item.totale) || 0;
             });
+            
+            const chartTitle = isSpecificYear ? 'Fatturato per Mese' : 'Fatturato per Anno';
             
             chartPerMeseInstance = new Chart(chartPerMese, {
                 type: 'bar',
@@ -425,7 +451,7 @@ function renderCharts(data) {
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Fatturato per Mese'
+                            text: chartTitle
                         }
                     },
                     scales: {
@@ -511,8 +537,43 @@ function renderCharts(data) {
 const dashboardTab = document.getElementById('dashboard-tab');
 if (dashboardTab) {
     dashboardTab.addEventListener('shown.bs.tab', function(event) {
-        fetchDashboardStats();
+        initializeDashboard();
     });
+}
+
+// Funzione per inizializzare la dashboard
+function initializeDashboard() {
+    // Prima popola il selettore degli anni
+    populateYearSelector();
+    // Poi carica le statistiche
+    fetchDashboardStats();
+}
+
+// Funzione per popolare il selettore degli anni
+function populateYearSelector() {
+    fetch('/api/invoices/years')
+        .then(response => response.json())
+        .then(years => {
+            const yearSelector = document.getElementById('yearSelector');
+            if (yearSelector) {
+                yearSelector.innerHTML = '<option value="">Tutti gli anni</option>';
+                years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelector.appendChild(option);
+                });
+                
+                // Event listener per il cambio di anno
+                yearSelector.addEventListener('change', function() {
+                    const selectedYear = this.value || null;
+                    fetchDashboardStats(selectedYear);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Errore nel recupero degli anni:', error);
+        });
 }
 
 // Carica le statistiche anche se la dashboard è già attiva al caricamento della pagina
@@ -520,12 +581,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Controlla se il tab dashboard è già attivo
     const dashboardTab = document.getElementById('dashboard-tab');
     if (dashboardTab && dashboardTab.classList.contains('active')) {
-        fetchDashboardStats();
+        initializeDashboard();
     }
     
     // Oppure carica sempre le statistiche se esiste il container
     const statsContainer = document.getElementById('dashboard-stats');
     if (statsContainer) {
-        fetchDashboardStats();
+        initializeDashboard();
     }
 });

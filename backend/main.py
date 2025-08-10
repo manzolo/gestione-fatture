@@ -309,25 +309,65 @@ def download_invoice_docx(invoice_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+# Aggiungi questo nuovo endpoint per ottenere gli anni disponibili
+@app.route('/api/invoices/years', methods=['GET'])
+def get_available_years():
+    """
+    Restituisce la lista degli anni per cui esistono fatture.
+    """
+    try:
+        years = db.session.query(Fattura.anno).distinct().order_by(Fattura.anno.desc()).all()
+        years_list = [year.anno for year in years]
+        return jsonify(years_list)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Modifica l'endpoint esistente per supportare il filtro per anno
 @app.route('/api/invoices/stats', methods=['GET'])
 def get_invoice_stats():
     """
     Restituisce statistiche aggregate sulle fatture per la dashboard.
+    Supporta il parametro 'year' per filtrare per un anno specifico.
     """
     try:
-        current_year = datetime.now().year
+        # Ottieni il parametro year dalla query string (opzionale)
+        year_param = request.args.get('year')
+        
+        if year_param:
+            # Filtra per l'anno specifico
+            selected_year = int(year_param)
+            year_filter = Fattura.anno == selected_year
+            year_display = f"Anno {selected_year}"
+        else:
+            # Usa tutti gli anni
+            year_filter = True  # Nessun filtro
+            selected_year = None
+            year_display = "Tutti gli anni"
 
         # Statistiche generali
-        total_invoices = db.session.query(Fattura).filter(Fattura.anno == current_year).count()
-        total_amount = db.session.query(func.sum(Fattura.totale)).filter(Fattura.anno == current_year).scalar() or 0.0
-        unique_clients = db.session.query(Fattura.cliente_id).filter(Fattura.anno == current_year).distinct().count()
+        total_invoices = db.session.query(Fattura).filter(year_filter).count()
+        total_amount = db.session.query(func.sum(Fattura.totale)).filter(year_filter).scalar() or 0.0
+        unique_clients = db.session.query(Fattura.cliente_id).filter(year_filter).distinct().count()
 
-        # Dati per grafico mensile (bar chart)
-        monthly_stats = db.session.query(
-            extract('month', Fattura.data_fattura).label('mese'),
-            func.count(Fattura.id).label('conteggio'),
-            func.sum(Fattura.totale).label('totale')
-        ).filter(Fattura.anno == current_year).group_by('mese').order_by('mese').all()
+        if selected_year:
+            # Per un anno specifico, mostra i dati mensili
+            monthly_stats = db.session.query(
+                extract('month', Fattura.data_fattura).label('mese'),
+                func.count(Fattura.id).label('conteggio'),
+                func.sum(Fattura.totale).label('totale')
+            ).filter(year_filter).group_by('mese').order_by('mese').all()
+            
+            monthly_data = [{'mese': int(s.mese), 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in monthly_stats]
+        else:
+            # Per tutti gli anni, mostra i dati annuali
+            yearly_stats = db.session.query(
+                Fattura.anno.label('anno'),
+                func.count(Fattura.id).label('conteggio'),
+                func.sum(Fattura.totale).label('totale')
+            ).group_by(Fattura.anno).order_by(Fattura.anno).all()
+            
+            # Per compatibilità con il frontend, usa il campo 'mese' ma con gli anni
+            monthly_data = [{'mese': s.anno, 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in yearly_stats]
 
         # Dati per grafico clienti (pie chart)
         client_stats = db.session.query(
@@ -335,10 +375,8 @@ def get_invoice_stats():
             Cliente.cognome,
             func.count(Fattura.id).label('conteggio'),
             func.sum(Fattura.totale).label('totale')
-        ).join(Fattura, Cliente.id == Fattura.cliente_id).filter(Fattura.anno == current_year).group_by(Cliente.id).order_by(func.count(Fattura.id).desc()).all()
+        ).join(Fattura, Cliente.id == Fattura.cliente_id).filter(year_filter).group_by(Cliente.id).order_by(func.count(Fattura.id).desc()).all()
 
-        # Preparazione dei dati per la risposta JSON
-        monthly_data = [{'mese': f'Mese {int(s.mese)}', 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in monthly_stats]
         client_data = [{'cliente': f'{s.nome} {s.cognome}', 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in client_stats]
 
         return jsonify({
@@ -346,7 +384,9 @@ def get_invoice_stats():
             'totale_annuo': total_amount,
             'clienti_con_fatture': unique_clients,
             'per_mese': monthly_data,
-            'per_cliente': client_data
+            'per_cliente': client_data,
+            'anno_selezionato': selected_year,
+            'year_display': year_display
         })
 
     except Exception as e:
