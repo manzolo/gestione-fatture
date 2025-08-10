@@ -4,8 +4,12 @@ from datetime import datetime
 from sqlalchemy import text, func, extract
 from collections import defaultdict
 from docxtpl import DocxTemplate
+from docx2pdf import convert
 import os
 import json
+import tempfile
+import zipfile
+import shutil
 from .utils import calculate_invoice_totals, PRESTAZIONE_BASE, BOLLO_COSTO, BOLLO_SOGLIA
 
 invoices_bp = Blueprint('invoices_bp', __name__)
@@ -116,29 +120,30 @@ def invoice_api_detail(invoice_id):
         return jsonify({'message': 'Fattura aggiornata con successo!'})
 
 @invoices_bp.route('/invoices/<int:invoice_id>/download', methods=['GET'])
-def download_invoice_docx(invoice_id):
+def download_invoice_zip(invoice_id):
     try:
         fattura = Fattura.query.get_or_404(invoice_id)
         cliente = Cliente.query.get_or_404(fattura.cliente_id)
         app_root = current_app.root_path
+        
+        # Sposta l'inizializzazione di SAVE_DIR all'interno della funzione
+        SAVE_DIR = os.path.join(app_root, 'invoices')
 
         template_path = os.path.join(app_root, 'templates', 'invoice_template.docx')
         if not os.path.exists(template_path):
             return jsonify({"error": "Template file not found"}), 404
-        
-        doc = DocxTemplate(template_path)
+
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
         descrizione_prestazione = f"n. {calcoli['numero_sedute']} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
-        
+
         bollo_descrizione_estesa = ""
         bollo_descrizione_semplice = ""
         bollo_importo_formattato = ""
-
         if calcoli['bollo_flag']:
             bollo_descrizione_estesa = "Imposta di bollo da 2 euro assolta sull’originale per importi maggiori di 77,47 euro"
             bollo_descrizione_semplice = "Imposta di Bollo - Esc. Art. 15"
             bollo_importo_formattato = f"€{calcoli['bollo_importo']:.2f}".replace('.', ',')
-        
+
         context = {
             'numero_fattura': f"{fattura.progressivo}",
             'data_fattura': fattura.data_fattura.strftime('%d/%m/%Y'),
@@ -160,14 +165,45 @@ def download_invoice_docx(invoice_id):
             'metodo_pagamento': fattura.metodo_pagamento,
             'data_pagamento': fattura.data_pagamento.strftime('%d/%m/%Y') if fattura.data_pagamento else 'Non pagato',
         }
-        
-        doc.render(context)
-        file_path = os.path.join(app_root, 'invoices', f"fattura_{fattura.progressivo}_{fattura.anno}.docx")
-        doc.save(file_path)
-        return_data = send_file(file_path, as_attachment=True)
-        return return_data
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Crea il DOCX
+            docx_path = os.path.join(tmpdir, f"fattura_{fattura.progressivo}_{fattura.anno}.docx")
+            doc = DocxTemplate(template_path)
+            doc.render(context)
+            doc.save(docx_path)
+
+            # Converte il DOCX in PDF usando LibreOffice headless
+            os.system(f'libreoffice --headless --convert-to pdf "{docx_path}" --outdir "{tmpdir}"')
+
+            pdf_path = os.path.join(tmpdir, f"fattura_{fattura.progressivo}_{fattura.anno}.pdf")
+            if not os.path.exists(pdf_path):
+                return jsonify({"error": "Errore nella conversione a PDF"}), 500
+
+            # Crea il file ZIP
+            zip_path = os.path.join(tmpdir, f"fattura_{fattura.progressivo}_{fattura.anno}.zip")
+            with zipfile.ZipFile(zip_path, 'w') as zipf:
+                zipf.write(docx_path, os.path.basename(docx_path))
+                zipf.write(pdf_path, os.path.basename(pdf_path))
+            
+            # --- AGGIUNTA PER SALVARE IL FILE IN UNA CARTELLA PERMANENTE ---
+            # Assicurati che la directory di salvataggio esista
+            os.makedirs(SAVE_DIR, exist_ok=True)
+            
+            # Definisci il percorso finale per il file ZIP
+            final_zip_path = os.path.join(SAVE_DIR, os.path.basename(zip_path))
+            
+            # Copia il file dalla cartella temporanea alla cartella permanente
+            shutil.copyfile(zip_path, final_zip_path)
+            
+            # Log per debugging (opzionale)
+            print(f"Fattura salvata in: {final_zip_path}")
+            # ------------------------------------------------------------------
+
+            return send_file(zip_path, as_attachment=True)
 
     except Exception as e:
+        # In caso di errore, puliamo i file temporanei
         return jsonify({"error": str(e)}), 500
     
 @invoices_bp.route('/invoices/years', methods=['GET'])

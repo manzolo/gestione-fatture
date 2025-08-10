@@ -66,20 +66,22 @@ def edit_invoice_proxy(invoice_id):
         flash(f"Errore durante la modifica: {e}", 'danger')
         return jsonify({'message': f"Errore: {e}"}), 500
 
-@fattura_bp.route('/download_invoice/<int:invoice_id>')
-def download_invoice(invoice_id):
-    """Rotta per scaricare un file DOCX di fattura, proxato dal backend."""
+@fattura_bp.route('/download_invoice_zip/<int:invoice_id>')
+def download_invoice_zip(invoice_id):
+    """Rotta per scaricare un file ZIP di fattura, proxato dal backend."""
     try:
         response = requests.get(f"{BACKEND_URL}/api/invoices/{invoice_id}/download")
         response.raise_for_status()
 
+        # Leggi il contenuto come un oggetto BytesIO
         file_object = BytesIO(response.content)
 
+        # Restituisci il file ZIP con il mimetype corretto
         return send_file(
             file_object,
-            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            mimetype='application/zip',
             as_attachment=True,
-            download_name=f"fattura_{invoice_id}.docx"
+            download_name=f"fattura_{invoice_id}.zip"
         )
     except requests.exceptions.RequestException as e:
         flash(f"Errore durante il download: {e}", 'danger')
