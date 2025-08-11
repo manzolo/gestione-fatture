@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from .models import db, Cliente
+from codicefiscale import isvalid
 
 clients_bp = Blueprint('clients_bp', __name__)
 
@@ -7,6 +8,8 @@ clients_bp = Blueprint('clients_bp', __name__)
 def clients_api():
     if request.method == 'POST':
         data = request.get_json()
+        if not isvalid(data['codice_fiscale']):
+            return jsonify({"message": "Codice fiscale errato."}), 400
         new_client = Cliente(
             nome=data['nome'],
             cognome=data['cognome'],
@@ -47,6 +50,11 @@ def client_api_detail(client_id):
         })
     elif request.method == 'PUT':
         data = request.get_json()
+        
+        # Aggiunto il controllo di validità del Codice Fiscale
+        if 'codice_fiscale' in data and not isvalid(data['codice_fiscale']):
+            return jsonify({"message": "Codice fiscale errato."}), 400
+        
         client.nome = data.get('nome', client.nome)
         client.cognome = data.get('cognome', client.cognome)
         client.codice_fiscale = data.get('codice_fiscale', client.codice_fiscale)
