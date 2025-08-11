@@ -5,6 +5,7 @@ from datetime import datetime
 # Importa i Blueprint dai nuovi file
 from .cliente_routes import cliente_bp
 from .fattura_routes import fattura_bp
+from .costi_routes import costi_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'una-chiave-segreta-molto-complessa'
@@ -29,3 +30,4 @@ app.jinja_env.filters['to_italian_date'] = format_date_italian
 # Le rotte definite nei Blueprint verranno aggiunte all'applicazione principale
 app.register_blueprint(cliente_bp)
 app.register_blueprint(fattura_bp)
+app.register_blueprint(costi_bp)

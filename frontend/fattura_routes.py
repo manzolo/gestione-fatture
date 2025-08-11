@@ -17,6 +17,9 @@ def fatture():
         clients_response = requests.get(f"{BACKEND_URL}/api/clients")
         clients_response.raise_for_status()
         clients = clients_response.json()
+        
+        # Ordina la lista dei clienti per cognome e poi per nome
+        clients.sort(key=lambda c: (c['cognome'], c['nome']))
 
         invoices_response = requests.get(f"{BACKEND_URL}/api/invoices")
         invoices_response.raise_for_status()

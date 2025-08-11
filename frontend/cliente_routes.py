@@ -8,19 +8,6 @@ cliente_bp = Blueprint('cliente_bp', __name__)
 # Variabile d'ambiente per l'URL del backend
 BACKEND_URL = os.getenv("BACKEND_URL", "http://invoice_backend:5000")
 
-@cliente_bp.route('/clienti')
-def clienti():
-    """Rotta per la gestione dei clienti."""
-    try:
-        clients_response = requests.get(f"{BACKEND_URL}/api/clients")
-        clients_response.raise_for_status()
-        clients = clients_response.json()
-    except requests.exceptions.RequestException as e:
-        flash(f"Errore di connessione al backend: {e}", 'danger')
-        clients = []
-
-    return render_template('clienti.html', clients=clients)
-
 # --- Proxy API per i clienti ---
 @cliente_bp.route('/api/clients', methods=['POST'])
 def add_client_proxy():

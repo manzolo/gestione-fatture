@@ -11,6 +11,7 @@ WORKDIR /app/invoice_frontend
 COPY main.py ./
 COPY cliente_routes.py ./
 COPY fattura_routes.py ./
+COPY costi_routes.py ./
 COPY templates ./templates
 COPY static ./static
 COPY __init__.py ./

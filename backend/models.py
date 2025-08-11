@@ -39,3 +39,11 @@ class FatturaProgressivo(db.Model):
     __tablename__ = 'fattura_progressivo'
     anno = db.Column(db.Integer, primary_key=True)
     last_progressivo = db.Column(db.Integer, default=0)
+
+class Costo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    descrizione = db.Column(db.String(255), nullable=False)
+    anno_riferimento = db.Column(db.Integer, nullable=False)
+    data_pagamento = db.Column(db.Date, nullable=False, default=datetime.now)
+    totale = db.Column(db.Float, nullable=False)
+    pagato = db.Column(db.Boolean, default=False)
