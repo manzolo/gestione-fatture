@@ -97,7 +97,7 @@ function renderCharts(data) {
                 if (isSpecificYear) {
                     return MESE_MAPPINGS[item.mese] || `Mese ${item.mese}`;
                 } else {
-                    return `${item.mese}`;
+                    return `${item.anno}`;
                 }
             });
             
@@ -206,31 +206,52 @@ function renderCharts(data) {
 }
 
 export function initializeDashboard() {
-    populateYearSelector();
-    fetchDashboardStats();
+    const dashboardTab = document.getElementById('dashboard-tab');
+    if (dashboardTab) {
+        dashboardTab.addEventListener('shown.bs.tab', async function () {
+            await setupDashboard();
+        });
+    }
 }
 
-function populateYearSelector() {
-    fetch('/api/invoices/years')
-        .then(response => response.json())
-        .then(years => {
-            const yearSelector = document.getElementById('yearSelector');
-            if (yearSelector) {
-                yearSelector.innerHTML = '<option value="">Tutti gli anni</option>';
-                years.forEach(year => {
-                    const option = document.createElement('option');
-                    option.value = year;
-                    option.textContent = year;
-                    yearSelector.appendChild(option);
-                });
-                
-                yearSelector.addEventListener('change', function() {
-                    const selectedYear = this.value || null;
-                    fetchDashboardStats(selectedYear);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Errore nel recupero degli anni:', error);
+async function setupDashboard() {
+    const yearSelector = document.getElementById('yearSelector');
+    if (!yearSelector) return;
+    
+    try {
+        const response = await fetch('/api/invoices/years');
+        const years = await response.json();
+        
+        // Pulisce le opzioni esistenti
+        yearSelector.innerHTML = '<option value="">Tutti gli anni</option>';
+        years.forEach(year => {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelector.appendChild(option);
         });
+        
+        // Imposta l'anno corrente come predefinito
+        const currentYear = new Date().getFullYear();
+        if (years.includes(currentYear)) {
+            yearSelector.value = currentYear;
+        } else {
+            yearSelector.value = '';
+        }
+        
+        // Aggiunge l'event listener DOPO aver popolato le opzioni
+        yearSelector.removeEventListener('change', onYearChange);
+        yearSelector.addEventListener('change', onYearChange);
+
+        // Carica la dashboard con l'anno predefinito
+        fetchDashboardStats(yearSelector.value || null);
+
+    } catch (error) {
+        console.error('Errore durante la configurazione della dashboard:', error);
+    }
+}
+
+function onYearChange() {
+    const selectedYear = this.value || null;
+    fetchDashboardStats(selectedYear);
 }
