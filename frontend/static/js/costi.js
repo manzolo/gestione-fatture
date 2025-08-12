@@ -1,33 +1,5 @@
-// Funzione per mostrare notifiche client-side
-function showNotification(message, type = 'success') {
-    const alertContainer = document.getElementById('expenseAlertContainer');
-    if (!alertContainer) return;
-
-    // Rimuovi eventuali alert esistenti
-    alertContainer.innerHTML = '';
-    
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.setAttribute('role', 'alert');
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    
-    alertContainer.appendChild(alertDiv);
-    
-    // Auto-rimuovi l'alert dopo 5 secondi
-    setTimeout(() => {
-        if (alertDiv && alertDiv.parentNode) {
-            alertDiv.classList.remove('show');
-            setTimeout(() => {
-                if (alertDiv && alertDiv.parentNode) {
-                    alertDiv.remove();
-                }
-            }, 150);
-        }
-    }, 5000);
-}
+// ====== COSTI CRUD CON NOTIFICHE UNIFICATE =======
+import { notifications } from './notifications.js';
 
 // Funzione per caricare i costi dal backend e popolare la tabella
 async function loadCosts() {
@@ -77,7 +49,7 @@ async function loadCosts() {
     } catch (error) {
         console.error("Errore nel caricamento dei costi:", error);
         tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Errore nel caricamento dei costi. Riprova più tardi.</td></tr>`;
-        showNotification('Errore nel caricamento dei costi. Riprova più tardi.', 'danger');
+        notifications.error('Errore nel caricamento dei costi. Riprova più tardi.');
     }
 }
 
@@ -95,33 +67,22 @@ function handleDeleteButtonClick(e) {
 
 // Funzione per mostrare il modal di conferma eliminazione
 function showDeleteConfirmation(costoId) {
-    const confirmModalElement = document.getElementById('confirmDeleteExpenseModal');
-    if (!confirmModalElement) {
-        console.error('Modal di conferma non trovato');
-        return;
-    }
-
-    // Ottieni o crea l'istanza del modal
-    let confirmModal = bootstrap.Modal.getInstance(confirmModalElement);
-    if (!confirmModal) {
-        confirmModal = new bootstrap.Modal(confirmModalElement);
-    }
-
-    // Mostra il modal
-    confirmModal.show();
+    // Trova la descrizione del costo per la conferma
+    const button = document.querySelector(`[data-id="${costoId}"].delete-cost-btn`);
+    const row = button.closest('tr');
+    const descrizione = row ? row.cells[0].textContent : 'questo costo';
     
-    const confirmBtn = document.getElementById('confirmDeleteExpenseBtn');
-    if (confirmBtn) {
-        // Rimuovi listener precedenti
-        const newConfirmBtn = confirmBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-        
-        // Aggiungi nuovo listener
-        newConfirmBtn.addEventListener('click', () => {
+    notifications.confirm(
+        `Sei sicuro di voler eliminare il costo "${descrizione}"? Questa azione non può essere annullata.`,
+        () => {
             handleDeleteCost(costoId);
-            confirmModal.hide();
-        });
-    }
+        },
+        () => {
+            notifications.info('Eliminazione annullata.', 2000);
+        },
+        'Elimina',
+        'Annulla'
+    );
 }
 
 // Variabile globale per l'istanza del modal di modifica
@@ -129,6 +90,8 @@ let editCostModalInstance = null;
 
 // Funzione per aprire il modal di modifica e popolare i campi
 async function openEditCostModal(costoId) {
+    notifications.info('Caricamento dati costo...', 2000);
+    
     try {
         const response = await fetch(`/api/costs/${costoId}`);
         if (!response.ok) {
@@ -160,7 +123,7 @@ async function openEditCostModal(costoId) {
         editCostModalInstance.show();
     } catch (error) {
         console.error("Errore nel recupero dei dati del costo:", error);
-        showNotification('Impossibile recuperare i dati del costo per la modifica.', 'danger');
+        notifications.error('Impossibile recuperare i dati del costo per la modifica.');
     }
 }
 
@@ -175,11 +138,11 @@ async function handleDeleteCost(costoId) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         
-        showNotification('Costo eliminato con successo!', 'success');
+        notifications.success('Costo eliminato con successo!');
         loadCosts();
     } catch (error) {
         console.error("Errore durante l'eliminazione del costo:", error);
-        showNotification('Si è verificato un errore durante l\'eliminazione del costo.', 'danger');
+        notifications.error('Si è verificato un errore durante l\'eliminazione del costo.');
     }
 }
 
@@ -207,17 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Validazione client-side
             if (!formData.descrizione.trim()) {
-                showNotification('La descrizione è obbligatoria.', 'warning');
+                notifications.warning('La descrizione è obbligatoria.');
                 return;
             }
 
             if (!formData.data_pagamento) {
-                showNotification('La data di pagamento è obbligatoria.', 'warning');
+                notifications.warning('La data di pagamento è obbligatoria.');
                 return;
             }
 
             if (isNaN(formData.totale) || formData.totale <= 0) {
-                showNotification('Il totale deve essere un numero positivo.', 'warning');
+                notifications.warning('Il totale deve essere un numero positivo.');
                 return;
             }
 
@@ -236,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const result = await response.json();
-                showNotification(`Costo "${formData.descrizione}" aggiunto con successo!`, 'success');
+                notifications.success(`Costo "${formData.descrizione}" aggiunto con successo!`);
 
                 // Chiudi il modal
                 const addExpenseModalElement = document.getElementById('addExpenseModal');
@@ -251,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadCosts(); // Ricarica la lista
             } catch (error) {
                 console.error("Errore nell'aggiunta del costo:", error);
-                showNotification(error.message || 'Si è verificato un errore durante l\'aggiunta del costo.', 'danger');
+                notifications.error(error.message || 'Si è verificato un errore durante l\'aggiunta del costo.');
             }
         });
     }
@@ -285,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.innerHTML = '<td colspan="6" class="text-center text-muted">Nessun risultato trovato per la ricerca.</td>';
                     document.getElementById('expensesTableBody').appendChild(row);
                 }
+                notifications.info('Nessun costo trovato per la ricerca corrente.', 3000);
             } else {
                 const noResultsRow = document.querySelector('#expensesTableBody .no-results');
                 if (noResultsRow) {
@@ -312,17 +276,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Validazione client-side
             if (!formData.descrizione.trim()) {
-                showNotification('La descrizione è obbligatoria.', 'warning');
+                notifications.warning('La descrizione è obbligatoria.');
                 return;
             }
 
             if (!formData.data_pagamento) {
-                showNotification('La data di pagamento è obbligatoria.', 'warning');
+                notifications.warning('La data di pagamento è obbligatoria.');
                 return;
             }
 
             if (isNaN(formData.totale) || formData.totale <= 0) {
-                showNotification('Il totale deve essere un numero positivo.', 'warning');
+                notifications.warning('Il totale deve essere un numero positivo.');
                 return;
             }
 
@@ -341,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const result = await response.json();
-                showNotification(`Costo "${formData.descrizione}" aggiornato con successo!`, 'success');
+                notifications.success(`Costo "${formData.descrizione}" aggiornato con successo!`);
                 
                 // Chiudi il modal
                 if (editCostModalInstance) {
@@ -351,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadCosts();
             } catch (error) {
                 console.error("Errore nell'aggiornamento del costo:", error);
-                showNotification(error.message || 'Si è verificato un errore durante l\'aggiornamento.', 'danger');
+                notifications.error(error.message || 'Si è verificato un errore durante l\'aggiornamento.');
             }
         });
     }
@@ -376,18 +340,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 dataField.value = today;
             }
         });
-        
-        // Pulisci notifiche quando il modal si chiude
-        addExpenseModalElement.addEventListener('hidden.bs.modal', () => {
-            // Opzionalmente puoi pulire le notifiche qui se necessario
-        });
     }
 
     // Gestione modal di modifica - pulisci notifiche quando si chiude
     const editExpenseModalElement = document.getElementById('editExpenseModal');
     if (editExpenseModalElement) {
         editExpenseModalElement.addEventListener('hidden.bs.modal', () => {
-            // Opzionalmente puoi pulire le notifiche qui se necessario
+            // Modal chiuso - le notifiche si auto-rimuovono già
         });
     }
 });

@@ -1,4 +1,6 @@
-// ====== CLIENTI CRUD =======
+// ====== CLIENTI CRUD CON NOTIFICHE UNIFICATE =======
+import { notifications } from './notifications.js';
+
 export function initializeClients() {
     let clientToDelete = null;
 
@@ -63,8 +65,7 @@ export function initializeClients() {
 
             const codiceFiscaleInput = document.getElementById('codice_fiscale');
             if (!isValidCodiceFiscale(codiceFiscaleInput.value)) {
-                // Sostituito alert() con un messaggio di errore più chiaro.
-                alert('Attenzione: Il Codice Fiscale inserito non è valido.');
+                notifications.warning('Il Codice Fiscale inserito non è valido. Controlla e riprova.');
                 return; // Blocca l'esecuzione
             }
             
@@ -80,11 +81,12 @@ export function initializeClients() {
             })
                 .then(response => {
                     if (!response.ok) throw new Error('Errore durante l\'aggiunta del cliente.');
-                    window.location.reload();
+                    notifications.success(`Cliente ${data.nome} ${data.cognome} aggiunto con successo!`);
+                    setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
                     console.error('Errore:', error);
-                    alert('Si è verificato un errore durante l\'aggiunta del cliente.');
+                    notifications.error('Si è verificato un errore durante l\'aggiunta del cliente.');
                 });
         });
     }
@@ -97,8 +99,7 @@ export function initializeClients() {
             
             const codiceFiscaleInput = document.getElementById('edit-codice_fiscale');
             if (!isValidCodiceFiscale(codiceFiscaleInput.value)) {
-                // Sostituito alert() con un messaggio di errore più chiaro.
-                alert('Attenzione: Il Codice Fiscale inserito non è valido.');
+                notifications.warning('Il Codice Fiscale inserito non è valido. Controlla e riprova.');
                 return; // Blocca l'esecuzione
             }
 
@@ -115,38 +116,46 @@ export function initializeClients() {
             })
                 .then(response => {
                     if (!response.ok) return response.json().then(err => { throw new Error(err.message || 'Errore'); });
-                    window.location.reload();
+                    notifications.success(`Cliente ${data.nome} ${data.cognome} aggiornato con successo!`);
+                    setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
                     console.error('Errore:', error);
-                    alert(error.message || 'Errore durante il salvataggio.');
+                    notifications.error(error.message || 'Errore durante il salvataggio.');
                 });
         });
     }
 
     // Conferma eliminazione cliente
     window.confirmDeleteClient = function (clientId) {
-        clientToDelete = clientId;
-        new bootstrap.Modal(document.getElementById('confirmDeleteClientModal')).show();
-    }
-
-    const confirmDeleteClientBtn = document.getElementById('confirmDeleteClientBtn');
-    if (confirmDeleteClientBtn) {
-        confirmDeleteClientBtn.addEventListener('click', function () {
-            if (!clientToDelete) return;
-
-            fetch(`/api/clients/${clientToDelete}`, {
-                method: 'DELETE'
-            })
+        // Recupera il nome del cliente per la conferma
+        const clientCard = document.querySelector(`[onclick*="${clientId}"]`).closest('.client-item');
+        const clientName = clientCard ? clientCard.querySelector('.card-title').textContent : 'questo cliente';
+        
+        notifications.confirm(
+            `Sei sicuro di voler eliminare ${clientName}? Questa azione non può essere annullata.`,
+            () => {
+                // Conferma eliminazione
+                fetch(`/api/clients/${clientId}`, {
+                    method: 'DELETE'
+                })
                 .then(response => {
                     if (!response.ok) throw new Error('Errore durante l\'eliminazione del cliente.');
-                    window.location.reload();
+                    notifications.success(`Cliente ${clientName} eliminato con successo!`);
+                    setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
                     console.error('Errore:', error);
-                    alert(error.message || 'Errore durante l\'eliminazione.');
+                    notifications.error(error.message || 'Errore durante l\'eliminazione.');
                 });
-        });
+            },
+            () => {
+                // Annullamento
+                notifications.info('Eliminazione annullata.', 2000);
+            },
+            'Elimina',
+            'Annulla'
+        );
     }
 
     // Ricerca clienti (live)
@@ -177,11 +186,18 @@ export function initializeClients() {
             if (searchTerm === '' && noClientsMessage) {
                 noClientsMessage.classList.remove('d-none');
             }
+
+            // Mostra messaggio se nessun risultato
+            if (searchTerm !== '' && visibleCount === 0) {
+                notifications.info('Nessun cliente trovato per la ricerca corrente.', 3000);
+            }
         });
     }
 
     // Apertura modale modifica cliente
     window.openEditClientModal = function (clientId) {
+        notifications.info('Caricamento dati cliente...', 2000);
+        
         fetch(`/api/clients/${clientId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Errore recupero cliente');
@@ -200,8 +216,7 @@ export function initializeClients() {
             })
             .catch(error => {
                 console.error('Errore:', error);
-                alert('Errore nel recupero dei dati del cliente.');
+                notifications.error('Errore nel recupero dei dati del cliente.');
             });
     }
-
 }

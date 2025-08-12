@@ -1,4 +1,6 @@
-// ====== DASHBOARD ========
+// ====== DASHBOARD CON NOTIFICHE UNIFICATE ========
+import { notifications } from './notifications.js';
+
 let chartPerMeseInstance = null;
 let chartPerClienteInstance = null;
 
@@ -16,6 +18,8 @@ export async function fetchDashboardStats(year = null) {
             <div class="col-12"><p class="alert alert-info text-center">Caricamento statistiche in corso...</p></div>
         `;
     }
+
+    notifications.info('Caricamento statistiche dashboard...', 2000);
 
     try {
         const urlInvoices = year ? `/api/invoices/stats?year=${year}` : '/api/invoices/stats';
@@ -39,15 +43,13 @@ export async function fetchDashboardStats(year = null) {
         const invoicesData = await invoicesResponse.json();
         const costsData = await costsResponse.json();
         
-        // Ho rimosso l'unione automatica degli oggetti per evitare conflitti di nomi.
-        // I dati vengono ora assegnati esplicitamente a variabili separate.
-
         if (statsContainer) {
             // Estrae i dati corretti dalle rispettive API
             const totaleAnnualeFatturato = parseFloat(invoicesData.totale_annuo) || 0;
-            const totaleCostiAnnuali = parseFloat(costsData.totale_annuo) || 0; // Utilizzo il totale annuo dei costi
+            const totaleCostiAnnuali = parseFloat(costsData.totale_annuo) || 0;
             const totaleFatture = parseInt(invoicesData.totale_fatture) || 0;
             const clientiFatturati = parseInt(invoicesData.clienti_con_fatture) || 0;
+            const profitto = totaleAnnualeFatturato - totaleCostiAnnuali;
 
             statsContainer.innerHTML = `
                 <div class="col-md-3">
@@ -65,7 +67,7 @@ export async function fetchDashboardStats(year = null) {
                         <div class="card-body">
                             <i class="fas fa-euro-sign stat-icon"></i>
                             <h5 class="card-title mt-2">Fatturato ${year ? 'Annuo' : 'Complessivo'}</h5>
-                            <p class="card-text fs-4">€${totaleAnnualeFatturato.toFixed(2)}</p>
+                            <p class="card-text fs-4 text-success">€${totaleAnnualeFatturato.toFixed(2)}</p>
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -74,8 +76,8 @@ export async function fetchDashboardStats(year = null) {
                     <div class="card stat-card text-center">
                         <div class="card-body">
                             <i class="fas fa-hand-holding-usd stat-icon"></i>
-                            <h5 class="card-title mt-2">Costi ${year ? 'Annuo' : 'Complessivo'}</h5>
-                            <p class="card-text fs-4">€${totaleCostiAnnuali.toFixed(2)}</p>
+                            <h5 class="card-title mt-2">Costi ${year ? 'Annuali' : 'Complessivi'}</h5>
+                            <p class="card-text fs-4 text-danger">€${totaleCostiAnnuali.toFixed(2)}</p>
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -83,9 +85,9 @@ export async function fetchDashboardStats(year = null) {
                 <div class="col-md-3">
                     <div class="card stat-card text-center">
                         <div class="card-body">
-                            <i class="fas fa-users stat-icon"></i>
-                            <h5 class="card-title mt-2">Clienti Fatturati</h5>
-                            <p class="card-text fs-4">${clientiFatturati}</p>
+                            <i class="fas fa-chart-line stat-icon"></i>
+                            <h5 class="card-title mt-2">Profitto ${year ? 'Annuo' : 'Complessivo'}</h5>
+                            <p class="card-text fs-4 ${profitto >= 0 ? 'text-success' : 'text-danger'}">€${profitto.toFixed(2)}</p>
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -94,20 +96,24 @@ export async function fetchDashboardStats(year = null) {
         }
 
         setTimeout(() => {
-            renderCharts(invoicesData, costsData); // Passa entrambi gli oggetti
+            renderCharts(invoicesData, costsData);
         }, 100);
+
+        notifications.success('Statistiche dashboard caricate con successo!', 3000);
 
     } catch (error) {
         console.error('Errore nel recupero delle statistiche:', error);
         if (statsContainer) {
             statsContainer.innerHTML = '<div class="col-12"><p class="alert alert-danger">Errore nel caricare le statistiche: ' + error.message + '</p></div>';
         }
+        notifications.error('Errore nel caricamento delle statistiche: ' + error.message);
     }
 }
 
 function renderCharts(invoicesData, costsData) {
     if (typeof Chart === 'undefined') {
         console.error('Chart.js non è caricato!');
+        notifications.error('Errore: libreria grafici non disponibile.');
         return;
     }
     
@@ -116,7 +122,6 @@ function renderCharts(invoicesData, costsData) {
     
     // Grafico combinato Fatturato e Costi per Mese/Anno
     const chartPerMese = document.getElementById('chartPerMese');
-    // Uso i dati corretti per il fatturato e i costi
     if (chartPerMese && invoicesData.per_mese && Array.isArray(invoicesData.per_mese) && costsData.per_mese && Array.isArray(costsData.per_mese)) {
         try {
             if (chartPerMeseInstance) {
@@ -178,12 +183,15 @@ function renderCharts(invoicesData, costsData) {
                     }
                 }
             });
+
+            notifications.info('Grafico fatturato/costi caricato.', 2000);
         } catch (error) {
             console.error('Errore creazione grafico per mese:', error);
+            notifications.error('Errore nella creazione del grafico fatturato/costi.');
         }
     }
 
-    // Grafico a torta delle fatture per cliente (rimane invariato)
+    // Grafico a torta delle fatture per cliente
     const chartPerCliente = document.getElementById('chartPerCliente');
     
     if (chartPerCliente && invoicesData.per_cliente && Array.isArray(invoicesData.per_cliente)) {
@@ -244,8 +252,11 @@ function renderCharts(invoicesData, costsData) {
                     }
                 }
             });
+
+            notifications.info('Grafico clienti caricato.', 2000);
         } catch (error) {
             console.error('Errore creazione grafico per cliente:', error);
+            notifications.error('Errore nella creazione del grafico per cliente.');
         }
     }
 }
@@ -254,6 +265,7 @@ export function initializeDashboard() {
     const dashboardTab = document.getElementById('dashboard-tab');
     if (dashboardTab) {
         dashboardTab.addEventListener('shown.bs.tab', async function () {
+            notifications.info('Inizializzazione dashboard...', 2000);
             await setupDashboard();
         });
     }
@@ -293,10 +305,13 @@ async function setupDashboard() {
 
     } catch (error) {
         console.error('Errore durante la configurazione della dashboard:', error);
+        notifications.error('Errore nella configurazione della dashboard.');
     }
 }
 
 function onYearChange() {
     const selectedYear = this.value || null;
+    const yearText = selectedYear ? `Anno ${selectedYear}` : 'Tutti gli anni';
+    notifications.info(`Caricamento dati per: ${yearText}`, 2000);
     fetchDashboardStats(selectedYear);
 }

@@ -1,4 +1,6 @@
-// ====== FATTURE CRUD =======
+// ====== FATTURE CRUD CON NOTIFICHE UNIFICATE =======
+import { notifications } from './notifications.js';
+
 export function initializeInvoices() {
     // Sincronizza la data della fattura con la data del pagamento
     const dataFatturaInput = document.getElementById('data_fattura');
@@ -7,6 +9,7 @@ export function initializeInvoices() {
     if (dataFatturaInput && dataPagamentoInput) {
         dataFatturaInput.addEventListener('change', function() {
             dataPagamentoInput.value = this.value;
+            notifications.info('Data pagamento sincronizzata con la data fattura.', 2000);
         });
     }
 
@@ -20,6 +23,7 @@ export function initializeInvoices() {
             
             // Per Select2, devi resettarlo manualmente
             $('#cliente_id').val(null).trigger('change');
+            notifications.info('Form pronto per nuova fattura.', 2000);
         });
     }
 
@@ -39,6 +43,24 @@ export function initializeInvoices() {
                 data['inviata_sns'] = inviataSnsCheckbox.checked;
             }
 
+            // Validazione client-side
+            if (!data.cliente_id) {
+                notifications.warning('Seleziona un cliente per procedere.');
+                return;
+            }
+
+            if (!data.data_fattura) {
+                notifications.warning('La data della fattura è obbligatoria.');
+                return;
+            }
+
+            if (!data.numero_sedute || data.numero_sedute <= 0) {
+                notifications.warning('Il numero di sedute deve essere maggiore di zero.');
+                return;
+            }
+
+            notifications.info('Creazione fattura in corso...', 2000);
+
             fetch('/api/invoices', {
                 method: 'POST',
                 headers: {
@@ -48,17 +70,23 @@ export function initializeInvoices() {
             })
                 .then(response => {
                     if (!response.ok) throw new Error('Errore durante l\'aggiunta della fattura.');
-                    window.location.reload();
+                    return response.json();
+                })
+                .then(result => {
+                    notifications.success(`Fattura #${result.numero_fattura || 'N/A'} creata con successo!`);
+                    setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
                     console.error('Errore:', error);
-                    alert('Si è verificato un errore durante l\'aggiunta della fattura.');
+                    notifications.error('Si è verificato un errore durante l\'aggiunta della fattura.');
                 });
         });
     }
 
     // Apertura modale modifica fattura
     window.openEditInvoiceModal = function(invoiceId) {
+        notifications.info('Caricamento dati fattura...', 2000);
+        
         fetch(`/api/invoices/${invoiceId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Errore recupero fattura');
@@ -88,7 +116,7 @@ export function initializeInvoices() {
             })
             .catch(error => {
                 console.error('Errore:', error);
-                alert('Errore nel recupero dei dati della fattura.');
+                notifications.error('Errore nel recupero dei dati della fattura.');
             });
     }
 
@@ -106,6 +134,24 @@ export function initializeInvoices() {
                 data['inviata_sns'] = editInviataSns.checked;
             }
 
+            // Validazione client-side
+            if (!data.cliente_id) {
+                notifications.warning('Seleziona un cliente per procedere.');
+                return;
+            }
+
+            if (!data.data_fattura) {
+                notifications.warning('La data della fattura è obbligatoria.');
+                return;
+            }
+
+            if (!data.numero_sedute || data.numero_sedute <= 0) {
+                notifications.warning('Il numero di sedute deve essere maggiore di zero.');
+                return;
+            }
+
+            notifications.info('Aggiornamento fattura in corso...', 2000);
+
             fetch(`/api/invoices/${invoiceId}`, {
                 method: 'PUT',
                 headers: {
@@ -115,11 +161,15 @@ export function initializeInvoices() {
             })
                 .then(response => {
                     if (!response.ok) throw new Error('Errore durante l\'aggiornamento della fattura.');
-                    window.location.reload();
+                    return response.json();
+                })
+                .then(result => {
+                    notifications.success(`Fattura #${result.numero_fattura || invoiceId} aggiornata con successo!`);
+                    setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
                     console.error('Errore:', error);
-                    alert('Si è verificato un errore durante l\'aggiornamento della fattura.');
+                    notifications.error('Si è verificato un errore durante l\'aggiornamento della fattura.');
                 });
         });
     }
@@ -130,15 +180,22 @@ export function initializeInvoices() {
         invoiceSearch.addEventListener('input', function (event) {
             const searchTerm = event.target.value.toLowerCase();
             const rows = document.querySelectorAll('#invoicesAccordion tbody tr');
+            let visibleCount = 0;
 
             rows.forEach(row => {
                 const textContent = row.textContent.toLowerCase();
                 if (textContent.includes(searchTerm)) {
                     row.style.display = '';
+                    visibleCount++;
                 } else {
                     row.style.display = 'none';
                 }
             });
+
+            // Mostra notifica se nessun risultato
+            if (searchTerm !== '' && visibleCount === 0) {
+                notifications.info('Nessuna fattura trovata per la ricerca corrente.', 3000);
+            }
         });
     }
 
@@ -149,6 +206,9 @@ export function initializeInvoices() {
             placeholder: "Seleziona un cliente",
             allowClear: true,
             width: '100%'
+        }).on('select2:select', function (e) {
+            const clientName = e.params.data.text;
+            notifications.info(`Cliente "${clientName}" selezionato.`, 2000);
         });
     }
     
@@ -158,6 +218,16 @@ export function initializeInvoices() {
             placeholder: "Seleziona un cliente",
             allowClear: true,
             width: '100%'
+        }).on('select2:select', function (e) {
+            const clientName = e.params.data.text;
+            notifications.info(`Cliente cambiato in "${clientName}".`, 2000);
         });
     }
+
+    // Gestione download fattura
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-success[title="Scarica fattura"]')) {
+            notifications.info('Download fattura avviato...', 3000);
+        }
+    });
 }
