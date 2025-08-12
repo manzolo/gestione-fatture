@@ -15,11 +15,38 @@ body {
 .stat-card {
     background-color: #fff;
     border-left: 5px solid #007bff;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 12px;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 .stat-icon {
     font-size: 2.5rem;
-    color: #007bff;
+    margin-bottom: 0.5rem;
+    /* Il colore verrà gestito dalle classi text-primary, text-info, etc. */
+}
+
+.stat-card .card-body {
+    padding: 1.5rem;
+}
+
+.stat-card .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.stat-card .card-text.fs-4 {
+    font-size: 1.8rem !important;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
 .nav-tabs .nav-link.active {
@@ -46,4 +73,53 @@ body {
 
 .modal .select2-container .select2-dropdown {
     z-index: 2001 !important;
+}
+
+/* Supporto per 5 colonne nelle statistiche dashboard */
+.col-md-2-4 {
+    flex: 0 0 auto;
+    width: 20%;
+}
+
+/* Media queries per responsività */
+@media (max-width: 1200px) {
+    .col-md-2-4 {
+        width: 33.333333%;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .col-md-2-4 {
+        width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+    .col-md-2-4 {
+        width: 100%;
+    }
+}
+
+/* Miglioramenti per i grafici */
+#chartPerMese, #chartPerCliente {
+    height: 400px !important;
+}
+
+/* Colori tematici per le statistiche */
+.text-primary { color: #0d6efd !important; }
+.text-info { color: #20c997 !important; }
+.text-success { color: #198754 !important; }
+.text-danger { color: #dc3545 !important; }
+
+/* Stile per il selettore anno */
+#yearSelector {
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#yearSelector:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
