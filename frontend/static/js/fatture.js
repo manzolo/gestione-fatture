@@ -73,7 +73,25 @@ export function initializeInvoices() {
                     return response.json();
                 })
                 .then(result => {
-                    notifications.success(`Fattura #${result.numero_fattura || 'N/A'} creata con successo!`);
+                    console.log('Risposta del server:', result); // Debug per vedere la struttura
+                    
+                    // Prova diversi possibili nomi per il numero fattura
+                    const numeroFattura = result.numero_fattura || result.invoice_number || result.number || result.id || 'nuova';
+                    
+                    // Crea un messaggio più descrittivo
+                    let successMessage = 'Fattura creata con successo!';
+                    if (numeroFattura && numeroFattura !== 'nuova') {
+                        successMessage = `Fattura #${numeroFattura} creata con successo!`;
+                    }
+                    
+                    notifications.success(successMessage);
+                    
+                    // Chiudi la modale prima di ricaricare
+                    const modal = bootstrap.Modal.getInstance(addInvoiceModal);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
                     setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
@@ -113,6 +131,8 @@ export function initializeInvoices() {
 
                 const editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
                 editModal.show();
+                
+                notifications.success('Dati fattura caricati per la modifica.', 2000);
             })
             .catch(error => {
                 console.error('Errore:', error);
@@ -164,7 +184,24 @@ export function initializeInvoices() {
                     return response.json();
                 })
                 .then(result => {
-                    notifications.success(`Fattura #${result.numero_fattura || invoiceId} aggiornata con successo!`);
+                    console.log('Risposta aggiornamento:', result); // Debug
+                    
+                    // Prova diversi possibili nomi per il numero fattura
+                    const numeroFattura = result.numero_fattura || result.invoice_number || result.number || invoiceId;
+                    
+                    let successMessage = 'Fattura aggiornata con successo!';
+                    if (numeroFattura) {
+                        successMessage = `Fattura #${numeroFattura} aggiornata con successo!`;
+                    }
+                    
+                    notifications.success(successMessage);
+                    
+                    // Chiudi la modale prima di ricaricare
+                    const editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
+                    if (editModal) {
+                        editModal.hide();
+                    }
+                    
                     setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
@@ -192,7 +229,7 @@ export function initializeInvoices() {
                 }
             });
 
-            // Mostra notifica se nessun risultato
+            // Mostra notifica se nessun risultato solo se c'è un termine di ricerca
             if (searchTerm !== '' && visibleCount === 0) {
                 notifications.info('Nessuna fattura trovata per la ricerca corrente.', 3000);
             }
