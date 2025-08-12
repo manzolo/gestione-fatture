@@ -70,7 +70,7 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
 
         const invoicesData = await invoicesResponse.json();
         const costsData = await costsResponse.json();
-        
+
         if (statsContainer && !controller.signal.aborted) {
             // Estrae i dati corretti dalle rispettive API
             const totaleAnnualeFatturato = parseFloat(invoicesData.totale_annuo) || 0;
@@ -144,7 +144,7 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
         if (loadingNotification) {
             notifications.remove(loadingNotification);
         }
-        
+
         if (!controller.signal.aborted) {
             notifications.success('Statistiche dashboard caricate con successo!', 3000);
         }
@@ -156,7 +156,7 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
         }
 
         console.error('Errore nel recupero delle statistiche:', error);
-        
+
         // Rimuovi la notifica di caricamento
         if (loadingNotification) {
             notifications.remove(loadingNotification);
@@ -180,10 +180,10 @@ function renderCharts(invoicesData, costsData) {
         notifications.error('Errore: libreria grafici non disponibile.');
         return;
     }
-    
+
     // Controlla se l'anno è stato selezionato
     const isSpecificYear = invoicesData.anno_selezionato !== null && invoicesData.anno_selezionato !== undefined;
-    
+
     // Grafico combinato Fatturato e Costi per Mese/Anno
     const chartPerMese = document.getElementById('chartPerMese');
     if (chartPerMese) {
@@ -201,7 +201,7 @@ function renderCharts(invoicesData, costsData) {
                 // Crea un array per tutti i 12 mesi
                 const monthlyData = new Array(12).fill(0);
                 const monthlyCosts = new Array(12).fill(0);
-                
+
                 // Popola i dati delle fatture
                 invoicesData.per_mese.forEach(item => {
                     const monthIndex = parseInt(item.mese) - 1; // Converti a indice array (0-11)
@@ -228,7 +228,7 @@ function renderCharts(invoicesData, costsData) {
                 // Gestione dati per anno
                 const yearlyInvoices = new Map(invoicesData.per_anno.map(item => [parseInt(item.anno), parseFloat(item.totale) || 0]));
                 const yearlyCosts = new Map();
-                
+
                 if (costsData.per_anno && Array.isArray(costsData.per_anno)) {
                     costsData.per_anno.forEach(item => {
                         yearlyCosts.set(parseInt(item.anno), parseFloat(item.totale) || 0);
@@ -244,10 +244,10 @@ function renderCharts(invoicesData, costsData) {
                 costiValues = sortedYears.map(year => yearlyCosts.get(year) || 0);
             }
 
-            const dynamicChartTitle = isSpecificYear 
-                ? `Fatturato e Costi per Mese - ${invoicesData.anno_selezionato}` 
+            const dynamicChartTitle = isSpecificYear
+                ? `Fatturato e Costi per Mese - ${invoicesData.anno_selezionato}`
                 : 'Fatturato e Costi per Anno';
-            
+
             chartPerMeseInstance = new Chart(chartPerMese, {
                 type: 'bar',
                 data: {
@@ -272,39 +272,48 @@ function renderCharts(invoicesData, costsData) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
+                    },
                     plugins: {
                         title: {
                             display: true,
                             text: dynamicChartTitle,
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
+                            font: { size: 18, weight: 'bold' },
+                            padding: { top: 10, bottom: 20 }
                         },
                         legend: {
                             position: 'top',
+                            labels: {
+                                font: { size: 12 },
+                                color: '#444'
+                            }
                         },
                         tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 13 },
                             callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: €${context.parsed.y.toFixed(2)}`;
-                                }
+                                label: ctx => `${ctx.dataset.label}: €${ctx.parsed.y.toLocaleString()}`
                             }
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)',
+                                drawBorder: false
+                            },
                             ticks: {
-                                callback: function(value) {
-                                    return '€' + value.toFixed(0);
-                                }
+                                font: { size: 12 },
+                                callback: value => `€${value.toLocaleString()}`
                             }
                         },
                         x: {
-                            grid: {
-                                display: false
-                            }
+                            grid: { display: false },
+                            ticks: { font: { size: 12 } }
                         }
                     }
                 }
@@ -318,21 +327,21 @@ function renderCharts(invoicesData, costsData) {
 
     // Grafico a torta delle fatture per cliente
     const chartPerCliente = document.getElementById('chartPerCliente');
-    
+
     if (chartPerCliente && invoicesData.per_cliente && Array.isArray(invoicesData.per_cliente)) {
         try {
             if (chartPerClienteInstance) {
                 chartPerClienteInstance.destroy();
             }
-            
+
             const labels = invoicesData.per_cliente.map(item => {
                 return item.cliente || 'Cliente sconosciuto';
             });
-            
+
             const values = invoicesData.per_cliente.map(item => {
                 return parseInt(item.conteggio) || 0;
             });
-            
+
             // Colori più moderni e accattivanti
             const colors = [
                 'rgba(255, 99, 132, 0.8)',
@@ -346,7 +355,7 @@ function renderCharts(invoicesData, costsData) {
                 'rgba(132, 99, 255, 0.8)',
                 'rgba(255, 206, 132, 0.8)'
             ];
-            
+
             chartPerClienteInstance = new Chart(chartPerCliente, {
                 type: 'doughnut', // Cambiato da 'pie' a 'doughnut' per un aspetto più moderno
                 data: {
@@ -363,6 +372,7 @@ function renderCharts(invoicesData, costsData) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    //cutout: '35%',
                     plugins: {
                         title: {
                             display: true,
@@ -381,7 +391,7 @@ function renderCharts(invoicesData, costsData) {
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = ((context.parsed / total) * 100).toFixed(1);
                                     return `${context.label}: ${context.parsed} fatture (${percentage}%)`;
@@ -405,11 +415,11 @@ export function initializeDashboard() {
         // Rimuovi eventuali listener precedenti
         const newDashboardTab = dashboardTab.cloneNode(true);
         dashboardTab.parentNode.replaceChild(newDashboardTab, dashboardTab);
-        
+
         newDashboardTab.addEventListener('shown.bs.tab', async function () {
             // Pulisci le notifiche quando si entra nella dashboard
             notifications.clearAll();
-            
+
             if (!isInitialized) {
                 await setupDashboard();
                 isInitialized = true;
@@ -420,7 +430,7 @@ export function initializeDashboard() {
                 await fetchDashboardStats(selectedYear, false); // false = non mostrare notifica di caricamento
             }
         });
-        
+
         // Pulisci le notifiche quando si esce dalla dashboard
         newDashboardTab.addEventListener('hide.bs.tab', function () {
             notifications.clearAll();
@@ -431,12 +441,12 @@ export function initializeDashboard() {
 async function setupDashboard() {
     const yearSelector = document.getElementById('yearSelector');
     if (!yearSelector) return;
-    
+
     try {
         const response = await fetch('/api/invoices/years');
         const years = await response.json();
         const currentYear = new Date().getFullYear();
-        
+
         // Pulisce le opzioni esistenti
         yearSelector.innerHTML = '';
         years.forEach(year => {
@@ -445,7 +455,7 @@ async function setupDashboard() {
             option.textContent = year;
             yearSelector.appendChild(option);
         });
-        
+
         // Imposta l'anno corrente come predefinito SEMPRE
         if (years.includes(currentYear)) {
             yearSelector.value = currentYear;
@@ -454,11 +464,11 @@ async function setupDashboard() {
             const mostRecentYear = Math.max(...years);
             yearSelector.value = mostRecentYear;
         }
-        
+
         // Rimuovi tutti i listener precedenti e aggiungi quello nuovo
         const newYearSelector = yearSelector.cloneNode(true);
         yearSelector.parentNode.replaceChild(newYearSelector, yearSelector);
-        
+
         newYearSelector.addEventListener('change', onYearChange);
 
         // Carica la dashboard con l'anno predefinito (sempre un anno specifico, mai "tutti gli anni")
@@ -468,7 +478,7 @@ async function setupDashboard() {
     } catch (error) {
         console.error('Errore durante la configurazione della dashboard:', error);
         notifications.error('Errore nella configurazione della dashboard.');
-        
+
         // Fallback: carica comunque la dashboard con l'anno corrente
         await fetchDashboardStats(new Date().getFullYear());
     }
