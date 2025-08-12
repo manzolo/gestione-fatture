@@ -1,15 +1,25 @@
-// ====== DASHBOARD CON NOTIFICHE UNIFICATE ========
+// ====== DASHBOARD CON NOTIFICHE UNIFICATE - VERSIONE CORRETTA ========
 import { notifications } from './notifications.js';
 
 let chartPerMeseInstance = null;
 let chartPerClienteInstance = null;
+let isInitialized = false; // Flag per evitare inizializzazioni multiple
+let currentRequest = null; // Per cancellare richieste precedenti
 
 const MESE_MAPPINGS = {
     1: 'Gen', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'Mag', 6: 'Giu',
     7: 'Lug', 8: 'Ago', 9: 'Set', 10: 'Ott', 11: 'Nov', 12: 'Dic'
 };
 
-export async function fetchDashboardStats(year = null) {
+export async function fetchDashboardStats(year = null, showLoadingNotification = true) {
+    // Cancella la richiesta precedente se esiste
+    if (currentRequest) {
+        currentRequest.abort();
+    }
+
+    // Pulisci le notifiche esistenti per evitare accumulo
+    notifications.clearAll();
+
     const yearText = year ? `Anno ${year}` : 'Tutti gli anni';
     const statsContainer = document.getElementById('dashboard-stats');
 
@@ -19,16 +29,29 @@ export async function fetchDashboardStats(year = null) {
         `;
     }
 
-    notifications.info('Caricamento statistiche dashboard...', 2000);
+    // Mostra notifica di caricamento solo se richiesto
+    let loadingNotification = null;
+    if (showLoadingNotification) {
+        loadingNotification = notifications.info('Caricamento statistiche dashboard...', 0); // 0 = non auto-remove
+    }
 
     try {
+        // Crea un AbortController per questa richiesta
+        const controller = new AbortController();
+        currentRequest = controller;
+
         const urlInvoices = year ? `/api/invoices/stats?year=${year}` : '/api/invoices/stats';
         const urlCosts = year ? `/api/costs/stats?year=${year}` : '/api/costs/stats';
 
         const [invoicesResponse, costsResponse] = await Promise.all([
-            fetch(urlInvoices),
-            fetch(urlCosts)
+            fetch(urlInvoices, { signal: controller.signal }),
+            fetch(urlCosts, { signal: controller.signal })
         ]);
+
+        // Controlla se la richiesta è stata cancellata
+        if (controller.signal.aborted) {
+            return;
+        }
 
         if (!invoicesResponse.ok) {
             const err = await invoicesResponse.json();
@@ -43,7 +66,7 @@ export async function fetchDashboardStats(year = null) {
         const invoicesData = await invoicesResponse.json();
         const costsData = await costsResponse.json();
         
-        if (statsContainer) {
+        if (statsContainer && !controller.signal.aborted) {
             // Estrae i dati corretti dalle rispettive API
             const totaleAnnualeFatturato = parseFloat(invoicesData.totale_annuo) || 0;
             const totaleCostiAnnuali = parseFloat(costsData.totale_annuo) || 0;
@@ -95,18 +118,44 @@ export async function fetchDashboardStats(year = null) {
             `;
         }
 
-        setTimeout(() => {
-            renderCharts(invoicesData, costsData);
-        }, 100);
+        // Renderizza i grafici solo se la richiesta non è stata cancellata
+        if (!controller.signal.aborted) {
+            setTimeout(() => {
+                renderCharts(invoicesData, costsData);
+            }, 100);
+        }
 
-        notifications.success('Statistiche dashboard caricate con successo!', 3000);
+        // Rimuovi la notifica di caricamento e mostra successo
+        if (loadingNotification) {
+            notifications.remove(loadingNotification);
+        }
+        
+        if (!controller.signal.aborted) {
+            notifications.success('Statistiche dashboard caricate con successo!', 3000);
+        }
 
     } catch (error) {
+        // Se l'errore è dovuto a cancellazione, non mostrare nulla
+        if (error.name === 'AbortError') {
+            return;
+        }
+
         console.error('Errore nel recupero delle statistiche:', error);
+        
+        // Rimuovi la notifica di caricamento
+        if (loadingNotification) {
+            notifications.remove(loadingNotification);
+        }
+
         if (statsContainer) {
             statsContainer.innerHTML = '<div class="col-12"><p class="alert alert-danger">Errore nel caricare le statistiche: ' + error.message + '</p></div>';
         }
         notifications.error('Errore nel caricamento delle statistiche: ' + error.message);
+    } finally {
+        // Reset del currentRequest
+        if (currentRequest && currentRequest.signal && !currentRequest.signal.aborted) {
+            currentRequest = null;
+        }
     }
 }
 
@@ -184,7 +233,6 @@ function renderCharts(invoicesData, costsData) {
                 }
             });
 
-            notifications.info('Grafico fatturato/costi caricato.', 2000);
         } catch (error) {
             console.error('Errore creazione grafico per mese:', error);
             notifications.error('Errore nella creazione del grafico fatturato/costi.');
@@ -253,7 +301,6 @@ function renderCharts(invoicesData, costsData) {
                 }
             });
 
-            notifications.info('Grafico clienti caricato.', 2000);
         } catch (error) {
             console.error('Errore creazione grafico per cliente:', error);
             notifications.error('Errore nella creazione del grafico per cliente.');
@@ -264,9 +311,28 @@ function renderCharts(invoicesData, costsData) {
 export function initializeDashboard() {
     const dashboardTab = document.getElementById('dashboard-tab');
     if (dashboardTab) {
-        dashboardTab.addEventListener('shown.bs.tab', async function () {
-            notifications.info('Inizializzazione dashboard...', 2000);
-            await setupDashboard();
+        // Rimuovi eventuali listener precedenti
+        const newDashboardTab = dashboardTab.cloneNode(true);
+        dashboardTab.parentNode.replaceChild(newDashboardTab, dashboardTab);
+        
+        newDashboardTab.addEventListener('shown.bs.tab', async function () {
+            // Pulisci le notifiche quando si entra nella dashboard
+            notifications.clearAll();
+            
+            if (!isInitialized) {
+                await setupDashboard();
+                isInitialized = true;
+            } else {
+                // Se già inizializzato, ricarica solo i dati
+                const yearSelector = document.getElementById('yearSelector');
+                const selectedYear = yearSelector ? yearSelector.value || null : null;
+                await fetchDashboardStats(selectedYear, false); // false = non mostrare notifica di caricamento
+            }
+        });
+        
+        // Pulisci le notifiche quando si esce dalla dashboard
+        newDashboardTab.addEventListener('hide.bs.tab', function () {
+            notifications.clearAll();
         });
     }
 }
@@ -296,12 +362,14 @@ async function setupDashboard() {
             yearSelector.value = '';
         }
         
-        // Aggiunge l'event listener DOPO aver popolato le opzioni
-        yearSelector.removeEventListener('change', onYearChange);
-        yearSelector.addEventListener('change', onYearChange);
+        // Rimuovi tutti i listener precedenti e aggiungi quello nuovo
+        const newYearSelector = yearSelector.cloneNode(true);
+        yearSelector.parentNode.replaceChild(newYearSelector, yearSelector);
+        
+        newYearSelector.addEventListener('change', onYearChange);
 
         // Carica la dashboard con l'anno predefinito
-        fetchDashboardStats(yearSelector.value || null);
+        await fetchDashboardStats(newYearSelector.value || null);
 
     } catch (error) {
         console.error('Errore durante la configurazione della dashboard:', error);
@@ -311,7 +379,5 @@ async function setupDashboard() {
 
 function onYearChange() {
     const selectedYear = this.value || null;
-    const yearText = selectedYear ? `Anno ${selectedYear}` : 'Tutti gli anni';
-    notifications.info(`Caricamento dati per: ${yearText}`, 2000);
-    fetchDashboardStats(selectedYear);
+    fetchDashboardStats(selectedYear, true); // true = mostra notifica di caricamento
 }
