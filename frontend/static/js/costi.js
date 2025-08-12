@@ -1,6 +1,36 @@
+// Funzione per mostrare notifiche client-side
+function showNotification(message, type = 'success') {
+    const alertContainer = document.getElementById('expenseAlertContainer');
+    if (!alertContainer) return;
+
+    // Rimuovi eventuali alert esistenti
+    alertContainer.innerHTML = '';
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.setAttribute('role', 'alert');
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    alertContainer.appendChild(alertDiv);
+    
+    // Auto-rimuovi l'alert dopo 5 secondi
+    setTimeout(() => {
+        if (alertDiv && alertDiv.parentNode) {
+            alertDiv.classList.remove('show');
+            setTimeout(() => {
+                if (alertDiv && alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 150);
+        }
+    }, 5000);
+}
+
 // Funzione per caricare i costi dal backend e popolare la tabella
 async function loadCosts() {
-    //console.log("Caricamento dei costi...");
     const tableBody = document.getElementById('expensesTableBody');
     tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Caricamento in corso...</td></tr>';
 
@@ -47,6 +77,7 @@ async function loadCosts() {
     } catch (error) {
         console.error("Errore nel caricamento dei costi:", error);
         tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Errore nel caricamento dei costi. Riprova più tardi.</td></tr>`;
+        showNotification('Errore nel caricamento dei costi. Riprova più tardi.', 'danger');
     }
 }
 
@@ -129,7 +160,7 @@ async function openEditCostModal(costoId) {
         editCostModalInstance.show();
     } catch (error) {
         console.error("Errore nel recupero dei dati del costo:", error);
-        alert("Impossibile recuperare i dati del costo per la modifica.");
+        showNotification('Impossibile recuperare i dati del costo per la modifica.', 'danger');
     }
 }
 
@@ -144,11 +175,11 @@ async function handleDeleteCost(costoId) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         
-        //console.log("Costo eliminato con successo!");
+        showNotification('Costo eliminato con successo!', 'success');
         loadCosts();
     } catch (error) {
         console.error("Errore durante l'eliminazione del costo:", error);
-        alert("Si è verificato un errore durante l'eliminazione del costo.");
+        showNotification('Si è verificato un errore durante l\'eliminazione del costo.', 'danger');
     }
 }
 
@@ -174,6 +205,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 pagato: form.querySelector('#pagato_costo').checked,
             };
 
+            // Validazione client-side
+            if (!formData.descrizione.trim()) {
+                showNotification('La descrizione è obbligatoria.', 'warning');
+                return;
+            }
+
+            if (!formData.data_pagamento) {
+                showNotification('La data di pagamento è obbligatoria.', 'warning');
+                return;
+            }
+
+            if (isNaN(formData.totale) || formData.totale <= 0) {
+                showNotification('Il totale deve essere un numero positivo.', 'warning');
+                return;
+            }
+
             try {
                 const response = await fetch('/api/costs', {
                     method: 'POST',
@@ -184,11 +231,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                //console.log("Costo aggiunto:", result);
+                showNotification(`Costo "${formData.descrizione}" aggiunto con successo!`, 'success');
 
                 // Chiudi il modal
                 const addExpenseModalElement = document.getElementById('addExpenseModal');
@@ -203,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadCosts(); // Ricarica la lista
             } catch (error) {
                 console.error("Errore nell'aggiunta del costo:", error);
-                alert("Si è verificato un errore durante l'aggiunta del costo. Controlla la console per i dettagli.");
+                showNotification(error.message || 'Si è verificato un errore durante l\'aggiunta del costo.', 'danger');
             }
         });
     }
@@ -215,14 +263,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const searchTerm = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('#expensesTableBody tr');
 
+            let visibleCount = 0;
             rows.forEach(row => {
                 const rowText = row.textContent.toLowerCase();
-                if (rowText.includes(searchTerm)) {
+                if (rowText.includes(searchTerm) || searchTerm === '') {
                     row.style.display = '';
+                    if (!row.textContent.includes('Nessun costo') && !row.textContent.includes('Caricamento')) {
+                        visibleCount++;
+                    }
                 } else {
                     row.style.display = 'none';
                 }
             });
+
+            // Mostra messaggio se nessun risultato
+            if (searchTerm !== '' && visibleCount === 0) {
+                const noResultsRow = document.querySelector('#expensesTableBody .no-results');
+                if (!noResultsRow && rows.length > 0) {
+                    const row = document.createElement('tr');
+                    row.className = 'no-results';
+                    row.innerHTML = '<td colspan="6" class="text-center text-muted">Nessun risultato trovato per la ricerca.</td>';
+                    document.getElementById('expensesTableBody').appendChild(row);
+                }
+            } else {
+                const noResultsRow = document.querySelector('#expensesTableBody .no-results');
+                if (noResultsRow) {
+                    noResultsRow.remove();
+                }
+            }
         });
     }
 
@@ -242,6 +310,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 pagato: form.querySelector('#edit-pagato-costo').checked,
             };
 
+            // Validazione client-side
+            if (!formData.descrizione.trim()) {
+                showNotification('La descrizione è obbligatoria.', 'warning');
+                return;
+            }
+
+            if (!formData.data_pagamento) {
+                showNotification('La data di pagamento è obbligatoria.', 'warning');
+                return;
+            }
+
+            if (isNaN(formData.totale) || formData.totale <= 0) {
+                showNotification('Il totale deve essere un numero positivo.', 'warning');
+                return;
+            }
+
             try {
                 const response = await fetch(`/api/costs/${costoId}`, {
                     method: 'PUT',
@@ -252,11 +336,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
 
                 const result = await response.json();
-                //console.log("Costo aggiornato:", result);
+                showNotification(`Costo "${formData.descrizione}" aggiornato con successo!`, 'success');
                 
                 // Chiudi il modal
                 if (editCostModalInstance) {
@@ -266,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadCosts();
             } catch (error) {
                 console.error("Errore nell'aggiornamento del costo:", error);
-                alert("Si è verificato un errore durante l'aggiornamento. Controlla la console per i dettagli.");
+                showNotification(error.message || 'Si è verificato un errore durante l\'aggiornamento.', 'danger');
             }
         });
     }
@@ -278,6 +363,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!addExpenseModalInstance) {
                 addExpenseModalInstance = bootstrap.Modal.getInstance(addExpenseModalElement) || new bootstrap.Modal(addExpenseModalElement);
             }
+            // Imposta l'anno corrente
+            const annoField = document.getElementById('anno_costo');
+            if (annoField) {
+                const currentYear = new Date().getFullYear();
+                annoField.value = currentYear;
+            }
+            // Imposta la data di oggi
+            const dataField = document.getElementById('data_pagamento_costo');
+            if (dataField) {
+                const today = new Date().toISOString().split('T')[0];
+                dataField.value = today;
+            }
+        });
+        
+        // Pulisci notifiche quando il modal si chiude
+        addExpenseModalElement.addEventListener('hidden.bs.modal', () => {
+            // Opzionalmente puoi pulire le notifiche qui se necessario
+        });
+    }
+
+    // Gestione modal di modifica - pulisci notifiche quando si chiude
+    const editExpenseModalElement = document.getElementById('editExpenseModal');
+    if (editExpenseModalElement) {
+        editExpenseModalElement.addEventListener('hidden.bs.modal', () => {
+            // Opzionalmente puoi pulire le notifiche qui se necessario
         });
     }
 });

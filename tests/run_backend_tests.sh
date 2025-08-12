@@ -154,6 +154,45 @@ curl_check GET "$BASE_URL/invoices/1"
 # FATTURE - DOWNLOAD fattura ZIP (verifica il download e il file)
 curl_check GET "$BASE_URL/invoices/1/download"
 
+# --- NUOVI TEST PER I COSTI ---
+# COSTI - GET lista vuota iniziale
+curl_check GET "$BASE_URL/costs"
+
+# COSTI - POST nuovo costo
+curl_check POST "$BASE_URL/costs" '{
+  "descrizione": "Abbonamento software",
+  "anno_riferimento": 2025,
+  "data_pagamento": "2025-08-12",
+  "totale": 49.99,
+  "pagato": false
+}'
+
+# COSTI - GET lista con costo
+curl_check GET "$BASE_URL/costs"
+
+# COSTI - GET dettaglio costo
+curl_check GET "$BASE_URL/costs/1"
+
+# COSTI - PUT aggiornamento costo
+curl_check PUT "$BASE_URL/costs/1" '{
+  "descrizione": "Abbonamento software (aggiornato)",
+  "anno_riferimento": 2025,
+  "data_pagamento": "2025-08-12",
+  "totale": 59.99,
+  "pagato": true
+}'
+
+# COSTI - GET dettaglio aggiornato
+curl_check GET "$BASE_URL/costs/1"
+
+# COSTI - DELETE costo
+curl_check DELETE "$BASE_URL/costs/1"
+
+# COSTI - GET lista dopo eliminazione (dovrebbe essere di nuovo vuota)
+curl_check GET "$BASE_URL/costs"
+# --- FINE NUOVI TEST ---
+
+
 # Riepilogo finale
 echo -e "\n===== RIEPILOGO TEST ====="
 echo -e "${GREEN}Successi: $success_count${NC}"

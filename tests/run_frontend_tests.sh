@@ -131,6 +131,44 @@ curl_check PUT "$BASE_URL/api/invoices/1" '{
 # Download ZIP fattura 1 (qui verifichiamo solo che risponda correttamente)
 curl_check GET "$BASE_URL/download_invoice_zip/1"
 
+# --- NUOVI TEST PER I COSTI FRONTEND ---
+# COSTI - GET lista vuota iniziale (proxy)
+curl_check GET "$BASE_URL/api/costs"
+
+# COSTI - POST nuovo costo (proxy)
+curl_check POST "$BASE_URL/api/costs" '{
+  "descrizione": "Abbonamento software",
+  "anno_riferimento": 2025,
+  "data_pagamento": "2025-08-12",
+  "totale": 49.99,
+  "pagato": false
+}'
+
+# COSTI - GET lista con costo (proxy)
+curl_check GET "$BASE_URL/api/costs"
+
+# COSTI - GET dettaglio costo (proxy)
+curl_check GET "$BASE_URL/api/costs/1"
+
+# COSTI - PUT aggiornamento costo (proxy)
+curl_check PUT "$BASE_URL/api/costs/1" '{
+  "descrizione": "Abbonamento software (aggiornato)",
+  "anno_riferimento": 2025,
+  "data_pagamento": "2025-08-12",
+  "totale": 59.99,
+  "pagato": true
+}'
+
+# COSTI - GET dettaglio aggiornato (proxy)
+curl_check GET "$BASE_URL/api/costs/1"
+
+# COSTI - DELETE costo (proxy)
+curl_check DELETE "$BASE_URL/api/costs/1"
+
+# COSTI - GET lista dopo eliminazione (proxy)
+curl_check GET "$BASE_URL/api/costs"
+# --- FINE NUOVI TEST ---
+
 echo -e "\n===== RIEPILOGO TEST ====="
 echo -e "${GREEN}Successi: $success_count${NC}"
 echo -e "${RED}Fallimenti: $fail_count${NC}"
