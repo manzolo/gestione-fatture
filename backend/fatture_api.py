@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, send_file, Response, current_app
-from .models import db, Fattura, FatturaProgressivo, Cliente
+from .models import db, Fattura, FatturaProgressivo, Cliente, Costo
 from datetime import datetime
 from sqlalchemy import text, func, extract
 from collections import defaultdict
@@ -261,6 +261,58 @@ def get_invoice_stats():
             'clienti_con_fatture': unique_clients,
             'per_mese': monthly_data,
             'per_cliente': client_data,
+            'anno_selezionato': selected_year
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@invoices_bp.route('/costs/stats', methods=['GET'])
+def get_costs_stats():
+    """Endpoint per ottenere le statistiche dei costi (con supporto per parametro year)."""
+    try:
+        year_param = request.args.get('year')
+        
+        if year_param:
+            selected_year = int(year_param)
+            year_filter = extract('year', Costo.data_pagamento) == selected_year
+            total_costs_amount = db.session.query(func.sum(Costo.totale)).filter(year_filter).scalar() or 0.0
+
+            monthly_stats = db.session.query(
+                extract('month', Costo.data_pagamento).label('mese'),
+                func.count(Costo.id).label('conteggio'),
+                func.sum(Costo.totale).label('totale')
+            ).filter(year_filter).group_by('mese').order_by('mese').all()
+            monthly_data = [{'mese': int(s.mese), 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in monthly_stats]
+
+            
+        else:
+            year_filter = True
+            selected_year = None
+            total_costs_amount = db.session.query(func.sum(Costo.totale)).scalar() or 0.0
+
+            yearly_stats = db.session.query(
+                extract('year', Costo.data_pagamento).label('anno'),
+                func.count(Costo.id).label('conteggio'),
+                func.sum(Costo.totale).label('totale')
+            ).group_by('anno').order_by('anno').all()
+            monthly_data = [{'mese': s.anno, 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in yearly_stats]
+
+        total_costs_count = db.session.query(Costo).filter(year_filter).count()
+
+        category_stats = db.session.query(
+            Costo.descrizione,
+            func.count(Costo.id).label('conteggio'),
+            func.sum(Costo.totale).label('totale')
+        ).filter(year_filter).group_by(Costo.descrizione).order_by(func.count(Costo.id).desc()).all()
+
+        category_data = [{'descrizione': s.descrizione, 'conteggio': s.conteggio, 'totale': float(s.totale)} for s in category_stats]
+
+        return jsonify({
+            'totale_costi': total_costs_count,
+            'totale_annuo': total_costs_amount,
+            'per_mese': monthly_data,
+            'per_descrizione': category_data,
             'anno_selezionato': selected_year
         })
 

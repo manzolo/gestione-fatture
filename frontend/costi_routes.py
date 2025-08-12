@@ -68,3 +68,17 @@ def delete_costo_proxy(costo_id):
     except requests.exceptions.RequestException as e:
         flash(f"Errore durante l'eliminazione del costo: {e}", 'danger')
         return jsonify({'message': f"Errore: {e}"}), 500
+
+@costi_bp.route('/api/costs/stats', methods=['GET'])
+def get_costs_stats_proxy():
+    """Proxy per ottenere le statistiche dei costi."""
+    try:
+        # Passa l'anno selezionato se presente, altrimenti ottieni le statistiche generali
+        year = request.args.get('year')
+        params = {'year': year} if year else {}
+        response = requests.get(f"{BACKEND_URL}/api/costs/stats", params=params)
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante il recupero delle statistiche dei costi: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
