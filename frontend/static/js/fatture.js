@@ -25,10 +25,20 @@ export function initializeInvoices() {
             $('#cliente_id').val(null).trigger('change');
             notifications.info('Form pronto per nuova fattura.', 2000);
         });
+
+        // Imposta il focus sulla select del cliente quando il modale è completamente aperto
+        addInvoiceModal.addEventListener('shown.bs.modal', function () {
+            setTimeout(() => {
+                $('#cliente_id').select2('open');
+            }, 200);
+        });
     }
 
     // Aggiunta nuova fattura
     if (addInvoiceForm) {
+        // Disabilita la validazione HTML5 nativa per questo form
+        addInvoiceForm.setAttribute('novalidate', 'novalidate');
+        
         addInvoiceForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -43,19 +53,24 @@ export function initializeInvoices() {
                 data['inviata_sns'] = inviataSnsCheckbox.checked;
             }
 
-            // Validazione client-side
+            // Validazione client-side migliorata
             if (!data.cliente_id) {
                 notifications.warning('Seleziona un cliente per procedere.');
+                setTimeout(() => {
+                    $('#cliente_id').select2('open');
+                }, 200);
                 return;
             }
 
             if (!data.data_fattura) {
                 notifications.warning('La data della fattura è obbligatoria.');
+                document.getElementById('data_fattura').focus();
                 return;
             }
 
             if (!data.numero_sedute || data.numero_sedute <= 0) {
                 notifications.warning('Il numero di sedute deve essere maggiore di zero.');
+                document.getElementById('numero_sedute').focus();
                 return;
             }
 
@@ -131,6 +146,13 @@ export function initializeInvoices() {
 
                 const editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
                 editModal.show();
+
+                // Focus sulla select del cliente nel modale di modifica
+                document.getElementById('editInvoiceModal').addEventListener('shown.bs.modal', function() {
+                    setTimeout(() => {
+                        $('#edit-cliente_id').select2('open');
+                    }, 200);
+                }, { once: true });
                 
                 notifications.success('Dati fattura caricati per la modifica.', 2000);
             })
@@ -143,6 +165,9 @@ export function initializeInvoices() {
     // Salvataggio modifiche fattura
     const editInvoiceForm = document.getElementById('editInvoiceForm');
     if (editInvoiceForm) {
+        // Disabilita la validazione HTML5 nativa per questo form
+        editInvoiceForm.setAttribute('novalidate', 'novalidate');
+        
         editInvoiceForm.addEventListener('submit', function (event) {
             event.preventDefault();
             const invoiceId = document.getElementById('edit-invoice-id').value;
@@ -154,19 +179,24 @@ export function initializeInvoices() {
                 data['inviata_sns'] = editInviataSns.checked;
             }
 
-            // Validazione client-side
+            // Validazione client-side migliorata per la modifica
             if (!data.cliente_id) {
                 notifications.warning('Seleziona un cliente per procedere.');
+                setTimeout(() => {
+                    $('#edit-cliente_id').select2('open');
+                }, 200);
                 return;
             }
 
             if (!data.data_fattura) {
                 notifications.warning('La data della fattura è obbligatoria.');
+                document.getElementById('edit-data_fattura').focus();
                 return;
             }
 
             if (!data.numero_sedute || data.numero_sedute <= 0) {
                 notifications.warning('Il numero di sedute deve essere maggiore di zero.');
+                document.getElementById('edit-numero_sedute').focus();
                 return;
             }
 
@@ -238,6 +268,9 @@ export function initializeInvoices() {
 
     // Inizializzazione Select2
     if ($('#cliente_id').length) {
+        // Rimuovi l'attributo required dalla select originale per evitare validazione HTML5
+        $('#cliente_id').removeAttr('required');
+        
         $('#cliente_id').select2({
             dropdownParent: $('#addInvoiceModal'),
             placeholder: "Seleziona un cliente",
@@ -246,10 +279,25 @@ export function initializeInvoices() {
         }).on('select2:select', function (e) {
             const clientName = e.params.data.text;
             notifications.info(`Cliente "${clientName}" selezionato.`, 2000);
+        }).on('select2:open', function () {
+            // Focus automatico sul campo di ricerca quando si apre
+            setTimeout(() => {
+                // Prova diversi selettori per trovare il campo di ricerca
+                const searchField = $('.select2-container--open .select2-search__field').last();
+                if (searchField.length > 0) {
+                    searchField.get(0).focus();
+                    console.log('Focus impostato su:', searchField.get(0)); // Debug
+                } else {
+                    console.log('Campo di ricerca non trovato'); // Debug
+                }
+            }, 150);
         });
     }
     
     if ($('#edit-cliente_id').length) {
+        // Rimuovi l'attributo required dalla select originale per evitare validazione HTML5
+        $('#edit-cliente_id').removeAttr('required');
+        
         $('#edit-cliente_id').select2({
             dropdownParent: $('#editInvoiceModal'),
             placeholder: "Seleziona un cliente",
@@ -258,6 +306,18 @@ export function initializeInvoices() {
         }).on('select2:select', function (e) {
             const clientName = e.params.data.text;
             notifications.info(`Cliente cambiato in "${clientName}".`, 2000);
+        }).on('select2:open', function () {
+            // Focus automatico sul campo di ricerca quando si apre
+            setTimeout(() => {
+                // Prova diversi selettori per trovare il campo di ricerca
+                const searchField = $('.select2-container--open .select2-search__field').last();
+                if (searchField.length > 0) {
+                    searchField.get(0).focus();
+                    console.log('Focus impostato su:', searchField.get(0)); // Debug
+                } else {
+                    console.log('Campo di ricerca non trovato'); // Debug
+                }
+            }, 150);
         });
     }
 

@@ -123,3 +123,29 @@ body {
     border-color: #0d6efd;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
+
+/* Disabilita completamente la validazione HTML5 per Select2 */
+select[data-select2-id] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Nasconde tutti i messaggi di validazione HTML5 */
+select:invalid {
+    box-shadow: none !important;
+    border-color: #ced4da !important;
+}
+
+/* Nasconde il bubble di validazione HTML5 */
+select::-webkit-validation-bubble-message,
+select::-webkit-validation-bubble-arrow,
+select::-webkit-validation-bubble {
+    display: none !important;
+}
+
+/* Per Firefox */
+select:-moz-ui-invalid {
+    box-shadow: none !important;
+    border-color: #ced4da !important;
+}
