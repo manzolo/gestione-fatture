@@ -438,7 +438,7 @@ async function setupDashboard() {
         const currentYear = new Date().getFullYear();
         
         // Pulisce le opzioni esistenti
-        yearSelector.innerHTML = '<option value="">Tutti gli anni</option>';
+        yearSelector.innerHTML = '';
         years.forEach(year => {
             const option = document.createElement('option');
             option.value = year;

@@ -1,0 +1,102 @@
+<div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="addClientForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Aggiungi un nuovo Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="nome" name="nome" required>
+                </div>
+                <div class="mb-3">
+                    <label for="cognome" class="form-label">Cognome</label>
+                    <input type="text" class="form-control" id="cognome" name="cognome" required>
+                </div>
+                <div class="mb-3">
+                    <label for="codice_fiscale" class="form-label">Codice Fiscale</label>
+                    <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" required>
+                </div>
+                <div class="mb-3">
+                    <label for="indirizzo" class="form-label">Indirizzo</label>
+                    <input type="text" class="form-control" id="indirizzo" name="indirizzo">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="citta" class="form-label">Città</label>
+                        <input type="text" class="form-control" id="citta" name="citta">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="cap" class="form-label">CAP</label>
+                        <input type="text" class="form-control" id="cap" name="cap">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Aggiungi Cliente</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="editClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editClientForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifica Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-client-id" name="id">
+                <div class="mb-3">
+                    <label for="edit-nome" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="edit-nome" name="nome" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-cognome" class="form-label">Cognome</label>
+                    <input type="text" class="form-control" id="edit-cognome" name="cognome" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-codice_fiscale" class="form-label">Codice Fiscale</label>
+                    <input type="text" class="form-control" id="edit-codice_fiscale" name="codice_fiscale" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-indirizzo" class="form-label">Indirizzo</label>
+                    <input type="text" class="form-control" id="edit-indirizzo" name="indirizzo">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="edit-citta" class="form-label">Città</label>
+                        <input type="text" class="form-control" id="edit-citta" name="citta">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="edit-cap" class="form-label">CAP</label>
+                        <input type="text" class="form-control" id="edit-cap" name="cap">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+            </div>
+        </form>
+    </div>
+    <div class="modal fade" id="confirmDeleteClientModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Conferma eliminazione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler eliminare questo cliente?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" id="confirmDeleteClientBtn" class="btn btn-danger">Elimina</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

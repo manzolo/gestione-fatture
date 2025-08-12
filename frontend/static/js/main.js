@@ -22,7 +22,7 @@ function showTabById(tabButtonSelector) {
 // Inizializzazione principale
 document.addEventListener('DOMContentLoaded', function() {
     // Mostra notifica di benvenuto
-    notifications.success('Gestionale caricato correttamente!', 3000);
+    //notifications.success('Gestionale caricato correttamente!', 3000);
     
     // Inizializzazione bottone vai a clienti
     const gotoClientsBtn = document.getElementById('gotoClientsBtn');

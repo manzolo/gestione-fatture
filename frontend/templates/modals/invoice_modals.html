@@ -1,0 +1,127 @@
+<!-- Modali per le Fatture -->
+
+<!-- Modal Aggiungi Fattura -->
+<div class="modal fade" id="addInvoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="addInvoiceForm" class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Aggiungi una nuova Fattura</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="cliente_id" class="form-label">Seleziona Cliente</label>
+                        <select class="form-control" id="cliente_id" name="cliente_id" required>
+                            <option value="">Seleziona...</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.nome }} {{ client.cognome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="data_fattura" class="form-label">Data Fattura</label>
+                        <input type="date" class="form-control" id="data_fattura" name="data_fattura"
+                            value="{{ now.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="numero_sedute" class="form-label">Numero di Sedute</label>
+                        <input type="number" class="form-control" id="numero_sedute" name="numero_sedute"
+                            value="1" min="1" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="metodo_pagamento" class="form-label">Metodo Pagamento</label>
+                        <select class="form-control" id="metodo_pagamento" name="metodo_pagamento" required>
+                            <option value="Carta di credito/debito">Carta di credito/debito</option>
+                            <option value="Bonifico">Bonifico</option>
+                            <option value="Contanti">Contanti</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="data_pagamento" class="form-label">Data Pagamento (opzionale)</label>
+                        <input type="date" class="form-control" id="data_pagamento" name="data_pagamento"
+                            value="{{ now.strftime('%Y-%m-%d') }}">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="inviata_sns"
+                                name="inviata_sns">
+                            <label class="form-check-label" for="inviata_sns">Inviata a Sistema
+                                Sanitario</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary"><i
+                        class="fas fa-plus-circle me-2"></i>Aggiungi
+                    Fattura</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Modifica Fattura -->
+<div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editInvoiceModalLabel">Modifica Fattura</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editInvoiceForm">
+                    <input type="hidden" id="edit-invoice-id">
+                    <div class="mb-3">
+                        <label for="edit-cliente_id" class="form-label">Seleziona Cliente</label>
+                        <select class="form-control" id="edit-cliente_id" name="cliente_id" required>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.nome }} {{ client.cognome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-data_fattura" class="form-label">Data Fattura</label>
+                        <input type="date" class="form-control" id="edit-data_fattura" name="data_fattura"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-numero_sedute" class="form-label">Numero di Sedute</label>
+                        <input type="number" class="form-control" id="edit-numero_sedute"
+                            name="numero_sedute" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-metodo_pagamento" class="form-label">Metodo Pagamento</label>
+                        <select class="form-control" id="edit-metodo_pagamento" name="metodo_pagamento"
+                            required>
+                            <option value="Carta di credito/debito">Carta di credito/debito</option>
+                            <option value="Bonifico">Bonifico</option>
+                            <option value="Contanti">Contanti</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-data_pagamento" class="form-label">Data Pagamento</label>
+                        <input type="date" class="form-control" id="edit-data_pagamento"
+                            name="data_pagamento">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" id="edit-inviata-sns"
+                            name="inviata_sns">
+                        <label class="form-check-label" for="edit-inviata-sns">Inviata a Sistema
+                            Sanitario</label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
