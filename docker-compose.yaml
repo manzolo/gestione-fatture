@@ -16,6 +16,7 @@ services:
       PGUSER: ${POSTGRES_USER}
       PGDATABASE: ${POSTGRES_DB}
       BACKEND_PORT: ${BACKEND_PORT}
+      GOTENBERG_URL: "http://${GOTENBERG_HOST}:${GOTENBERG_PORT}"
     volumes:
       - ./invoices_data:/app/backend/invoices
     depends_on:
@@ -78,6 +79,15 @@ services:
     depends_on:
       invoice_postgres_db:
         condition: service_healthy
+    networks:
+      - invoice_network
+  invoice_gotenberg:
+    image: gotenberg/gotenberg:7
+    container_name: invoice_gotenberg
+    # Gotenberg ascolta sulla porta 3000, non è necessario esporla all'host
+    # se viene usata solo dalla rete Docker.
+    # ports:
+    #   - "3000:3000"
     networks:
       - invoice_network
 

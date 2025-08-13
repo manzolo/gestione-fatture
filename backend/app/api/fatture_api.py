@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import text, func, extract
 from collections import defaultdict
 from docxtpl import DocxTemplate
-from docx2pdf import convert
+import requests
 import os
 import json
 import tempfile
@@ -126,9 +126,8 @@ def download_invoice_zip(invoice_id):
         cliente = Cliente.query.get_or_404(fattura.cliente_id)
         app_root = current_app.root_path
         
-        # Sposta l'inizializzazione di SAVE_DIR all'interno della funzione
         SAVE_DIR = os.path.join(app_root, 'invoices')
-
+        os.makedirs(SAVE_DIR, exist_ok=True)
         template_path = os.path.join(app_root, 'templates', 'invoice_template.docx')
         if not os.path.exists(template_path):
             return jsonify({"error": "Template file not found"}), 404
@@ -172,13 +171,24 @@ def download_invoice_zip(invoice_id):
             doc = DocxTemplate(template_path)
             doc.render(context)
             doc.save(docx_path)
+            
+            gotenberg_url = os.getenv('GOTENBERG_URL', 'http://localhost:3000')
+            gotenberg_libreoffice_endpoint = f'{gotenberg_url}/forms/libreoffice/convert'
 
-            # Converte il DOCX in PDF usando LibreOffice headless
-            os.system(f'libreoffice --headless --convert-to pdf "{docx_path}" --outdir "{tmpdir}"')
+            files = {
+                'files': open(docx_path, 'rb')
+            }
+            
+            try:
+                response = requests.post(gotenberg_libreoffice_endpoint, files=files, timeout=60)
+                response.raise_for_status()                
+                pdf_path = os.path.join(tmpdir, f"fattura_{fattura.progressivo}_{fattura.anno}.pdf")
+                with open(pdf_path, 'wb') as pdf_file:
+                    pdf_file.write(response.content)
 
-            pdf_path = os.path.join(tmpdir, f"fattura_{fattura.progressivo}_{fattura.anno}.pdf")
-            if not os.path.exists(pdf_path):
-                return jsonify({"error": "Errore nella conversione a PDF"}), 500
+            except requests.exceptions.RequestException as e:
+                print(f"Errore nella comunicazione con Gotenberg: {e}")
+                return jsonify({"error": "Errore nella conversione a PDF (problema con il servizio Gotenberg)"}), 500
 
             # Crea il file ZIP
             zip_path = os.path.join(tmpdir, f"fattura_{fattura.progressivo}_{fattura.anno}.zip")
@@ -186,25 +196,14 @@ def download_invoice_zip(invoice_id):
                 zipf.write(docx_path, os.path.basename(docx_path))
                 zipf.write(pdf_path, os.path.basename(pdf_path))
             
-            # --- AGGIUNTA PER SALVARE IL FILE IN UNA CARTELLA PERMANENTE ---
-            # Assicurati che la directory di salvataggio esista
-            os.makedirs(SAVE_DIR, exist_ok=True)
-            
-            # Definisci il percorso finale per il file ZIP
             final_zip_path = os.path.join(SAVE_DIR, os.path.basename(zip_path))
-            
-            # Copia il file dalla cartella temporanea alla cartella permanente
             shutil.copyfile(zip_path, final_zip_path)
             
-            # Log per debugging (opzionale)
-            print(f"Fattura salvata in: {final_zip_path}")
-            # ------------------------------------------------------------------
-
             return send_file(zip_path, as_attachment=True)
 
     except Exception as e:
-        # In caso di errore, puliamo i file temporanei
         return jsonify({"error": str(e)}), 500
+
     
 @invoices_bp.route('/invoices/years', methods=['GET'])
 def get_available_years():

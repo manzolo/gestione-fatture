@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Installa netcat, postgresql-client, build-essential, LibreOffice headless e Java
 RUN apt-get update && \
-    apt-get install -y curl netcat-traditional postgresql-client build-essential libreoffice libreoffice-java-common default-jre && \
+    apt-get install -y curl netcat-traditional postgresql-client build-essential && \
     rm -rf /var/lib/apt/lists/*
 
 # Copia requirements e installa le dipendenze Python
