@@ -2,10 +2,10 @@ from flask import Flask, render_template
 import os
 from datetime import datetime
 
-# Importa i Blueprint dai nuovi file
-from .cliente_routes import cliente_bp
-from .fattura_routes import fattura_bp
-from .costi_routes import costi_bp
+# Importa i Blueprint dai nuovi file nella cartella routes
+from .routes.cliente_routes import cliente_bp
+from .routes.fattura_routes import fattura_bp
+from .routes.costi_routes import costi_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'una-chiave-segreta-molto-complessa'
