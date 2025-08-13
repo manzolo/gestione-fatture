@@ -1,14 +1,8 @@
 #!/bin/sh
 set -e # Exit immediately if a command exits with a non-zero status.
 
-# Set PYTHONPATH to include the /app directory so Python can find the 'app' package
-#export PYTHONPATH=/app:$PYTHONPATH
-
 # Change to the /app directory where your backend package and alembic.ini are expected to reside
 cd /app
-
-# Parse DATABASE_URL to extract host, port, user, and database name
-# Example DATABASE_URL: postgresql://user:password@emm_postgres_db:5432/backend_db
 
 # Extract DB_HOST (e.g., emm_postgres_db)
 DB_HOST=$(echo "$DATABASE_URL" | sed -e 's|.*@||g' -e 's|:.*||g' -e 's|/.*||g')
