@@ -147,10 +147,14 @@ export function initializeInvoices() {
                 const editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
                 editModal.show();
 
-                // Focus sulla select del cliente nel modale di modifica
+                // Focus sul numero sedute nel modale di modifica
                 document.getElementById('editInvoiceModal').addEventListener('shown.bs.modal', function() {
                     setTimeout(() => {
-                        $('#edit-cliente_id').select2('open');
+                        const numeroSeduteField = document.getElementById('edit-numero_sedute');
+                        if (numeroSeduteField) {
+                            numeroSeduteField.focus();
+                            numeroSeduteField.select(); // Seleziona tutto il contenuto per facilitare la modifica
+                        }
                     }, 200);
                 }, { once: true });
                 

@@ -24,8 +24,7 @@
                     Anno {{ anno }} ({{ fatture_anno | length }} fatture)
                 </button>
             </h2>
-            <div id="collapse-{{ anno }}"
-                class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+            <div id="collapse-{{ anno }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
                 aria-labelledby="heading-{{ anno }}" data-bs-parent="#invoicesAccordion">
                 <div class="accordion-body p-0">
                     <div class="table-responsive">
@@ -52,8 +51,7 @@
                                         invoice.data_pagamento else 'N/D' }}</td>
                                     <td>
                                         {% if invoice.metodo_pagamento == 'Carta di credito/debito' %}
-                                        <i class="fas fa-credit-card text-primary"
-                                            title="Carta di credito/debito"></i>
+                                        <i class="fas fa-credit-card text-primary" title="Carta di credito/debito"></i>
                                         {% elif invoice.metodo_pagamento == 'Bonifico' %}
                                         <i class="fas fa-university text-success" title="Bonifico"></i>
                                         {% elif invoice.metodo_pagamento == 'Contanti' %}
@@ -73,12 +71,17 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('fattura_bp.download_invoice_zip', invoice_id=invoice.id) }}"
-                                            class="btn btn-success btn-sm" title="Scarica fattura"><i
-                                                class="fas fa-download"></i></a>
-                                        <button type="button" class="btn btn-primary btn-sm"
-                                            onclick="openEditInvoiceModal({{ invoice.id }})"
-                                            title="Modifica"><i class="fas fa-edit"></i></button>
+                                        <div class="action-buttons">
+                                            <a href="{{ url_for('fattura_bp.download_invoice_zip', invoice_id=invoice.id) }}"
+                                                class="btn btn-success btn-action" title="Scarica fattura">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-warning btn-action"
+                                                onclick="openEditInvoiceModal({{ invoice.id }})"
+                                                title="Modifica fattura">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}

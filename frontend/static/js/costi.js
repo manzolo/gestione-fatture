@@ -28,8 +28,10 @@ async function loadCosts() {
                 <td>€${costo.totale.toFixed(2)}</td>
                 <td>${costo.pagato ? '<span class="badge bg-success">Pagato</span>' : '<span class="badge bg-danger">Non Pagato</span>'}</td>
                 <td>
-                    <button class="btn btn-warning btn-sm edit-cost-btn" data-id="${costo.id}" title="Modifica"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-danger btn-sm delete-cost-btn" data-id="${costo.id}" title="Elimina"><i class="fas fa-trash-alt"></i></button>
+                    <div class="action-buttons">
+                        <button class="btn btn-warning btn-action edit-cost-btn" data-id="${costo.id}" title="Modifica"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-action delete-cost-btn" data-id="${costo.id}" title="Elimina"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 </td>
             `;
             tableBody.appendChild(row);
