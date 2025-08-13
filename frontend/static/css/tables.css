@@ -1,0 +1,9 @@
+/* tables.css - Stili per le tabelle */
+
+/* Colonna azioni nelle tabelle */
+.table th:last-child,
+.table td:last-child {
+    width: 80px;
+    min-width: 80px;
+    text-align: center;
+}

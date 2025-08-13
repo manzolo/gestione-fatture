@@ -1,0 +1,66 @@
+/* base.css - Stili di base e layout generale */
+
+body {
+    padding: 20px;
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+/* Colori globali */
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.cost-value {
+    color: #dc3545 !important;
+}
+
+/* Griglia responsive personalizzata */
+.col-md-2-4 {
+    flex: 0 0 auto;
+    width: 18%;
+}
+
+/* Disabilita validazione HTML5 per Select2 */
+select[data-select2-id] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+select:invalid {
+    box-shadow: none !important;
+    border-color: #dee2e6 !important;
+}
+
+select::-webkit-validation-bubble-message,
+select::-webkit-validation-bubble-arrow,
+select::-webkit-validation-bubble {
+    display: none !important;
+}
+
+select:-moz-ui-invalid {
+    box-shadow: none !important;
+    border-color: #dee2e6 !important;
+}

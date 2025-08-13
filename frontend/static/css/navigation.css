@@ -1,0 +1,30 @@
+/* navigation.css - Stili per navigazione e tab */
+
+/* Navigazione con tab */
+.nav-tabs {
+    border-bottom: none;
+    margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    margin: 0 3px;
+    background: #f8f9fa;
+    color: #6c757d;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background: #e9ecef;
+    color: #007bff;
+}
+
+.nav-tabs .nav-link.active {
+    background: #007bff;
+    color: white !important;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+}

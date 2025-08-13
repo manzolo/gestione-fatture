@@ -1,0 +1,20 @@
+/* modals.css - Stili per i modal e dropdown */
+
+/* Modal e Select2 */
+.modal .dropdown-menu {
+    z-index: 2000 !important;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal .select2-container {
+    z-index: 2000 !important;
+}
+
+.modal .select2-container .select2-dropdown {
+    z-index: 2001 !important;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}

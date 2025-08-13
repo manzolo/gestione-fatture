@@ -1,48 +1,4 @@
-/* Stili Generali */
-.page-header {
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    border-left: 6px solid #007bff;
-}
-
-.page-header h2 {
-    color: #2d3748;
-    font-weight: 700;
-}
-
-.card {
-    margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: none;
-    border-radius: 12px;
-    background: white;
-    transition: all 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-}
-
-/* Year Selector */
-.year-selector {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-weight: 600;
-    color: #495057;
-    transition: all 0.3s ease;
-}
-
-.year-selector:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.15);
-    background: white;
-}
+/* dashboard.css - Stili specifici per la dashboard */
 
 /* Stats Section */
 .stats-section {
@@ -70,11 +26,25 @@
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
 }
 
-.stat-card.primary { border-left-color: #007bff; }
-.stat-card.info { border-left-color: #6f42c1; }
-.stat-card.success { border-left-color: #28a745; }
-.stat-card.danger { border-left-color: #dc3545; }
-.stat-card.warning { border-left-color: #fd7e14; }
+.stat-card.primary { 
+    border-left-color: #007bff; 
+}
+
+.stat-card.info { 
+    border-left-color: #6f42c1; 
+}
+
+.stat-card.success { 
+    border-left-color: #28a745; 
+}
+
+.stat-card.danger { 
+    border-left-color: #dc3545; 
+}
+
+.stat-card.warning { 
+    border-left-color: #fd7e14; 
+}
 
 .stat-card .card-body {
     padding: 0.5rem 1rem;
@@ -87,11 +57,25 @@
     transition: all 0.3s ease;
 }
 
-.stat-card.primary .stat-icon { color: #007bff; }
-.stat-card.info .stat-icon { color: #6f42c1; }
-.stat-card.success .stat-icon { color: #28a745; }
-.stat-card.danger .stat-icon { color: #dc3545; }
-.stat-card.warning .stat-icon { color: #fd7e14; }
+.stat-card.primary .stat-icon { 
+    color: #007bff; 
+}
+
+.stat-card.info .stat-icon { 
+    color: #6f42c1; 
+}
+
+.stat-card.success .stat-icon { 
+    color: #28a745; 
+}
+
+.stat-card.danger .stat-icon { 
+    color: #dc3545; 
+}
+
+.stat-card.warning .stat-icon { 
+    color: #fd7e14; 
+}
 
 .stat-card:hover .stat-icon {
     transform: scale(1.1);
@@ -111,115 +95,4 @@
     font-weight: 800;
     margin-bottom: 0.5rem;
     color: #2d3748;
-}
-
-/* Charts Section */
-.charts-section {
-    margin-top: 3rem;
-}
-
-.chart-container {
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    border-left: 6px solid #007bff;
-    height: 100%;
-}
-
-.chart-title {
-    color: #2d3748;
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.chart-canvas {
-    height: 400px;
-    width: 100%;
-}
-
-/* Responsive per la dashboard */
-@media (max-width: 1200px) {
-    .stats-row .col-md-2-4 {
-        width: 33.333333%;
-        margin-bottom: 1.5rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .stats-row .col-md-2-4 {
-        width: 50%;
-        margin-bottom: 1.5rem;
-    }
-
-    .page-header {
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .page-header .d-flex {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .stat-card .card-body {
-        padding: 2rem 1.5rem;
-    }
-
-    .stat-card .card-text.fs-4 {
-        font-size: 1rem;
-    }
-
-    .chart-container {
-        padding: 1.5rem;
-    }
-
-    .chart-canvas {
-        height: 350px;
-    }
-}
-
-@media (max-width: 576px) {
-    .stats-row .col-md-2-4 {
-        width: 100%;
-        margin-bottom: 1.5rem;
-    }
-
-    .stats-row {
-        gap: 1rem;
-    }
-
-    .stat-card .stat-icon {
-        font-size: 3rem;
-    }
-
-    .stat-card .card-text.fs-4 {
-        font-size: 1.8rem;
-    }
-
-    .year-selector {
-        width: 140px;
-    }
-}
-
-/* Animazioni */
-.fade-in {
-    animation: fadeIn 0.6s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.slide-in {
-    animation: slideIn 0.8s ease-in-out;
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-30px); }
-    to { opacity: 1; transform: translateX(0); }
 }
