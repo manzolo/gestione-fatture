@@ -1,37 +1,38 @@
 <!-- Sezione Dashboard -->
 <div class="tab-pane fade" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-        <h2 class="mb-0">Panoramica e Report</h2>
-        <div class="d-flex align-items-center">
-            <label for="yearSelector" class="form-label me-2 mb-0">Anno:</label>
-            <select class="form-select" id="yearSelector" style="width: 150px;">
-                <!-- Verrà popolato dinamicamente via JavaScript, ma l'anno corrente sarà preselezionato -->
-            </select>
-        </div>
-    </div>
-
-    <div class="row" id="dashboard-stats">
-        <!-- Le statistiche verranno caricate qui dinamicamente -->
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0" id="chartPerMeseTitle">Totale Fatturato per Mese</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="chartPerMese"></canvas>
-                </div>
+    <!-- Header della Dashboard -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0"><i class="fas fa-chart-line me-3"></i>Panoramica e Report</h2>
+            <div class="d-flex align-items-center">
+                <label for="yearSelector" class="form-label me-3 mb-0 fw-semibold">Anno:</label>
+                <select class="form-select year-selector" id="yearSelector" style="width: 160px;">
+                    <!-- Verrà popolato dinamicamente via JavaScript, ma l'anno corrente sarà preselezionato -->
+                </select>
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Fatture per Cliente</h5>
+    </div>
+
+    <!-- Sezione Statistiche -->
+    <div class="stats-section">
+        <div class="row stats-row" id="dashboard-stats">
+            <!-- Le statistiche verranno caricate qui dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Sezione Grafici -->
+    <div class="charts-section">
+        <div class="row">
+            <div class="col-lg-7 col-md-6 mb-4">
+                <div class="chart-container">
+                    <h3 class="chart-title" id="chartPerMeseTitle">Totale Fatturato per Mese</h3>
+                    <canvas id="chartPerMese" class="chart-canvas"></canvas>
                 </div>
-                <div class="card-body">
-                    <canvas id="chartPerCliente"></canvas>
+            </div>
+            <div class="col-lg-5 col-md-6 mb-4">
+                <div class="chart-container">
+                    <h3 class="chart-title">Distribuzione Fatture per Cliente</h3>
+                    <canvas id="chartPerCliente" class="chart-canvas"></canvas>
                 </div>
             </div>
         </div>
