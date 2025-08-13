@@ -8,7 +8,7 @@ from .routes.fattura_routes import fattura_bp
 from .routes.costi_routes import costi_bp
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'una-chiave-segreta-molto-complessa'
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "una-chiave-segreta-molto-complessa")
 
 # Variabile d'ambiente per l'URL del backend
 BACKEND_URL = os.getenv("BACKEND_URL", "http://invoice_backend:5000")

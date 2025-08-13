@@ -38,6 +38,7 @@ services:
       - "${FRONTEND_EXTERNAL_PORT}:80"
     environment:
       BACKEND_URL: http://${BACKEND_HOST}:${BACKEND_PORT}
+      SECRET_KEY: ${SECRET_KEY}
     depends_on:
       invoice_backend:
         condition: service_healthy
