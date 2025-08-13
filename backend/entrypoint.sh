@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e # Exit immediately if a command exits with a non-zero status.
 
-# Set PYTHONPATH to include the /app directory so Python can find the 'backend' package
-export PYTHONPATH=/app:$PYTHONPATH
+# Set PYTHONPATH to include the /app directory so Python can find the 'app' package
+#export PYTHONPATH=/app:$PYTHONPATH
 
 # Change to the /app directory where your backend package and alembic.ini are expected to reside
 cd /app
@@ -16,7 +16,7 @@ DB_HOST=$(echo "$DATABASE_URL" | sed -e 's|.*@||g' -e 's|:.*||g' -e 's|/.*||g')
 # Extract DB_PORT (e.g., 5432). Default to 5432 if not explicitly in URL
 DB_PORT=$(echo "$DATABASE_URL" | sed -n 's|.*:\([0-9]*\)/.*|\1|p')
 if [ -z "$DB_PORT" ]; then
-  DB_PORT="5432" # Default PostgreSQL port
+    DB_PORT="5432" # Default PostgreSQL port
 fi
 
 # Extract DB_USER (e.g., user)
@@ -28,11 +28,9 @@ DB_NAME=$(echo "$DATABASE_URL" | sed -e 's|.*/||g')
 echo "Waiting for PostgreSQL at $DB_HOST:$DB_PORT (User: $DB_USER, DB: $DB_NAME)..."
 
 # Loop until pg_isready reports success
-# pg_isready uses PGPASSWORD environment variable if set, otherwise it will prompt.
-# It's better to pass user and dbname explicitly for clarity.
 until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME"; do
-  echo "PostgreSQL is unavailable - sleeping"
-  sleep 1
+    echo "PostgreSQL is unavailable - sleeping"
+    sleep 1
 done
 
 echo "PostgreSQL is up - executing migrations"
@@ -42,8 +40,6 @@ echo "Running Alembic migrations..."
 python -m alembic upgrade head
 echo "Alembic migrations completed."
 
-# Start the FastAPI application
-#echo "Starting FastAPI application..."
-#exec uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
-echo "Starting Flask application with Gunicorn..."
-exec gunicorn -b 0.0.0.0:8000 "backend.main:app"
+# Start the application
+echo "Starting application with Gunicorn..."
+exec gunicorn -b 0.0.0.0:8000 "app.main:app"

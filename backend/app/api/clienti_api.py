@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .models import db, Cliente
+from app.models import db, Cliente
 from codicefiscale import isvalid
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound

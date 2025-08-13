@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, send_file, Response
-from .models import db
+from app.models import db
 from datetime import datetime
 import os
-from .clienti_api import clients_bp
-from .fatture_api import invoices_bp
-from .costi_api import costi_bp
+from app.api.clienti_api import clients_bp
+from app.api.fatture_api import invoices_bp
+from app.api.costi_api import costi_bp
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_SQLALCHEMY_URL') or 'sqlite:///test.db'

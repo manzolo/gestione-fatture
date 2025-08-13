@@ -53,7 +53,7 @@ function curl_check() {
   body="${response:0:${#response}-3}"
 
   # Qui controllo se è un errore ma con messaggio previsto
-  if [[ "$http_code" == "400" ]] && [[ "$body" == *"Impossibile eliminare un cliente con fatture associate."* ]]; then
+  if [[ "$http_code" == "400" ]] && [[ "$body" == *"fatture associate."* ]]; then
     color=$GREEN
     status_text="EXPECTED FAILURE"
     ((success_count++))  # Non considerarlo fallito

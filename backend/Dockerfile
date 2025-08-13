@@ -15,10 +15,13 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY ./backend/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-# Copia il codice backend
-COPY ./backend /app/backend
+# Copia il codice backend nella cartella app
+COPY ./backend/app /app/app
+
+# Copia alembic
 COPY ./backend/alembic.ini /app/
 COPY ./backend/alembic /app/alembic
 
 EXPOSE 8000
+
 ENTRYPOINT ["/app/entrypoint.sh"]

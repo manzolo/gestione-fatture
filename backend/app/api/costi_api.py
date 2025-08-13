@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .models import db, Costo
+from app.models import db, Costo
 from datetime import datetime
 
 # Crea un Blueprint per le rotte API dei costi

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, send_file, Response, current_app
-from .models import db, Fattura, FatturaProgressivo, Cliente, Costo
+from app.models import db, Fattura, FatturaProgressivo, Cliente, Costo
 from datetime import datetime
 from sqlalchemy import text, func, extract
 from collections import defaultdict
@@ -10,7 +10,7 @@ import json
 import tempfile
 import zipfile
 import shutil
-from .utils import calculate_invoice_totals, PRESTAZIONE_BASE, BOLLO_COSTO, BOLLO_SOGLIA
+from app.utils import calculate_invoice_totals, PRESTAZIONE_BASE, BOLLO_COSTO, BOLLO_SOGLIA
 
 invoices_bp = Blueprint('invoices_bp', __name__)
 
