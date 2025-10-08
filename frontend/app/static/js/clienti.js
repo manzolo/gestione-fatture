@@ -1,6 +1,14 @@
 // ====== CLIENTI CRUD CON NOTIFICHE UNIFICATE =======
 import { notifications } from './notifications.js';
 
+// Funzione per salvare la tab attiva
+function saveActiveTab() {
+    const activeTab = document.querySelector('.nav-link.active');
+    if (activeTab) {
+        localStorage.setItem('activeTab', activeTab.id);
+    }
+}
+
 export function initializeClients() {
     let clientToDelete = null;
 
@@ -149,6 +157,7 @@ export function initializeClients() {
                 await handleApiResponse(response, 'l\'aggiunta del cliente');
                 
                 notifications.success(`Cliente ${data.nome} ${data.cognome} aggiunto con successo!`);
+                saveActiveTab(); // Salva la tab prima del reload
                 setTimeout(() => window.location.reload(), 1500);
                 
             } catch (error) {
@@ -204,6 +213,7 @@ export function initializeClients() {
                 await handleApiResponse(response, 'l\'aggiornamento del cliente');
                 
                 notifications.success(`Cliente ${data.nome} ${data.cognome} aggiornato con successo!`);
+                saveActiveTab(); // Salva la tab prima del reload
                 setTimeout(() => window.location.reload(), 1500);
                 
             } catch (error) {
@@ -231,6 +241,7 @@ export function initializeClients() {
                     await handleApiResponse(response, 'l\'eliminazione del cliente');
                     
                     notifications.success(`Cliente ${clientName} eliminato con successo!`);
+                    saveActiveTab(); // Salva la tab prima del reload
                     setTimeout(() => window.location.reload(), 1500);
                     
                 } catch (error) {

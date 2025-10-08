@@ -1,6 +1,14 @@
 // ====== FATTURE CRUD CON NOTIFICHE UNIFICATE =======
 import { notifications } from './notifications.js';
 
+// Funzione per salvare la tab attiva
+function saveActiveTab() {
+    const activeTab = document.querySelector('.nav-link.active');
+    if (activeTab) {
+        localStorage.setItem('activeTab', activeTab.id);
+    }
+}
+
 export function initializeInvoices() {
     // Sincronizza la data della fattura con la data del pagamento
     const dataFatturaInput = document.getElementById('data_fattura');
@@ -88,12 +96,10 @@ export function initializeInvoices() {
                     return response.json();
                 })
                 .then(result => {
-                    console.log('Risposta del server:', result); // Debug per vedere la struttura
+                    console.log('Risposta del server:', result);
                     
-                    // Prova diversi possibili nomi per il numero fattura
                     const numeroFattura = result.numero_fattura || result.invoice_number || result.number || result.id || 'nuova';
                     
-                    // Crea un messaggio più descrittivo
                     let successMessage = 'Fattura creata con successo!';
                     if (numeroFattura && numeroFattura !== 'nuova') {
                         successMessage = `Fattura #${numeroFattura} creata con successo!`;
@@ -107,6 +113,7 @@ export function initializeInvoices() {
                         modal.hide();
                     }
                     
+                    saveActiveTab(); // Salva la tab prima del reload
                     setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
@@ -153,7 +160,7 @@ export function initializeInvoices() {
                         const numeroSeduteField = document.getElementById('edit-numero_sedute');
                         if (numeroSeduteField) {
                             numeroSeduteField.focus();
-                            numeroSeduteField.select(); // Seleziona tutto il contenuto per facilitare la modifica
+                            numeroSeduteField.select();
                         }
                     }, 200);
                 }, { once: true });
@@ -218,9 +225,8 @@ export function initializeInvoices() {
                     return response.json();
                 })
                 .then(result => {
-                    console.log('Risposta aggiornamento:', result); // Debug
+                    console.log('Risposta aggiornamento:', result);
                     
-                    // Prova diversi possibili nomi per il numero fattura
                     const numeroFattura = result.numero_fattura || result.invoice_number || result.number || invoiceId;
                     
                     let successMessage = 'Fattura aggiornata con successo!';
@@ -236,6 +242,7 @@ export function initializeInvoices() {
                         editModal.hide();
                     }
                     
+                    saveActiveTab(); // Salva la tab prima del reload
                     setTimeout(() => window.location.reload(), 1500);
                 })
                 .catch(error => {
@@ -284,15 +291,10 @@ export function initializeInvoices() {
             const clientName = e.params.data.text;
             notifications.info(`Cliente "${clientName}" selezionato.`, 2000);
         }).on('select2:open', function () {
-            // Focus automatico sul campo di ricerca quando si apre
             setTimeout(() => {
-                // Prova diversi selettori per trovare il campo di ricerca
                 const searchField = $('.select2-container--open .select2-search__field').last();
                 if (searchField.length > 0) {
                     searchField.get(0).focus();
-                    console.log('Focus impostato su:', searchField.get(0)); // Debug
-                } else {
-                    console.log('Campo di ricerca non trovato'); // Debug
                 }
             }, 150);
         });
@@ -311,15 +313,10 @@ export function initializeInvoices() {
             const clientName = e.params.data.text;
             notifications.info(`Cliente cambiato in "${clientName}".`, 2000);
         }).on('select2:open', function () {
-            // Focus automatico sul campo di ricerca quando si apre
             setTimeout(() => {
-                // Prova diversi selettori per trovare il campo di ricerca
                 const searchField = $('.select2-container--open .select2-search__field').last();
                 if (searchField.length > 0) {
                     searchField.get(0).focus();
-                    console.log('Focus impostato su:', searchField.get(0)); // Debug
-                } else {
-                    console.log('Campo di ricerca non trovato'); // Debug
                 }
             }, 150);
         });

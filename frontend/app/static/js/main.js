@@ -9,6 +9,29 @@ import { notifications } from './notifications.js';
 // Rendi il sistema di notifiche disponibile globalmente
 window.notifications = notifications;
 
+// Funzione per salvare la tab attiva
+function saveActiveTab() {
+    const activeTab = document.querySelector('.nav-link.active');
+    if (activeTab) {
+        localStorage.setItem('activeTab', activeTab.id);
+        //console.log('Tab salvata:', activeTab.id); // Debug
+    }
+}
+
+// Funzione per ripristinare la tab attiva
+function restoreActiveTab() {
+    const activeTabId = localStorage.getItem('activeTab');
+    //console.log('Tab da ripristinare:', activeTabId); // Debug
+    if (activeTabId) {
+        const tabElement = document.getElementById(activeTabId);
+        if (tabElement) {
+            const tab = new bootstrap.Tab(tabElement);
+            tab.show();
+            //console.log('Tab ripristinata:', activeTabId); // Debug
+        }
+    }
+}
+
 // ----- Helper per mostrare tab -----
 function showTabById(tabButtonSelector) {
     const tabEl = document.querySelector(tabButtonSelector);
@@ -21,8 +44,17 @@ function showTabById(tabButtonSelector) {
 
 // Inizializzazione principale
 document.addEventListener('DOMContentLoaded', function() {
-    // Mostra notifica di benvenuto
-    //notifications.success('Gestionale caricato correttamente!', 3000);
+    // Ripristina la tab attiva se presente
+    restoreActiveTab();
+    
+    // Aggiungi listener per salvare automaticamente la tab quando cambia
+    const tabButtons = document.querySelectorAll('.nav-tabs button[data-bs-toggle="tab"]');
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function(event) {
+            //console.log('Tab cambiata a:', event.target.id); // Debug
+            saveActiveTab();
+        });
+    });
     
     // Inizializzazione bottone vai a clienti
     const gotoClientsBtn = document.getElementById('gotoClientsBtn');

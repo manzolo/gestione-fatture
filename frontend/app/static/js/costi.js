@@ -1,6 +1,26 @@
 // ====== COSTI CRUD CON NOTIFICHE UNIFICATE =======
 import { notifications } from './notifications.js';
 
+// Funzione per salvare la tab attiva
+function saveActiveTab() {
+    const activeTab = document.querySelector('.nav-link.active');
+    if (activeTab) {
+        localStorage.setItem('activeTab', activeTab.id);
+    }
+}
+
+// Funzione per ripristinare la tab attiva
+function restoreActiveTab() {
+    const activeTabId = localStorage.getItem('activeTab');
+    if (activeTabId) {
+        const tabElement = document.getElementById(activeTabId);
+        if (tabElement) {
+            const tab = new bootstrap.Tab(tabElement);
+            tab.show();
+        }
+    }
+}
+
 // Funzione per caricare i costi dal backend e popolare la tabella
 async function loadCosts() {
     // Non serve più loadCosts dinamicamente perché i costi sono già nel template
