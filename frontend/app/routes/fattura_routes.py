@@ -3,6 +3,7 @@ import requests
 import os
 from datetime import datetime
 from io import BytesIO
+from collections import defaultdict
 
 # Crea un Blueprint per le rotte delle fatture
 fattura_bp = Blueprint('fattura_bp', __name__)
@@ -14,6 +15,7 @@ BACKEND_URL = os.getenv("BACKEND_URL", "http://invoice_backend:5000")
 def fatture():
     """Rotta per la gestione delle fatture e la dashboard."""
     try:
+        # Recupera i clienti
         clients_response = requests.get(f"{BACKEND_URL}/api/clients")
         clients_response.raise_for_status()
         clients = clients_response.json()
@@ -21,15 +23,32 @@ def fatture():
         # Ordina la lista dei clienti per cognome e poi per nome
         clients.sort(key=lambda c: (c['cognome'], c['nome']))
 
+        # Recupera le fatture
         invoices_response = requests.get(f"{BACKEND_URL}/api/invoices")
         invoices_response.raise_for_status()
         invoices = invoices_response.json()
+        
+        # Recupera i costi
+        costs_response = requests.get(f"{BACKEND_URL}/api/costs")
+        costs_response.raise_for_status()
+        costs_data = costs_response.json()
+        
+        # Raggruppa i costi per anno
+        costs_grouped = defaultdict(list)
+        for cost in costs_data:
+            costs_grouped[cost['anno_riferimento']].append(cost)
+        
+        # Ordina gli anni in ordine decrescente
+        sorted_years = sorted(costs_grouped.keys(), reverse=True)
+        costs = {year: costs_grouped[year] for year in sorted_years}
+        
     except requests.exceptions.RequestException as e:
         flash(f"Errore di connessione al backend: {e}", 'danger')
         clients = []
         invoices = []
+        costs = {}
 
-    return render_template('index.html', clients=clients, invoices=invoices, now=datetime.now())
+    return render_template('index.html', clients=clients, invoices=invoices, costs=costs, now=datetime.now())
 
 # --- Proxy API per le fatture e le statistiche ---
 @fattura_bp.route('/api/invoices', methods=['POST'])

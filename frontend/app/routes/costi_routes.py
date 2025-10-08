@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, flash
+from flask import Blueprint, request, jsonify, flash, render_template
 import requests
 import os
+from collections import defaultdict
 
 # Crea un Blueprint per le rotte dei costi
 costi_bp = Blueprint('costi_bp', __name__)

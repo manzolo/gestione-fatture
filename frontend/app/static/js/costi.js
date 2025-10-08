@@ -3,88 +3,8 @@ import { notifications } from './notifications.js';
 
 // Funzione per caricare i costi dal backend e popolare la tabella
 async function loadCosts() {
-    const tableBody = document.getElementById('expensesTableBody');
-    tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Caricamento in corso...</td></tr>';
-
-    try {
-        const response = await fetch('/api/costs');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const costs = await response.json();
-        
-        tableBody.innerHTML = ''; // Pulisci la tabella
-        if (costs.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Nessun costo registrato.</td></tr>';
-            return;
-        }
-
-        costs.forEach(costo => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${costo.descrizione}</td>
-                <td>${costo.anno_riferimento}</td>
-                <td>${costo.data_pagamento}</td>
-                <td>€${costo.totale.toFixed(2)}</td>
-                <td>${costo.pagato ? '<span class="badge bg-success">Pagato</span>' : '<span class="badge bg-danger">Non Pagato</span>'}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="btn btn-warning btn-action edit-cost-btn" data-id="${costo.id}" title="Modifica"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-action delete-cost-btn" data-id="${costo.id}" title="Elimina"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // Rimuovi event listener esistenti per evitare duplicati
-        document.querySelectorAll('.edit-cost-btn').forEach(button => {
-            button.removeEventListener('click', handleEditButtonClick);
-            button.addEventListener('click', handleEditButtonClick);
-        });
-        
-        document.querySelectorAll('.delete-cost-btn').forEach(button => {
-            button.removeEventListener('click', handleDeleteButtonClick);
-            button.addEventListener('click', handleDeleteButtonClick);
-        });
-
-    } catch (error) {
-        console.error("Errore nel caricamento dei costi:", error);
-        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Errore nel caricamento dei costi. Riprova più tardi.</td></tr>`;
-        notifications.error('Errore nel caricamento dei costi. Riprova più tardi.');
-    }
-}
-
-// Handler separato per il pulsante di modifica
-function handleEditButtonClick(e) {
-    const costoId = e.currentTarget.dataset.id;
-    openEditCostModal(costoId);
-}
-
-// Handler separato per il pulsante di eliminazione
-function handleDeleteButtonClick(e) {
-    const costoId = e.currentTarget.dataset.id;
-    showDeleteConfirmation(costoId);
-}
-
-// Funzione per mostrare il modal di conferma eliminazione
-function showDeleteConfirmation(costoId) {
-    // Trova la descrizione del costo per la conferma
-    const button = document.querySelector(`[data-id="${costoId}"].delete-cost-btn`);
-    const row = button.closest('tr');
-    const descrizione = row ? row.cells[0].textContent : 'questo costo';
-    
-    notifications.confirm(
-        `Sei sicuro di voler eliminare il costo "${descrizione}"? Questa azione non può essere annullata.`,
-        () => {
-            handleDeleteCost(costoId);
-        },
-        () => {
-            notifications.info('Eliminazione annullata.', 2000);
-        },
-        'Elimina',
-        'Annulla'
-    );
+    // Non serve più loadCosts dinamicamente perché i costi sono già nel template
+    // Questa funzione può essere rimossa o utilizzata per ricaricare dopo modifiche
 }
 
 // Variabile globale per l'istanza del modal di modifica
@@ -129,6 +49,38 @@ async function openEditCostModal(costoId) {
     }
 }
 
+// Funzione per mostrare il modal di conferma eliminazione
+function showDeleteConfirmation(costoId) {
+    // Trova la descrizione del costo per la conferma
+    const button = document.querySelector(`[data-id="${costoId}"].delete-cost-btn`);
+    const row = button.closest('tr');
+    const descrizione = row ? row.cells[0].textContent : 'questo costo';
+    
+    notifications.confirm(
+        `Sei sicuro di voler eliminare il costo "${descrizione}"? Questa azione non può essere annullata.`,
+        () => {
+            handleDeleteCost(costoId);
+        },
+        () => {
+            notifications.info('Eliminazione annullata.', 2000);
+        },
+        'Elimina',
+        'Annulla'
+    );
+}
+
+// Handler separato per il pulsante di modifica
+function handleEditButtonClick(e) {
+    const costoId = e.currentTarget.dataset.id;
+    openEditCostModal(costoId);
+}
+
+// Handler separato per il pulsante di eliminazione
+function handleDeleteButtonClick(e) {
+    const costoId = e.currentTarget.dataset.id;
+    showDeleteConfirmation(costoId);
+}
+
 // Funzione per gestire l'eliminazione di un costo
 async function handleDeleteCost(costoId) {
     try {
@@ -141,7 +93,7 @@ async function handleDeleteCost(costoId) {
         }
         
         notifications.success('Costo eliminato con successo!');
-        loadCosts();
+        setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
         console.error("Errore durante l'eliminazione del costo:", error);
         notifications.error('Si è verificato un errore durante l\'eliminazione del costo.');
@@ -153,7 +105,14 @@ let addExpenseModalInstance = null;
 
 // Inizializzazione principale
 document.addEventListener('DOMContentLoaded', () => {
-    loadCosts();
+    // Aggiungi event listener per i pulsanti di modifica ed eliminazione
+    document.querySelectorAll('.edit-cost-btn').forEach(button => {
+        button.addEventListener('click', handleEditButtonClick);
+    });
+    
+    document.querySelectorAll('.delete-cost-btn').forEach(button => {
+        button.addEventListener('click', handleDeleteButtonClick);
+    });
 
     // Gestione form di aggiunta costo
     const addExpenseForm = document.getElementById('addExpenseForm');
@@ -212,8 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 
-                form.reset(); // Resetta il form
-                loadCosts(); // Ricarica la lista
+                setTimeout(() => window.location.reload(), 1500);
             } catch (error) {
                 console.error("Errore nell'aggiunta del costo:", error);
                 notifications.error(error.message || 'Si è verificato un errore durante l\'aggiunta del costo.');
@@ -221,41 +179,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Gestione ricerca/filtro costi
+    // Gestione ricerca/filtro costi con accordion
     const expenseSearch = document.getElementById('expenseSearch');
     if (expenseSearch) {
         expenseSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#expensesTableBody tr');
+            const accordionItems = document.querySelectorAll('#costsAccordion .accordion-item');
+            let totalVisibleCount = 0;
 
-            let visibleCount = 0;
-            rows.forEach(row => {
-                const rowText = row.textContent.toLowerCase();
-                if (rowText.includes(searchTerm) || searchTerm === '') {
-                    row.style.display = '';
-                    if (!row.textContent.includes('Nessun costo') && !row.textContent.includes('Caricamento')) {
-                        visibleCount++;
+            accordionItems.forEach(accordionItem => {
+                const rows = accordionItem.querySelectorAll('tbody tr');
+                let visibleRowsInAccordion = 0;
+
+                rows.forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    if (rowText.includes(searchTerm) || searchTerm === '') {
+                        row.style.display = '';
+                        visibleRowsInAccordion++;
+                        totalVisibleCount++;
+                    } else {
+                        row.style.display = 'none';
                     }
+                });
+
+                // Nascondi l'accordion se non ha righe visibili
+                if (visibleRowsInAccordion === 0) {
+                    accordionItem.style.display = 'none';
                 } else {
-                    row.style.display = 'none';
+                    accordionItem.style.display = '';
+                    // Espandi l'accordion se ha risultati
+                    if (searchTerm !== '') {
+                        const collapseElement = accordionItem.querySelector('.accordion-collapse');
+                        if (collapseElement && !collapseElement.classList.contains('show')) {
+                            const bsCollapse = new bootstrap.Collapse(collapseElement, { toggle: true });
+                        }
+                    }
                 }
             });
 
             // Mostra messaggio se nessun risultato
-            if (searchTerm !== '' && visibleCount === 0) {
-                const noResultsRow = document.querySelector('#expensesTableBody .no-results');
-                if (!noResultsRow && rows.length > 0) {
-                    const row = document.createElement('tr');
-                    row.className = 'no-results';
-                    row.innerHTML = '<td colspan="6" class="text-center text-muted">Nessun risultato trovato per la ricerca.</td>';
-                    document.getElementById('expensesTableBody').appendChild(row);
-                }
+            if (searchTerm !== '' && totalVisibleCount === 0) {
                 notifications.info('Nessun costo trovato per la ricerca corrente.', 3000);
-            } else {
-                const noResultsRow = document.querySelector('#expensesTableBody .no-results');
-                if (noResultsRow) {
-                    noResultsRow.remove();
-                }
             }
         });
     }
@@ -314,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     editCostModalInstance.hide();
                 }
                 
-                loadCosts();
+                setTimeout(() => window.location.reload(), 1500);
             } catch (error) {
                 console.error("Errore nell'aggiornamento del costo:", error);
                 notifications.error(error.message || 'Si è verificato un errore durante l\'aggiornamento.');
@@ -329,17 +293,31 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!addExpenseModalInstance) {
                 addExpenseModalInstance = bootstrap.Modal.getInstance(addExpenseModalElement) || new bootstrap.Modal(addExpenseModalElement);
             }
+            
+            // Reset completo del form
+            const form = document.getElementById('addExpenseForm');
+            if (form) {
+                form.reset();
+            }
+            
             // Imposta l'anno corrente
             const annoField = document.getElementById('anno_costo');
             if (annoField) {
                 const currentYear = new Date().getFullYear();
                 annoField.value = currentYear;
             }
+            
             // Imposta la data di oggi
             const dataField = document.getElementById('data_pagamento_costo');
             if (dataField) {
                 const today = new Date().toISOString().split('T')[0];
                 dataField.value = today;
+            }
+            
+            // Assicurati che il checkbox "pagato" sia deselezionato
+            const pagatoCheckbox = document.getElementById('pagato_costo');
+            if (pagatoCheckbox) {
+                pagatoCheckbox.checked = false;
             }
         });
     }
