@@ -29,7 +29,7 @@ class Fattura(db.Model):
     bollo = db.Column(db.Boolean, default=False)
     descrizione = db.Column(db.String(255), nullable=False)
     totale = db.Column(db.Float, nullable=False)
-    numero_sedute = db.Column(db.Integer, nullable=False)
+    numero_sedute = db.Column(db.Float, nullable=False)
     inviata_sns = db.Column(db.Boolean, default=False)
 
     cliente = db.relationship('Cliente', backref=db.backref('fatture', lazy=True))

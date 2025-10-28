@@ -20,6 +20,16 @@ def invoices_api():
         data = request.get_json()
         current_year = datetime.now().year
         
+        # VALIDAZIONE E CONVERSIONE NUMERO_SEDUTE
+        try:
+            numero_sedute = float(data.get('numero_sedute', 1))
+            if numero_sedute <= 0:
+                return jsonify({'message': 'Il numero di sedute deve essere maggiore di 0'}), 400
+            if numero_sedute > 100:
+                return jsonify({'message': 'Il numero di sedute non può superare 100'}), 400
+        except (ValueError, TypeError):
+            return jsonify({'message': 'Il numero di sedute deve essere un numero valido (es: 1, 1.5, 2.5)'}), 400
+        
         progressivo_entry = FatturaProgressivo.query.filter_by(anno=current_year).first()
         if not progressivo_entry:
             progressivo_entry = FatturaProgressivo(anno=current_year, last_progressivo=0)
@@ -28,7 +38,6 @@ def invoices_api():
         
         progressivo = progressivo_entry.last_progressivo + 1
         
-        numero_sedute = int(data.get('numero_sedute', 1))
         calcoli = calculate_invoice_totals(numero_sedute)
         
         descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
@@ -109,8 +118,20 @@ def invoice_api_detail(invoice_id):
         fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
         fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
         fattura.metodo_pagamento = data.get('metodo_pagamento')
-        fattura.numero_sedute = int(data.get('numero_sedute', fattura.numero_sedute))
-
+        
+        # VALIDAZIONE E CONVERSIONE NUMERO_SEDUTE
+        numero_sedute_update = data.get('numero_sedute')
+        if numero_sedute_update is not None:
+            try:
+                numero_sedute_update = float(numero_sedute_update)
+                if numero_sedute_update <= 0:
+                    return jsonify({'message': 'Il numero di sedute deve essere maggiore di 0'}), 400
+                if numero_sedute_update > 100:
+                    return jsonify({'message': 'Il numero di sedute non può superare 100'}), 400
+                fattura.numero_sedute = numero_sedute_update
+            except (ValueError, TypeError):
+                return jsonify({'message': 'Il numero di sedute deve essere un numero valido'}), 400
+        
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
         fattura.totale = calcoli['totale']
         fattura.bollo = calcoli['bollo_flag']
@@ -139,7 +160,7 @@ def download_invoice_zip(invoice_id):
         bollo_descrizione_semplice = ""
         bollo_importo_formattato = ""
         if calcoli['bollo_flag']:
-            bollo_descrizione_estesa = "Imposta di bollo da 2 euro assolta sull’originale per importi maggiori di 77,47 euro"
+            bollo_descrizione_estesa = "Imposta di bollo da 2 euro assolta sull'originale per importi maggiori di 77,47 euro"
             bollo_descrizione_semplice = "Imposta di Bollo - Esc. Art. 15"
             bollo_importo_formattato = f"€{calcoli['bollo_importo']:.2f}".replace('.', ',')
 

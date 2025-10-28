@@ -4,17 +4,22 @@ CONTRIBUTO_FISSO_PER_SEDUTA = 1.18
 BOLLO_COSTO = 2.00
 BOLLO_SOGLIA = 77.47
 
-def calculate_invoice_totals(numero_sedute: int):
+def calculate_invoice_totals(numero_sedute: float):
     """
     Calcola i totali usando la logica desiderata.
+    Supporta sia interi che frazioni (es: 1.5, 2.5, ecc.)
     """
     if numero_sedute < 0:
         numero_sedute = 0
 
+    # Converte a float per assicurare operazioni in virgola mobile
+    numero_sedute = float(numero_sedute)
+    
     prezzo_base_unitario = PRESTAZIONE_BASE
     contributo_unitario = CONTRIBUTO_FISSO_PER_SEDUTA
     totale_unitario = round(prezzo_base_unitario + contributo_unitario, 2)
 
+    # Calcoli con supporto per frazioni
     subtotale_base = round(prezzo_base_unitario * numero_sedute, 2)
     contributo = round(contributo_unitario * numero_sedute, 2)
     totale_imponibile = round(subtotale_base + contributo, 2)
