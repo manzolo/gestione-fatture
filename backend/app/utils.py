@@ -4,6 +4,18 @@ CONTRIBUTO_FISSO_PER_SEDUTA = 1.18
 BOLLO_COSTO = 2.00
 BOLLO_SOGLIA = 77.47
 
+def format_numero_sedute(numero: float) -> str:
+    """
+    Formatta il numero di sedute in modo intelligente:
+    - Se intero (1.0, 2.0) -> "1", "2"
+    - Se decimale (1.5, 2.5) -> "1,5", "2,5" (con virgola italiana)
+    """
+    if numero % 1 == 0:  # È un numero intero
+        return str(int(numero))
+    else:
+        # Usa :g per rimuovere zeri trailing, sostituisce punto con virgola
+        return f"{numero:g}".replace('.', ',')
+
 def calculate_invoice_totals(numero_sedute: float):
     """
     Calcola i totali usando la logica desiderata.

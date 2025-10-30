@@ -10,7 +10,7 @@ import json
 import tempfile
 import zipfile
 import shutil
-from app.utils import calculate_invoice_totals, PRESTAZIONE_BASE, BOLLO_COSTO, BOLLO_SOGLIA
+from app.utils import calculate_invoice_totals, format_numero_sedute, PRESTAZIONE_BASE, BOLLO_COSTO, BOLLO_SOGLIA
 
 invoices_bp = Blueprint('invoices_bp', __name__)
 
@@ -39,9 +39,10 @@ def invoices_api():
         progressivo = progressivo_entry.last_progressivo + 1
         
         calcoli = calculate_invoice_totals(numero_sedute)
-        
-        descrizione = f"n. {numero_sedute} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
-        
+
+        numero_sedute_formattato = format_numero_sedute(numero_sedute)
+        descrizione = f"n. {numero_sedute_formattato} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
+
         inviata_sns_bool = data.get('inviata_sns', False)
 
         nuova_fattura = Fattura(
@@ -136,7 +137,8 @@ def invoice_api_detail(invoice_id):
         fattura.totale = calcoli['totale']
         fattura.bollo = calcoli['bollo_flag']
         fattura.inviata_sns = inviata_sns_bool
-        fattura.descrizione = f"n. {fattura.numero_sedute} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
+        numero_sedute_formattato = format_numero_sedute(fattura.numero_sedute)
+        fattura.descrizione = f"n. {numero_sedute_formattato} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
         db.session.commit()
         return jsonify({'message': 'Fattura aggiornata con successo!'})
 
@@ -154,7 +156,8 @@ def download_invoice_zip(invoice_id):
             return jsonify({"error": "Template file not found"}), 404
 
         calcoli = calculate_invoice_totals(fattura.numero_sedute)
-        descrizione_prestazione = f"n. {calcoli['numero_sedute']} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
+        numero_sedute_formattato = format_numero_sedute(calcoli['numero_sedute'])
+        descrizione_prestazione = f"n. {numero_sedute_formattato} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
 
         bollo_descrizione_estesa = ""
         bollo_descrizione_semplice = ""
@@ -174,7 +177,7 @@ def download_invoice_zip(invoice_id):
             'cliente_citta': getattr(cliente, 'citta', ''),
             'cliente_cap': getattr(cliente, 'cap', ''),
             'descrizione': descrizione_prestazione,
-            'numero_sedute': calcoli['numero_sedute'],
+            'numero_sedute': numero_sedute_formattato,
             'subtotale_prestazioni': f"€ {calcoli['subtotale_base']:.2f}".replace('.', ','),
             'contributo': f"€ {calcoli['contributo']:.2f}".replace('.', ','),
             'totale_imponibile': f"€ {calcoli['totale_imponibile']:.2f}".replace('.', ','),
