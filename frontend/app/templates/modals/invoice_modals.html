@@ -27,8 +27,14 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="numero_sedute" class="form-label">Numero di Sedute</label>
-                        <input type="number" class="form-control" id="numero_sedute" name="numero_sedute"
-                            value="1" min="1" required>
+                        <input type="number" class="form-control" id="numero_sedute" name="numero_sedute" value="1"
+                            min="1" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="prezzo_totale_unitario" class="form-label">Prezzo per Seduta (€)</label>
+                        <input type="number" class="form-control" id="prezzo_totale_unitario"
+                            name="prezzo_totale_unitario" value="60.00" step="0.01" min="0" required>
+                        <div class="form-text">Prezzo totale (base + contributo 2%)</div>
                     </div>
                 </div>
                 <div class="row">
@@ -47,8 +53,7 @@
                     </div>
                     <div class="col-md-4 d-flex align-items-end mb-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="inviata_sns"
-                                name="inviata_sns">
+                            <input class="form-check-input" type="checkbox" id="inviata_sns" name="inviata_sns">
                             <label class="form-check-label" for="inviata_sns">Inviata a Sistema
                                 Sanitario</label>
                         </div>
@@ -56,8 +61,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary"><i
-                        class="fas fa-plus-circle me-2"></i>Aggiungi
+                <button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle me-2"></i>Aggiungi
                     Fattura</button>
             </div>
         </form>
@@ -65,8 +69,7 @@
 </div>
 
 <!-- Modal Modifica Fattura -->
-<div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="editInvoiceModal" tabindex="-1" aria-labelledby="editInvoiceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
@@ -87,18 +90,22 @@
                     </div>
                     <div class="mb-3">
                         <label for="edit-data_fattura" class="form-label">Data Fattura</label>
-                        <input type="date" class="form-control" id="edit-data_fattura" name="data_fattura"
-                            required>
+                        <input type="date" class="form-control" id="edit-data_fattura" name="data_fattura" required>
                     </div>
                     <div class="mb-3">
                         <label for="edit-numero_sedute" class="form-label">Numero di Sedute</label>
-                        <input type="number" class="form-control" id="edit-numero_sedute"
-                            name="numero_sedute" min="1" required>
+                        <input type="number" class="form-control" id="edit-numero_sedute" name="numero_sedute" min="1"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-prezzo_totale_unitario" class="form-label">Prezzo per Seduta (€)</label>
+                        <input type="number" class="form-control" id="edit-prezzo_totale_unitario"
+                            name="prezzo_totale_unitario" step="0.01" min="0" required>
+                        <div class="form-text">Prezzo totale (base + contributo 2%)</div>
                     </div>
                     <div class="mb-3">
                         <label for="edit-metodo_pagamento" class="form-label">Metodo Pagamento</label>
-                        <select class="form-control" id="edit-metodo_pagamento" name="metodo_pagamento"
-                            required>
+                        <select class="form-control" id="edit-metodo_pagamento" name="metodo_pagamento" required>
                             <option value="Carta di credito/debito">Carta di credito/debito</option>
                             <option value="Bonifico">Bonifico</option>
                             <option value="Contanti">Contanti</option>
@@ -106,18 +113,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="edit-data_pagamento" class="form-label">Data Pagamento</label>
-                        <input type="date" class="form-control" id="edit-data_pagamento"
-                            name="data_pagamento">
+                        <input type="date" class="form-control" id="edit-data_pagamento" name="data_pagamento">
                     </div>
                     <div class="mb-3 form-check">
-                        <input class="form-check-input" type="checkbox" id="edit-inviata-sns"
-                            name="inviata_sns">
+                        <input class="form-check-input" type="checkbox" id="edit-inviata-sns" name="inviata_sns">
                         <label class="form-check-label" for="edit-inviata-sns">Inviata a Sistema
                             Sanitario</label>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
-                            data-bs-dismiss="modal">Annulla</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
                         <button type="submit" class="btn btn-primary">Salva Modifiche</button>
                     </div>
                 </form>

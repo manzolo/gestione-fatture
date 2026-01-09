@@ -15,7 +15,7 @@ export function initializeInvoices() {
     const dataPagamentoInput = document.getElementById('data_pagamento');
 
     if (dataFatturaInput && dataPagamentoInput) {
-        dataFatturaInput.addEventListener('change', function() {
+        dataFatturaInput.addEventListener('change', function () {
             dataPagamentoInput.value = this.value;
             notifications.info('Data pagamento sincronizzata con la data fattura.', 2000);
         });
@@ -28,7 +28,7 @@ export function initializeInvoices() {
     if (addInvoiceModal && addInvoiceForm) {
         addInvoiceModal.addEventListener('show.bs.modal', function () {
             addInvoiceForm.reset();
-            
+
             // Per Select2, devi resettarlo manualmente
             $('#cliente_id').val(null).trigger('change');
             notifications.info('Form pronto per nuova fattura.', 2000);
@@ -46,7 +46,7 @@ export function initializeInvoices() {
     if (addInvoiceForm) {
         // Disabilita la validazione HTML5 nativa per questo form
         addInvoiceForm.setAttribute('novalidate', 'novalidate');
-        
+
         addInvoiceForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -82,6 +82,12 @@ export function initializeInvoices() {
                 return;
             }
 
+            if (!data.prezzo_totale_unitario || data.prezzo_totale_unitario <= 0) {
+                notifications.warning('Il prezzo per seduta deve essere maggiore di zero.');
+                document.getElementById('prezzo_totale_unitario').focus();
+                return;
+            }
+
             notifications.info('Creazione fattura in corso...', 2000);
 
             fetch('/api/invoices', {
@@ -97,22 +103,22 @@ export function initializeInvoices() {
                 })
                 .then(result => {
                     console.log('Risposta del server:', result);
-                    
+
                     const numeroFattura = result.numero_fattura || result.invoice_number || result.number || result.id || 'nuova';
-                    
+
                     let successMessage = 'Fattura creata con successo!';
                     if (numeroFattura && numeroFattura !== 'nuova') {
                         successMessage = `Fattura #${numeroFattura} creata con successo!`;
                     }
-                    
+
                     notifications.success(successMessage);
-                    
+
                     // Chiudi la modale prima di ricaricare
                     const modal = bootstrap.Modal.getInstance(addInvoiceModal);
                     if (modal) {
                         modal.hide();
                     }
-                    
+
                     saveActiveTab(); // Salva la tab prima del reload
                     setTimeout(() => window.location.reload(), 1500);
                 })
@@ -124,9 +130,9 @@ export function initializeInvoices() {
     }
 
     // Apertura modale modifica fattura
-    window.openEditInvoiceModal = function(invoiceId) {
+    window.openEditInvoiceModal = function (invoiceId) {
         notifications.info('Caricamento dati fattura...', 2000);
-        
+
         fetch(`/api/invoices/${invoiceId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Errore recupero fattura');
@@ -134,18 +140,28 @@ export function initializeInvoices() {
             })
             .then(data => {
                 document.getElementById('edit-invoice-id').value = data.id;
-                
+
                 const editClienteSelect = document.getElementById('edit-cliente_id');
                 if (editClienteSelect) {
                     editClienteSelect.value = data.cliente_id;
                     $('#edit-cliente_id').trigger('change');
                 }
-                
+
                 document.getElementById('edit-data_fattura').value = data.data_fattura;
                 document.getElementById('edit-numero_sedute').value = data.numero_sedute;
+
+                // Popola il prezzo totale unitario (dall'API o calcola dal prezzo base)
+                if (data.prezzo_totale_unitario) {
+                    document.getElementById('edit-prezzo_totale_unitario').value = data.prezzo_totale_unitario;
+                } else {
+                    // Fallback: calcola dal prezzo base se disponibile 
+                    const prezzoBase = data.prezzo_unitario || 58.82;
+                    document.getElementById('edit-prezzo_totale_unitario').value = (prezzoBase * 1.02).toFixed(2);
+                }
+
                 document.getElementById('edit-metodo_pagamento').value = data.metodo_pagamento;
                 document.getElementById('edit-data_pagamento').value = data.data_pagamento || '';
-                
+
                 const editInviataSns = document.getElementById('edit-inviata-sns');
                 if (editInviataSns) {
                     editInviataSns.checked = data.inviata_sns;
@@ -155,7 +171,7 @@ export function initializeInvoices() {
                 editModal.show();
 
                 // Focus sul numero sedute nel modale di modifica
-                document.getElementById('editInvoiceModal').addEventListener('shown.bs.modal', function() {
+                document.getElementById('editInvoiceModal').addEventListener('shown.bs.modal', function () {
                     setTimeout(() => {
                         const numeroSeduteField = document.getElementById('edit-numero_sedute');
                         if (numeroSeduteField) {
@@ -164,7 +180,7 @@ export function initializeInvoices() {
                         }
                     }, 200);
                 }, { once: true });
-                
+
                 notifications.success('Dati fattura caricati per la modifica.', 2000);
             })
             .catch(error => {
@@ -178,7 +194,7 @@ export function initializeInvoices() {
     if (editInvoiceForm) {
         // Disabilita la validazione HTML5 nativa per questo form
         editInvoiceForm.setAttribute('novalidate', 'novalidate');
-        
+
         editInvoiceForm.addEventListener('submit', function (event) {
             event.preventDefault();
             const invoiceId = document.getElementById('edit-invoice-id').value;
@@ -211,6 +227,12 @@ export function initializeInvoices() {
                 return;
             }
 
+            if (!data.prezzo_totale_unitario || data.prezzo_totale_unitario <= 0) {
+                notifications.warning('Il prezzo per seduta deve essere maggiore di zero.');
+                document.getElementById('edit-prezzo_totale_unitario').focus();
+                return;
+            }
+
             notifications.info('Aggiornamento fattura in corso...', 2000);
 
             fetch(`/api/invoices/${invoiceId}`, {
@@ -226,22 +248,22 @@ export function initializeInvoices() {
                 })
                 .then(result => {
                     console.log('Risposta aggiornamento:', result);
-                    
+
                     const numeroFattura = result.numero_fattura || result.invoice_number || result.number || invoiceId;
-                    
+
                     let successMessage = 'Fattura aggiornata con successo!';
                     if (numeroFattura) {
                         successMessage = `Fattura #${numeroFattura} aggiornata con successo!`;
                     }
-                    
+
                     notifications.success(successMessage);
-                    
+
                     // Chiudi la modale prima di ricaricare
                     const editModal = bootstrap.Modal.getInstance(document.getElementById('editInvoiceModal'));
                     if (editModal) {
                         editModal.hide();
                     }
-                    
+
                     saveActiveTab(); // Salva la tab prima del reload
                     setTimeout(() => window.location.reload(), 1500);
                 })
@@ -281,7 +303,7 @@ export function initializeInvoices() {
     if ($('#cliente_id').length) {
         // Rimuovi l'attributo required dalla select originale per evitare validazione HTML5
         $('#cliente_id').removeAttr('required');
-        
+
         $('#cliente_id').select2({
             dropdownParent: $('#addInvoiceModal'),
             placeholder: "Seleziona un cliente",
@@ -299,11 +321,11 @@ export function initializeInvoices() {
             }, 150);
         });
     }
-    
+
     if ($('#edit-cliente_id').length) {
         // Rimuovi l'attributo required dalla select originale per evitare validazione HTML5
         $('#edit-cliente_id').removeAttr('required');
-        
+
         $('#edit-cliente_id').select2({
             dropdownParent: $('#editInvoiceModal'),
             placeholder: "Seleziona un cliente",
@@ -323,7 +345,7 @@ export function initializeInvoices() {
     }
 
     // Gestione download fattura
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.closest('.btn-success[title="Scarica fattura"]')) {
             notifications.info('Download fattura avviato...', 3000);
         }

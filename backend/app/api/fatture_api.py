@@ -10,7 +10,7 @@ import json
 import tempfile
 import zipfile
 import shutil
-from app.utils import calculate_invoice_totals, format_numero_sedute, PRESTAZIONE_BASE, BOLLO_COSTO, BOLLO_SOGLIA
+from app.utils import calculate_invoice_totals, calculate_prezzo_base_da_totale, format_numero_sedute, PRESTAZIONE_BASE, CONTRIBUTO_PERCENTUALE, BOLLO_COSTO, BOLLO_SOGLIA
 
 invoices_bp = Blueprint('invoices_bp', __name__)
 
@@ -30,6 +30,19 @@ def invoices_api():
         except (ValueError, TypeError):
             return jsonify({'message': 'Il numero di sedute deve essere un numero valido (es: 1, 1.5, 2.5)'}), 400
         
+        # GESTIONE PREZZO TOTALE UNITARIO (conversione in prezzo base)
+        prezzo_totale_unitario = data.get('prezzo_totale_unitario', 60.00)  # Default 60€
+        try:
+            prezzo_totale_unitario = float(prezzo_totale_unitario)
+            if prezzo_totale_unitario <= 0:
+                return jsonify({'message': 'Il prezzo deve essere maggiore di 0'}), 400
+            if prezzo_totale_unitario > 1000:
+                return jsonify({'message': 'Il prezzo non può superare 1000€'}), 400
+            # Converte il prezzo totale in prezzo base
+            prezzo_base = calculate_prezzo_base_da_totale(prezzo_totale_unitario)
+        except (ValueError, TypeError):
+            return jsonify({'message': 'Il prezzo deve essere un numero valido'}), 400
+        
         progressivo_entry = FatturaProgressivo.query.filter_by(anno=current_year).first()
         if not progressivo_entry:
             progressivo_entry = FatturaProgressivo(anno=current_year, last_progressivo=0)
@@ -38,7 +51,8 @@ def invoices_api():
         
         progressivo = progressivo_entry.last_progressivo + 1
         
-        calcoli = calculate_invoice_totals(numero_sedute)
+        # Calcola i totali usando il prezzo base personalizzato
+        calcoli = calculate_invoice_totals(numero_sedute, prezzo_base)
 
         numero_sedute_formattato = format_numero_sedute(numero_sedute)
         descrizione = f"n. {numero_sedute_formattato} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
@@ -52,7 +66,7 @@ def invoices_api():
             data_pagamento=datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None,
             metodo_pagamento=data.get('metodo_pagamento'),
             cliente_id=data['cliente_id'],
-            importo_prestazione=PRESTAZIONE_BASE,
+            importo_prestazione=prezzo_base,  # Salva il prezzo base
             bollo=calcoli['bollo_flag'],
             descrizione=descrizione,
             totale=calcoli['totale'],
@@ -92,7 +106,13 @@ def invoice_api_detail(invoice_id):
     fattura = Fattura.query.get_or_404(invoice_id)
     
     if request.method == 'GET':
-        calcoli = calculate_invoice_totals(fattura.numero_sedute)
+        # Usa importo_prestazione (prezzo base salvato nel database)
+        prezzo_base = fattura.importo_prestazione
+        calcoli = calculate_invoice_totals(fattura.numero_sedute, prezzo_base)
+        
+        # Calcola il prezzo totale per mostrarlo nel form
+        prezzo_totale_unitario = round(prezzo_base * (1 + CONTRIBUTO_PERCENTUALE), 2)
+        
         return jsonify({
             'id': fattura.id,
             'numero_fattura': f"{fattura.progressivo}/{fattura.anno}",
@@ -101,6 +121,8 @@ def invoice_api_detail(invoice_id):
             'metodo_pagamento': fattura.metodo_pagamento,
             'cliente_id': fattura.cliente_id,
             'numero_sedute': fattura.numero_sedute,
+            'prezzo_unitario': prezzo_base,  # Prezzo base
+            'prezzo_totale_unitario': prezzo_totale_unitario,  # Prezzo totale (base + contributo)
             'totale': f"{fattura.totale:.2f}",
             'bollo_applicato': fattura.bollo,
             'descrizione': fattura.descrizione,
@@ -133,7 +155,23 @@ def invoice_api_detail(invoice_id):
             except (ValueError, TypeError):
                 return jsonify({'message': 'Il numero di sedute deve essere un numero valido'}), 400
         
-        calcoli = calculate_invoice_totals(fattura.numero_sedute)
+        # GESTIONE PREZZO TOTALE UNITARIO (se fornito, aggiorna il prezzo_unitario)
+        prezzo_totale_update = data.get('prezzo_totale_unitario')
+        if prezzo_totale_update is not None:
+            try:
+                prezzo_totale_update = float(prezzo_totale_update)
+                if prezzo_totale_update <= 0:
+                    return jsonify({'message': 'Il prezzo deve essere maggiore di 0'}), 400
+                if prezzo_totale_update > 1000:
+                    return jsonify({'message': 'Il prezzo non può superare 1000€'}), 400
+                # Converte il prezzo totale in prezzo base e salva in importo_prestazione
+                fattura.importo_prestazione = calculate_prezzo_base_da_totale(prezzo_totale_update)
+            except (ValueError, TypeError):
+                return jsonify({'message': 'Il prezzo deve essere un numero valido'}), 400
+        
+        # Usa importo_prestazione (prezzo base salvato nel database)
+        prezzo_base = fattura.importo_prestazione
+        calcoli = calculate_invoice_totals(fattura.numero_sedute, prezzo_base)
         fattura.totale = calcoli['totale']
         fattura.bollo = calcoli['bollo_flag']
         fattura.inviata_sns = inviata_sns_bool
@@ -155,7 +193,9 @@ def download_invoice_zip(invoice_id):
         if not os.path.exists(template_path):
             return jsonify({"error": "Template file not found"}), 404
 
-        calcoli = calculate_invoice_totals(fattura.numero_sedute)
+        # Usa importo_prestazione (prezzo base salvato nel database)
+        prezzo_base = fattura.importo_prestazione
+        calcoli = calculate_invoice_totals(fattura.numero_sedute, prezzo_base)
         numero_sedute_formattato = format_numero_sedute(calcoli['numero_sedute'])
         descrizione_prestazione = f"n. {numero_sedute_formattato} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
 

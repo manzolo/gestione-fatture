@@ -1,6 +1,6 @@
 # --- Voci e parametri predefiniti ---
 PRESTAZIONE_BASE = 58.82
-CONTRIBUTO_FISSO_PER_SEDUTA = 1.18
+CONTRIBUTO_PERCENTUALE = 0.02  # 2% - contributo calcolato sul prezzo base
 BOLLO_COSTO = 2.00
 BOLLO_SOGLIA = 77.47
 
@@ -16,10 +16,28 @@ def format_numero_sedute(numero: float) -> str:
         # Usa :g per rimuovere zeri trailing, sostituisce punto con virgola
         return f"{numero:g}".replace('.', ',')
 
-def calculate_invoice_totals(numero_sedute: float):
+def calculate_prezzo_base_da_totale(prezzo_totale_unitario: float) -> float:
+    """
+    Converte il prezzo totale inserito dall'utente (es. 60€, 65€, 70€) 
+    nel prezzo base, sottraendo il contributo proporzionale del 2%.
+    
+    Formula: prezzo_base = prezzo_totale / (1 + CONTRIBUTO_PERCENTUALE)
+    
+    Esempio:
+        60€ -> 58.82€
+        65€ -> 63.73€
+        70€ -> 68.63€
+    """
+    return prezzo_totale_unitario / (1 + CONTRIBUTO_PERCENTUALE)
+
+def calculate_invoice_totals(numero_sedute: float, prezzo_base_unitario: float = None):
     """
     Calcola i totali usando la logica desiderata.
     Supporta sia interi che frazioni (es: 1.5, 2.5, ecc.)
+    
+    Args:
+        numero_sedute: Numero di sedute (può essere decimale)
+        prezzo_base_unitario: Prezzo base per seduta (opzionale, default PRESTAZIONE_BASE)
     """
     if numero_sedute < 0:
         numero_sedute = 0
@@ -27,8 +45,12 @@ def calculate_invoice_totals(numero_sedute: float):
     # Converte a float per assicurare operazioni in virgola mobile
     numero_sedute = float(numero_sedute)
     
-    prezzo_base_unitario = PRESTAZIONE_BASE
-    contributo_unitario = CONTRIBUTO_FISSO_PER_SEDUTA
+    # Usa il prezzo base fornito o quello di default
+    if prezzo_base_unitario is None:
+        prezzo_base_unitario = PRESTAZIONE_BASE
+    
+    # Calcola il contributo proporzionale (2% del prezzo base)
+    contributo_unitario = prezzo_base_unitario * CONTRIBUTO_PERCENTUALE
     totale_unitario = round(prezzo_base_unitario + contributo_unitario, 2)
 
     # Calcoli con supporto per frazioni
