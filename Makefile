@@ -170,17 +170,20 @@ restoredb: ## ♻️  Ripristina il database dal backup (backup.sql)
 	fi
 	@echo "$(YELLOW)♻️  Ripristino database da $(BACKUP_DIR)/backup.sql...$(NC)"
 	@echo "$(RED)⚠️  ATTENZIONE: Questo cancellerà tutti i dati attuali!$(NC)"
-	@read -p "Sei sicuro? (y/N) " -n 1 -r; \
-	echo; \
-	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
-			psql -U $(POSTGRES_USER) $(POSTGRES_DB) -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"; \
-		docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
-			psql -U $(POSTGRES_USER) $(POSTGRES_DB) < $(BACKUP_DIR)/backup.sql; \
-		echo "$(GREEN)✅ Database ripristinato con successo!$(NC)"; \
-	else \
-		echo "$(YELLOW)❌ Ripristino annullato.$(NC)"; \
-	fi
+	@printf "Sei sicuro? (y/N) "; \
+	read -r REPLY; \
+	case "$$REPLY" in \
+		[Yy]*) \
+			docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
+				psql -U $(POSTGRES_USER) $(POSTGRES_DB) -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"; \
+			docker compose -f $(COMPOSE_FILE) exec -T $(DB_SERVICE) \
+				psql -U $(POSTGRES_USER) $(POSTGRES_DB) < $(BACKUP_DIR)/backup.sql; \
+			echo "$(GREEN)✅ Database ripristinato con successo!$(NC)"; \
+			;; \
+		*) \
+			echo "$(YELLOW)❌ Ripristino annullato.$(NC)"; \
+			;; \
+	esac
 
 .PHONY: list-backups
 list-backups: ## 📂 Lista tutti i backup disponibili
@@ -271,15 +274,18 @@ test-quick: ## ⚡ Test rapidi senza setup del database
 .PHONY: clean
 clean: ## 🧹 Rimuove container, volumi e immagini
 	@echo "$(RED)⚠️  ATTENZIONE: Questo comando cancellerà tutti i dati!$(NC)"
-	@read -p "Sei sicuro di voler procedere? (y/N) " -n 1 -r; \
-	echo; \
-	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		echo "$(YELLOW)🧹 Pulizia in corso...$(NC)"; \
-		docker compose -f $(COMPOSE_FILE) down -v --rmi all; \
-		echo "$(GREEN)✅ Pulizia completata!$(NC)"; \
-	else \
-		echo "$(YELLOW)❌ Pulizia annullata.$(NC)"; \
-	fi
+	@printf "Sei sicuro di voler procedere? (y/N) "; \
+	read -r REPLY; \
+	case "$$REPLY" in \
+		[Yy]*) \
+			echo "$(YELLOW)🧹 Pulizia in corso...$(NC)"; \
+			docker compose -f $(COMPOSE_FILE) down -v --rmi all; \
+			echo "$(GREEN)✅ Pulizia completata!$(NC)"; \
+			;; \
+		*) \
+			echo "$(YELLOW)❌ Pulizia annullata.$(NC)"; \
+			;; \
+	esac
 
 .PHONY: prune
 prune: ## 🗑️  Rimuove risorse Docker inutilizzate
