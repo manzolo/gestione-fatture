@@ -338,7 +338,8 @@ def get_costs_stats():
         
         if year_param:
             selected_year = int(year_param)
-            year_filter = extract('year', Costo.data_pagamento) == selected_year
+            # FIX: Filtra per anno di competenza (anno_riferimento) invece che data pagamento
+            year_filter = Costo.anno_riferimento == selected_year
             total_costs_amount = db.session.query(func.sum(Costo.totale)).filter(year_filter).scalar() or 0.0
 
             monthly_stats = db.session.query(
@@ -354,8 +355,9 @@ def get_costs_stats():
             selected_year = None
             total_costs_amount = db.session.query(func.sum(Costo.totale)).scalar() or 0.0
 
+            # FIX: Raggruppa per anno di competenza (anno_riferimento)
             yearly_stats = db.session.query(
-                extract('year', Costo.data_pagamento).label('anno'),
+                Costo.anno_riferimento.label('anno'),
                 func.count(Costo.id).label('conteggio'),
                 func.sum(Costo.totale).label('totale')
             ).group_by('anno').order_by('anno').all()
