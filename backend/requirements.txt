@@ -27,3 +27,4 @@ docxtpl
 docx2pdf
 codicefiscale
 requests
+cryptography>=42.0.0

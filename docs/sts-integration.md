@@ -118,8 +118,11 @@ tests/
 - In produzione la CA è nel trust store standard o configurabile via `STS_CA_BUNDLE`.
 
 ### Cifratura CF paziente
-- **Fase attuale:** CF inviato in chiaro con `logger.warning`. Il server di test lo accetta.
-- **Fase futura:** scaricare `SanitelCF.cer` dal portale STS, copiarlo in `certs/sts_cert.pem`, aggiungere `cryptography>=42.0.0` a `requirements.txt`. La cifratura si attiva automaticamente.
+- **Implementata:** RSA PKCS#1 v1.5 con il certificato pubblico `SanitelCF.cer` di Agenzia delle Entrate.
+- Il certificato è in `certs/sts_cert.pem` (copiato da `kit730P_ver_20240214/SanitelCF.cer`, valido fino a gen 2027).
+- `cryptography>=42.0.0` è in `requirements.txt`.
+- Lo stesso certificato vale per test e produzione (è il certificato pubblico AE per cifrare il CF paziente).
+- **Deploy:** `certs/sts_cert.pem` è gitignored — va copiato manualmente sul server di produzione.
 
 ### Formato numero documento
 `F{anno}{progressivo:04d}` → es. `F20250042` (max 20 caratteri, conforme XSD `numDocType`)
@@ -135,7 +138,9 @@ tests/
 ## Prossimi passi
 
 - [ ] Merge `feature/sts-integration` → `main`
-- [ ] Scaricare `SanitelCF.cer` dal portale STS → `certs/sts_cert.pem`
-- [ ] Aggiungere `cryptography>=42.0.0` a `requirements.txt` e implementare `encrypt_cf()`
-- [ ] Interfaccia frontend: colonna stato STS in lista fatture + pulsante "Invia a STS"
-- [ ] Configurare credenziali di produzione in `.env` (mai committare)
+- [x] Certificato SanitelCF: `certs/sts_cert.pem` (da kit ufficiale, stesso per test e prod)
+- [x] `cryptography>=42.0.0` aggiunto a `requirements.txt`
+- [x] `encrypt_cf()` implementata in `backend/app/sts/encryption.py`
+- [x] Frontend: colonna stato STS + pulsante "Invia a STS" per riga
+- [ ] Configurare credenziali di produzione in `.env` seguendo `.env.production.template`
+- [ ] Copiare `certs/sts_cert.pem` sul server di produzione (gitignored)
