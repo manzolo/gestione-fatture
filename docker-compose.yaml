@@ -17,8 +17,19 @@ services:
       PGDATABASE: ${POSTGRES_DB}
       BACKEND_PORT: ${BACKEND_PORT}
       GOTENBERG_URL: "http://${GOTENBERG_HOST}:${GOTENBERG_PORT}"
+      STS_ENVIRONMENT: ${STS_ENVIRONMENT:-test}
+      STS_USERNAME: ${STS_USERNAME:-}
+      STS_PASSWORD: ${STS_PASSWORD:-}
+      STS_PINCODE_ENCRYPTED: ${STS_PINCODE_ENCRYPTED:-}
+      STS_CF_PROPRIETARIO_ENCRYPTED: ${STS_CF_PROPRIETARIO_ENCRYPTED:-}
+      STS_PARTITA_IVA: ${STS_PARTITA_IVA:-}
+      STS_DISPOSITIVO: ${STS_DISPOSITIVO:-1}
+      STS_CERTIFICATE_PATH: ${STS_CERTIFICATE_PATH:-/app/certs/sts_cert.pem}
+      STS_CA_BUNDLE: ${STS_CA_BUNDLE:-/app/certs/CAAgenziadelleEntrateTest.pem}
+      STS_SSL_VERIFY: ${STS_SSL_VERIFY:-true}
     volumes:
       - ./invoices_data:/app/backend/invoices
+      - ./certs:/app/certs:ro
     depends_on:
       invoice_postgres_db:
         condition: service_healthy

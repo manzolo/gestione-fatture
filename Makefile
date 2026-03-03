@@ -247,8 +247,16 @@ test-frontend: test-setup ## 🧪 Esegue i test del frontend
 	@chmod +x ./tests/run_frontend_tests.sh
 	@./tests/run_frontend_tests.sh
 
+.PHONY: test-sts
+test-sts: ## 🧪 Esegue i test di integrazione STS
+	@echo "$(CYAN)╔════════════════════════════════════════╗$(NC)"
+	@echo "$(CYAN)║     🧪 TEST STS (Tessera Sanitaria)    ║$(NC)"
+	@echo "$(CYAN)╚════════════════════════════════════════╝$(NC)"
+	@chmod +x ./tests/run_sts_tests.sh
+	@./tests/run_sts_tests.sh
+
 .PHONY: test-all
-test-all: ## 🧪 Esegue tutti i test (backend + frontend)
+test-all: ## 🧪 Esegue tutti i test (backend + frontend + sts)
 	@echo "$(CYAN)╔════════════════════════════════════════════════════════╗$(NC)"
 	@echo "$(CYAN)║     🧪 ESECUZIONE COMPLETA TEST SUITE                 ║$(NC)"
 	@echo "$(CYAN)╚════════════════════════════════════════════════════════╝$(NC)"
@@ -256,6 +264,8 @@ test-all: ## 🧪 Esegue tutti i test (backend + frontend)
 	@$(MAKE) test-backend
 	@echo ""
 	@$(MAKE) test-frontend
+	@echo ""
+	@$(MAKE) test-sts
 	@echo ""
 	@echo "$(GREEN)╔════════════════════════════════════════════════════════╗$(NC)"
 	@echo "$(GREEN)║     ✅ TUTTI I TEST COMPLETATI                         ║$(NC)"

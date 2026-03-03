@@ -5,6 +5,7 @@ import os
 from app.api.clienti_api import clients_bp
 from app.api.fatture_api import invoices_bp
 from app.api.costi_api import costi_bp
+from app.api.sts_api import sts_bp
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_SQLALCHEMY_URL') or 'sqlite:///test.db'
@@ -23,6 +24,7 @@ if not os.path.exists(invoices_dir):
 app.register_blueprint(clients_bp, url_prefix='/api')
 app.register_blueprint(invoices_bp, url_prefix='/api')
 app.register_blueprint(costi_bp, url_prefix='/api')
+app.register_blueprint(sts_bp, url_prefix='/api')
 
 # Endpoint di health check
 @app.route('/health')

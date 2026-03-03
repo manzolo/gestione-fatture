@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 db = SQLAlchemy()
 
 # Base è necessaria per Alembic
-Base = db.Model 
+Base = db.Model
 
 class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,6 +15,7 @@ class Cliente(db.Model):
     indirizzo = db.Column(db.String(200))
     citta = db.Column(db.String(255))
     cap = db.Column(db.String(5))
+    flag_opposizione = db.Column(db.Boolean, default=False)
 
 class Fattura(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,6 +32,9 @@ class Fattura(db.Model):
     totale = db.Column(db.Float, nullable=False)
     numero_sedute = db.Column(db.Float, nullable=False)
     inviata_sns = db.Column(db.Boolean, default=False)
+    inviata_sts = db.Column(db.Boolean, default=False)
+    protocollo_sts = db.Column(db.String(100), nullable=True)
+    data_invio_sts = db.Column(db.DateTime, nullable=True)
 
     cliente = db.relationship('Cliente', backref=db.backref('fatture', lazy=True))
 

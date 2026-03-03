@@ -13,3 +13,9 @@ backups/*
 __pycache__/
 .pytest_cache/ # Se usi pytest, anche questa cartella è generata automaticamente
 .mypy_cache/   # Se usi mypy per il type checking
+
+# STS certificates (never commit real certs — eccezione: CA pubblica di test)
+certs/*.crt
+certs/*.key
+# Solo i cert privati/produzione: escludere i CA cert pubblici del kit
+certs/sts_cert.pem
