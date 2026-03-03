@@ -39,6 +39,7 @@
                                     <th>Descrizione</th>
                                     <th>Totale</th>
                                     <th>Inviata SNS</th>
+                                    <th>STS</th>
                                     <th>Azioni</th>
                                 </tr>
                             </thead>
@@ -70,6 +71,18 @@
                                         <span class="text-danger" title="No">&#10006;</span>
                                         {% endif %}
                                     </td>
+                                    <td class="text-center">
+                                        {% if invoice.inviata_sts %}
+                                        <span class="text-success"
+                                            title="Inviata il {{ invoice.data_invio_sts | to_italian_date if invoice.data_invio_sts else '' }}&#10;Protocollo: {{ invoice.protocollo_sts or 'N/D' }}">
+                                            &#10004;
+                                        </span>
+                                        {% elif invoice.data_pagamento %}
+                                        <span class="text-muted" title="Non ancora inviata a STS">&#10006;</span>
+                                        {% else %}
+                                        <span class="text-muted" title="Data pagamento mancante">—</span>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <div class="action-buttons">
                                             <a href="{{ url_for('fattura_bp.download_invoice_zip', invoice_id=invoice.id) }}"
@@ -81,6 +94,14 @@
                                                 title="Modifica fattura">
                                                 <i class="fas fa-edit"></i>
                                             </button>
+                                            {% if invoice.data_pagamento %}
+                                            <button type="button"
+                                                class="btn btn-action {% if invoice.inviata_sts %}btn-secondary{% else %}btn-info{% endif %}"
+                                                onclick="sendToSTS({{ invoice.id }}, {{ 'true' if invoice.inviata_sts else 'false' }})"
+                                                title="{% if invoice.inviata_sts %}Reinvia a STS (protocollo: {{ invoice.protocollo_sts or 'N/D' }}){% else %}Invia a STS{% endif %}">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

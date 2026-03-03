@@ -93,7 +93,10 @@ def invoices_api():
                 'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
                 'descrizione': i.descrizione,
                 'totale': f"{i.totale:.2f}",
-                'inviata_sns': i.inviata_sns
+                'inviata_sns': i.inviata_sns,
+                'inviata_sts': i.inviata_sts or False,
+                'protocollo_sts': i.protocollo_sts,
+                'data_invio_sts': i.data_invio_sts.isoformat() if i.data_invio_sts else None,
             })
 
         sorted_years = sorted(grouped_invoices.keys(), reverse=True)

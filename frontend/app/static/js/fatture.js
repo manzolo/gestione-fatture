@@ -351,3 +351,37 @@ export function initializeInvoices() {
         }
     });
 }
+
+// Invio singola fattura a STS
+window.sendToSTS = function (invoiceId, alreadySent) {
+    const confirmMsg = alreadySent
+        ? 'Questa fattura è già stata inviata a STS. Vuoi reinviarla?'
+        : 'Inviare questa fattura al Sistema Tessera Sanitaria?';
+
+    if (!confirm(confirmMsg)) return;
+
+    const url = alreadySent
+        ? `/api/sts/invoices/${invoiceId}/send?force=true`
+        : `/api/sts/invoices/${invoiceId}/send`;
+
+    notifications.info('Invio a STS in corso...', 4000);
+
+    fetch(url, { method: 'POST' })
+        .then(response => response.json().then(data => ({ status: response.status, data })))
+        .then(({ status, data }) => {
+            if (data.success) {
+                const protocollo = data.protocollo ? ` — Protocollo: ${data.protocollo}` : '';
+                notifications.success(`Fattura inviata a STS con successo!${protocollo}`);
+                saveActiveTab();
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                const errori = (data.errors || [])
+                    .map(e => (e.codice ? `[${e.codice}] ${e.descrizione}` : String(e)))
+                    .join('; ') || data.error || 'Errore sconosciuto';
+                notifications.error(`Invio STS fallito: ${errori}`);
+            }
+        })
+        .catch(error => {
+            notifications.error(`Errore di rete durante l'invio a STS: ${error.message}`);
+        });
+};

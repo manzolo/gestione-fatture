@@ -109,6 +109,20 @@ def download_invoice_zip(invoice_id):
         flash(f"Errore durante il download: {e}", 'danger')
         return redirect(url_for('fattura_bp.fatture'))
     
+@fattura_bp.route('/api/sts/invoices/<int:invoice_id>/send', methods=['POST'])
+def sts_send_proxy(invoice_id):
+    """Proxy per l'invio di una fattura a STS."""
+    force = request.args.get('force', 'false')
+    try:
+        response = requests.post(
+            f"{BACKEND_URL}/api/sts/invoices/{invoice_id}/send",
+            params={'force': force},
+            timeout=35,
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @fattura_bp.route('/api/invoices/years', methods=['GET'])
 def get_invoices_years_proxy():
     """Proxy per ottenere gli anni disponibili delle fatture dal backend."""
