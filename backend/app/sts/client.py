@@ -131,7 +131,7 @@ def _parse_response(xml_text: str) -> dict:
     protocollo = find_text(root, "protocollo") or None
 
     errors = []
-    for msg in root.iter("{*}messaggio"):
+    for msg in root.findall(".//{*}messaggio"):
         codice = find_text(msg, "codice")
         descrizione = find_text(msg, "descrizione")
         if codice or descrizione:
