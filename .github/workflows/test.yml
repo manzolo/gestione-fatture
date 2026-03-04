@@ -1,0 +1,99 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          cat > .env << 'EOF'
+          POSTGRES_DB=backend_db
+          POSTGRES_USER=user
+          POSTGRES_PASSWORD=password
+          PGADMIN_DEFAULT_EMAIL=admin@example.com
+          PGADMIN_DEFAULT_PASSWORD=admin_password
+          PGADMIN_PORT=80
+          PGADMIN_HOST_PORT=8001
+          POSTGRES_HOST=invoice_postgres_db
+          BACKEND_HOST=invoice_backend
+          BACKEND_PORT=8000
+          FRONTEND_EXTERNAL_PORT=8080
+          GOTENBERG_HOST=invoice_gotenberg
+          GOTENBERG_PORT=3000
+          SECRET_KEY=ci-test-secret
+          APP_DEBUG=False
+          INVOICE_IBAN=
+          INVOICE_INTESTATARIO=Test User
+          STS_ENVIRONMENT=test
+          STS_USERNAME=MTOMRA66A41G224M
+          STS_PASSWORD=Salve123
+          STS_PINCODE_ENCRYPTED=W+cy4Lz7rOOgldsbK98TEAwR6OIikKMkQJ1nWS09LgnJ6up+4e2LfIHe9z6aOQ9NocHOqepHuUcqmNNXpOq2JDCZQms65cX2oif8VhSUsvOk/9mc/8A9A7tpLnHcoGNrrjrg0z3fat7JmENXo5LF5uQV2IqvT4z5BDJbNa5XZpQ=
+          STS_CF_PROPRIETARIO_ENCRYPTED=SsFrZY1plknIYKxk2MxIsgCyH2X3cfnrbg7B1aywMzw4SYwfzCa797Bb40vZMlS1pRjBki3SYZT/dao7W7SCwarTTLQqFmfXu7SGBStGzfAyVWcXAZapnW3d8QWfY7EgbktdHPfcoslCqY+K4JJrHQA9H2bk2ngSA7n+xOjuLVw=
+          STS_PARTITA_IVA=65498732105
+          STS_DISPOSITIVO=1
+          STS_CERTIFICATE_PATH=/app/certs/sts_cert.pem
+          STS_CA_BUNDLE=/app/certs/CAAgenziadelleEntrateTest.pem
+          STS_NATURA_IVA=N2.2
+          STS_SSL_VERIFY=false
+          STS_DEBUG=false
+          EOF
+
+      - name: Build and start services
+        run: docker compose up -d --build
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for backend health..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+              echo "Backend is healthy"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "Backend did not become healthy in time"
+              docker compose logs invoice_backend
+              exit 1
+            fi
+            sleep 5
+          done
+
+          echo "Waiting for frontend..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080/ > /dev/null 2>&1; then
+              echo "Frontend is healthy"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Frontend did not become healthy in time"
+              docker compose logs invoice_frontend
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Run backend tests
+        run: make test-backend
+
+      - name: Run frontend tests
+        run: make test-frontend
+
+      - name: Run STS tests
+        run: make test-sts
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop services
+        if: always()
+        run: docker compose down -v
