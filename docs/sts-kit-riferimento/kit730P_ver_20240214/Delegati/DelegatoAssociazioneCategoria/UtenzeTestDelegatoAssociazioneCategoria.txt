@@ -1,0 +1,14 @@
+ASSOCIAZIONE FARMACIE
+-----------------------------
+User: UYIIY4SD
+Password: P3FHUTTY
+Pincode: 3194575787
+Pincode cifrato: NIajKTU71Cwk24DdeEg2/P8YHfx6OthuHqTgzMxS86DG6in8hQvOrShjrRlBHw6wQ7VPisBG9xOgGMtVwHTZeaxHWqYzvwO8hBXCPnlvqgQ41NZVmiOfD96eLW0pdqr1XXfNWxsTj8RJwPMRplPsyLguhpSamPGowiEHQCa6STo=
+
+FARMACIA DELEGANTE
+codiceRegione: 130
+codiceAsl: 201
+codiceSSA: 88888
+cfProprietario: BBTMRZ54L19H501T
+cfcfProprietario cifrato: w8X9HVsNk84tEHbkntc73dxKLJ6IRCKfBdGuXsgatrflxx1TnFR7rUOhqhxXT+7T2VirIc8P70c7ufKUjTSZToqmbPTQ9PcjteXeH5uU4+mtogo2XUpch8pDZqW5934qUMP9tKaZBCv6MrGAH1Xs0FoPaGvsG5y4jNprPh0NuOY=
+partita iva: 01201200121

@@ -56,9 +56,9 @@ export function initializeInvoices() {
                 data[key] = value;
             }
 
-            const inviataSnsCheckbox = document.getElementById('inviata_sns');
-            if (inviataSnsCheckbox) {
-                data['inviata_sns'] = inviataSnsCheckbox.checked;
+            const inviataStsCheckbox = document.getElementById('inviata_sts');
+            if (inviataStsCheckbox) {
+                data['inviata_sts'] = inviataStsCheckbox.checked;
             }
 
             // Validazione client-side migliorata
@@ -162,9 +162,9 @@ export function initializeInvoices() {
                 document.getElementById('edit-metodo_pagamento').value = data.metodo_pagamento;
                 document.getElementById('edit-data_pagamento').value = data.data_pagamento || '';
 
-                const editInviataSns = document.getElementById('edit-inviata-sns');
-                if (editInviataSns) {
-                    editInviataSns.checked = data.inviata_sns;
+                const editInviataSts = document.getElementById('edit-inviata-sts');
+                if (editInviataSts) {
+                    editInviataSts.checked = data.inviata_sts;
                 }
 
                 const editModal = new bootstrap.Modal(document.getElementById('editInvoiceModal'));
@@ -201,9 +201,9 @@ export function initializeInvoices() {
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
 
-            const editInviataSns = document.getElementById('edit-inviata-sns');
-            if (editInviataSns) {
-                data['inviata_sns'] = editInviataSns.checked;
+            const editInviataSts = document.getElementById('edit-inviata-sts');
+            if (editInviataSts) {
+                data['inviata_sts'] = editInviataSts.checked;
             }
 
             // Validazione client-side migliorata per la modifica
@@ -351,6 +351,31 @@ export function initializeInvoices() {
         }
     });
 }
+
+// Cancellazione invio STS
+window.cancelSTS = function (invoiceId) {
+    if (!confirm('Annullare l\'invio di questa fattura su STS?')) return;
+
+    notifications.info('Cancellazione STS in corso...', 4000);
+
+    fetch(`/api/sts/invoices/${invoiceId}/cancel`, { method: 'POST' })
+        .then(response => response.json().then(data => ({ status: response.status, data })))
+        .then(({ status, data }) => {
+            if (data.success) {
+                notifications.success('Invio STS annullato con successo!');
+                saveActiveTab();
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                const errori = (data.errors || [])
+                    .map(e => (e.codice ? `[${e.codice}] ${e.descrizione}` : String(e)))
+                    .join('; ') || data.error || 'Errore sconosciuto';
+                notifications.error(`Cancellazione STS fallita: ${errori}`);
+            }
+        })
+        .catch(error => {
+            notifications.error(`Errore di rete durante la cancellazione STS: ${error.message}`);
+        });
+};
 
 // Invio singola fattura a STS
 window.sendToSTS = function (invoiceId, alreadySent) {

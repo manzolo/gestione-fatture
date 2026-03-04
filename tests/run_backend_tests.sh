@@ -112,13 +112,13 @@ echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━�
 echo -e "${CYAN}  SEZIONE: Gestione Fatture${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-curl_check POST "$BASE_URL/invoices" '{"data_fattura":"2025-01-15","data_pagamento":"2025-01-20","metodo_pagamento":"Bonifico","cliente_id":1,"numero_sedute":1,"inviata_sns":false}' "Crea fattura"
+curl_check POST "$BASE_URL/invoices" '{"data_fattura":"2025-01-15","data_pagamento":"2025-01-20","metodo_pagamento":"Bonifico","cliente_id":1,"numero_sedute":1,"inviata_sts":false}' "Crea fattura"
 curl_check DELETE "$BASE_URL/clients/1" "" "Elimina cliente con fatture (deve fallire)"
 curl_check POST "$BASE_URL/clients" '{"nome":"Luigi","cognome":"Verdi","codice_fiscale":"VRDLGU80A01H501Y"}' "Crea cliente Luigi"
 curl_check DELETE "$BASE_URL/clients/2" "" "Elimina cliente senza fatture"
 curl_check GET "$BASE_URL/invoices" "" "Lista fatture"
 curl_check GET "$BASE_URL/invoices/1" "" "Dettaglio fattura"
-curl_check PUT "$BASE_URL/invoices/1" '{"data_fattura":"2025-02-01","data_pagamento":"2025-02-05","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":2,"inviata_sns":true}' "Aggiorna fattura"
+curl_check PUT "$BASE_URL/invoices/1" '{"data_fattura":"2025-02-01","data_pagamento":"2025-02-05","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":2,"inviata_sts":true}' "Aggiorna fattura"
 
 echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}  SEZIONE: Gestione Costi${NC}"

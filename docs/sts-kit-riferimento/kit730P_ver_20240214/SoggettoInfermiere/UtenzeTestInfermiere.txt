@@ -1,0 +1,8 @@
+INFERMIERE
+-------------------------------------
+User: PPRPLT00A01H501I
+Password: Salve123
+Pincode: 1792525399
+Partita iva: 87654321098
+Pincode cifrato: V441BEqcx6g1sg6wXrKcJSGpYBkmZR+uF+55CfOAmDVWsCXzLS8Ot+vpCh8krFWGeloFFKHMQ3LafhzPErJdtlk3NHUphx7o802yk+wWYn/H4Eeax8aWLYuiUATjOM5A+ONSvhqQYrFdH/YXEAjkHLp7U4Lk+gP2QvDWrTY/244=
+CF proprietario cifrato: nFO/PSGVRL8n6dEk4ss3qpCJsYk/yCCTy3UqSGrEFAEDb0ft6m5zLRlp4kraHSvvk+oWfg7RpQm1CYB9jBo0mmf3aBSRTUPGs9fO4IrgcF9sU26J7pVFwWxB8TOcuzuAextgjJ09Wf3u9WTMH8ZAtMrCXHsOsaHVh0iyO7GzuAQ=

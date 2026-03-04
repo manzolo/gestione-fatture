@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://dettagliosegnalazione.p730.sanita.finanze.it" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://dettagliosegnalazione.p730.sanita.finanze.it" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+		<xsd:schema elementFormDefault="qualified">
+			<xsd:import namespace="http://dettagliosegnalazione.p730.sanita.finanze.it" schemaLocation="DettaglioSegnalazione730Service_schema.xsd"/>
+		</xsd:schema>		
+	</wsdl:types>	  
+	<wsdl:message name="dettaglioSegnalazioneRequest">
+		<wsdl:part element="tns:dettaglioSegnalazioneRequest" name="dettaglioSegnalazioneRequest"/>
+	</wsdl:message>
+	<wsdl:message name="dettaglioSegnalazioneResponse">
+		<wsdl:part element="tns:dettaglioSegnalazioneResponse" name="dettaglioSegnalazioneResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="DettaglioSegnalazione730pPort">
+		<wsdl:operation name="DettaglioSegnalazione">
+			<wsdl:input message="tns:dettaglioSegnalazioneRequest"/>
+			<wsdl:output message="tns:dettaglioSegnalazioneResponse"/>      
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="DettaglioSegnalazione730pServicePortBinding" type="tns:DettaglioSegnalazione730pPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="DettaglioSegnalazione">
+		<soap:operation soapAction="dettagliosegnalazione.p730.sanita.finanze.it"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>     
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="DettaglioSegnalazione730pPort">
+		<wsdl:port binding="tns:DettaglioSegnalazione730pServicePortBinding" name="DettaglioSegnalazione730pPort">
+			<soap:address location="http://localhost:9080/Interrogazioni730pWeb/DettaglioSegnalazione730pPort"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  	<wsdl:definitions targetNamespace="http://reportmensile.p730.sanita.finanze.it"   	  
+					  	   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+					  	   xmlns:tns="http://reportmensile.p730.sanita.finanze.it" 
+					  	   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+					  	   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+		<xsd:schema elementFormDefault="qualified">
+			<xsd:import namespace="http://reportmensile.p730.sanita.finanze.it"  schemaLocation="ReportMensile730Service_schema.xsd"/>
+		</xsd:schema>		
+	</wsdl:types>	  
+	<wsdl:message name="reportMensileRequest">
+		<wsdl:part element="tns:reportMensileRequest" name="reportMensileRequest"/>
+	</wsdl:message>
+	<wsdl:message name="reportMensileResponse">
+		<wsdl:part element="tns:reportMensileResponse" name="reportMensileResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="ReportMensile730pPort">
+		<wsdl:operation name="ReportMensile">
+			<wsdl:input message="tns:reportMensileRequest"></wsdl:input>
+			<wsdl:output message="tns:reportMensileResponse"></wsdl:output>      
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ReportMensile730pServicePortBinding" type="tns:ReportMensile730pPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="ReportMensile">
+		<soap:operation soapAction="reportmensile.p730.sanita.finanze.it"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>     
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ReportMensile730pPort">
+		<wsdl:port name="ReportMensile730pPort" binding="tns:ReportMensile730pServicePortBinding">
+			<soap:address location="http://localhost:9080/ReportMensile730Web/ReportMensilePort"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

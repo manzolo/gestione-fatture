@@ -1,0 +1,10 @@
+PARAFARMACIA
+-------------------------------------------------
+User: AWG7L09T	
+Password: Salve123
+Pincode: 2864543493
+Pincode cifrato: cchJVxMgnRg6aV1HHLLzwUqO3tnsoK6grvHNAS2jzhbET3ci02WsvoQPrJmjQuQs4nhH1jsUlAEROMJdic9aHWFIrs7O6PSwRNvMhi5/WBQF82yxKGcLGb8eO58auMGs+zWA07hfhipJIIrk1KVL6Hg4oOc0UBE+zTydBzm35CI=
+cfProprietario: PROVAX00X00X000Y
+pIva: 98765432103
+Codice ufficio: 603-120-010010
+CF proprietario cifrato: x42Ft28lh/e4WGpFQmpIrmwaXeii0e8k2F/59MHVLoyhSf//ZDrpTWsFFqZXlJgMq9+blw63F2UMy2IchdXBJn8j9AAVPwShVLsWZ9bv4cotqNJHxvBee4Y/O1r1G3MAm2/uH0NL8vgS5mfp11GCVwm1j63fpx+CcL/fjQHiLlk=

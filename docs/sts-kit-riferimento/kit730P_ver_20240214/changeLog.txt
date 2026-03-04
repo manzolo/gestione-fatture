@@ -1,0 +1,6 @@
+- ver_20201218 aggiunti i nuovi campi "pagamentoTracciato", "tipoDocumento", "flagOpposizione", "aliquotaIVA" e "naturaIVA"
+	1. modificato l'xsd della modalità asincrona, file TracciatiWS\WS_AsincronoInvioDati730\schemaFileAllegatoInvio\730_precompilata.xsd
+	2. modificato l'xsd del servizio sincrono, file TracciatiWS\WS_SincronoSingoloDato730\DocumentoSpesa730pSchema.xsd
+	3. aggiornati i progetti SoapUI in base al nuovo campo
+	4. aggiornati gli esempi nella cartella TracciatiWS\EsempiFileXmlInvioAsincrono
+	

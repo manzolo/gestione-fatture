@@ -20,7 +20,7 @@ def build_inserimento_payload(fattura, cliente, config: dict) -> str:
           idSpesa / pIva, dataEmissione, numDocumentoFiscale
           dataPagamento
           cfCittadino
-          voceSpesa / tipoSpesa, importo, aliquotaIVA
+          voceSpesa / tipoSpesa, importo, naturaIVA
           pagamentoTracciato
           tipoDocumento
           flagOpposizione
@@ -34,8 +34,6 @@ def build_inserimento_payload(fattura, cliente, config: dict) -> str:
     num_documento = _esc(f"F{fattura.anno}{fattura.progressivo:04d}")
     data_pagamento = _esc(fattura.data_pagamento.isoformat())
 
-    cf_cifrato = _esc(encrypt_cf(cliente.codice_fiscale, config.get("cert_path")))
-
     importo = f"{round(fattura.totale, 2):.2f}"
     flag_opposizione = "1" if getattr(cliente, "flag_opposizione", False) else "0"
     pagamento_tracciato = (
@@ -44,6 +42,12 @@ def build_inserimento_payload(fattura, cliente, config: dict) -> str:
         else "NO"
     )
 
+    # cfCittadino: non emettere il tag se flagOpposizione=1 (PDF pag.15)
+    cf_cittadino_xml = ""
+    if flag_opposizione != "1":
+        cf_cifrato = _esc(encrypt_cf(cliente.codice_fiscale, config.get("cert_path")))
+        cf_cittadino_xml = f"\n        <doc:cfCittadino>{cf_cifrato}</doc:cfCittadino>"
+
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope
     xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
@@ -51,30 +55,29 @@ def build_inserimento_payload(fattura, cliente, config: dict) -> str:
   <soapenv:Header/>
   <soapenv:Body>
     <doc:inserimentoDocumentoSpesaRequest>
-      <pincode>{pincode}</pincode>
-      <Proprietario>
-        <cfProprietario>{cf_prop}</cfProprietario>
-      </Proprietario>
-      <idInserimentoDocumentoFiscale>
-        <idSpesa>
-          <pIva>{piva}</pIva>
-          <dataEmissione>{data_emissione}</dataEmissione>
-          <numDocumentoFiscale>
-            <dispositivo>{dispositivo}</dispositivo>
-            <numDocumento>{num_documento}</numDocumento>
-          </numDocumentoFiscale>
-        </idSpesa>
-        <dataPagamento>{data_pagamento}</dataPagamento>
-        <cfCittadino>{cf_cifrato}</cfCittadino>
-        <voceSpesa>
-          <tipoSpesa>SP</tipoSpesa>
-          <importo>{importo}</importo>
-          <aliquotaIVA>0.00</aliquotaIVA>
-        </voceSpesa>
-        <pagamentoTracciato>{pagamento_tracciato}</pagamentoTracciato>
-        <tipoDocumento>F</tipoDocumento>
-        <flagOpposizione>{flag_opposizione}</flagOpposizione>
-      </idInserimentoDocumentoFiscale>
+      <doc:pincode>{pincode}</doc:pincode>
+      <doc:Proprietario>
+        <doc:cfProprietario>{cf_prop}</doc:cfProprietario>
+      </doc:Proprietario>
+      <doc:idInserimentoDocumentoFiscale>
+        <doc:idSpesa>
+          <doc:pIva>{piva}</doc:pIva>
+          <doc:dataEmissione>{data_emissione}</doc:dataEmissione>
+          <doc:numDocumentoFiscale>
+            <doc:dispositivo>{dispositivo}</doc:dispositivo>
+            <doc:numDocumento>{num_documento}</doc:numDocumento>
+          </doc:numDocumentoFiscale>
+        </doc:idSpesa>
+        <doc:dataPagamento>{data_pagamento}</doc:dataPagamento>{cf_cittadino_xml}
+        <doc:voceSpesa>
+          <doc:tipoSpesa>SP</doc:tipoSpesa>
+          <doc:importo>{importo}</doc:importo>
+          <doc:naturaIVA>N4</doc:naturaIVA>
+        </doc:voceSpesa>
+        <doc:pagamentoTracciato>{pagamento_tracciato}</doc:pagamentoTracciato>
+        <doc:tipoDocumento>F</doc:tipoDocumento>
+        <doc:flagOpposizione>{flag_opposizione}</doc:flagOpposizione>
+      </doc:idInserimentoDocumentoFiscale>
     </doc:inserimentoDocumentoSpesaRequest>
   </soapenv:Body>
 </soapenv:Envelope>"""
@@ -105,18 +108,18 @@ def build_cancellazione_payload(fattura, cliente, config: dict) -> str:
   <soapenv:Header/>
   <soapenv:Body>
     <doc:cancellazioneDocumentoSpesaRequest>
-      <pincode>{pincode}</pincode>
-      <Proprietario>
-        <cfProprietario>{cf_prop}</cfProprietario>
-      </Proprietario>
-      <idCancellazioneDocumentoFiscale>
-        <pIva>{piva}</pIva>
-        <dataEmissione>{data_emissione}</dataEmissione>
-        <numDocumentoFiscale>
-          <dispositivo>{dispositivo}</dispositivo>
-          <numDocumento>{num_documento}</numDocumento>
-        </numDocumentoFiscale>
-      </idCancellazioneDocumentoFiscale>
+      <doc:pincode>{pincode}</doc:pincode>
+      <doc:Proprietario>
+        <doc:cfProprietario>{cf_prop}</doc:cfProprietario>
+      </doc:Proprietario>
+      <doc:idCancellazioneDocumentoFiscale>
+        <doc:pIva>{piva}</doc:pIva>
+        <doc:dataEmissione>{data_emissione}</doc:dataEmissione>
+        <doc:numDocumentoFiscale>
+          <doc:dispositivo>{dispositivo}</doc:dispositivo>
+          <doc:numDocumento>{num_documento}</doc:numDocumento>
+        </doc:numDocumentoFiscale>
+      </doc:idCancellazioneDocumentoFiscale>
     </doc:cancellazioneDocumentoSpesaRequest>
   </soapenv:Body>
 </soapenv:Envelope>"""

@@ -1,0 +1,8 @@
+MEDICO
+--------------------------------------
+ 
+User: PROVAX00X00X000Y
+Password: Salve123
+Pincode: 1234567890
+Pincode cifrato: HmhwvMEtyHOwDm5K3YEQ9RZiNAkJ+FvRwXodiABj9HpRbdQUaLa4cyYZU8YqaBsSs4Lq6u85uDci6xowmF7ZrVgLhZ83q4nSi8bSvVDPS5pPStBlOJfvo8AisqDiKdJvEPbkIhBVnbmf28gh28G/vQLkp2RgVEYinPA0LUCz8PQ=
+CF proprietario cifrato: Ix4OzmfPxB0TTwS6+Hc0enwIhMtunRUkB4CjlDDDns5pCy2iZJ4Qxy+C/X8mMpLRz37tOXnklkkPml5Di32wtQlXpCL2qais/ZjSmwwLldUFvxQPRrwsOSgbH0yK3n+cfgXHbuyTFmjKBAT1dkc5xJ4sTW6qPlaMEIJIevQXvrQ=

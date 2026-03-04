@@ -38,7 +38,6 @@
                                     <th>Cliente</th>
                                     <th>Descrizione</th>
                                     <th>Totale</th>
-                                    <th>Inviata SNS</th>
                                     <th>STS</th>
                                     <th>Azioni</th>
                                 </tr>
@@ -64,13 +63,6 @@
                                     <td>{{ invoice.cliente }}</td>
                                     <td>{{ invoice.descrizione }}</td>
                                     <td>€{{ invoice.totale }}</td>
-                                    <td class="text-center">
-                                        {% if invoice.inviata_sns %}
-                                        <span class="text-success" title="Sì">&#10004;</span>
-                                        {% else %}
-                                        <span class="text-danger" title="No">&#10006;</span>
-                                        {% endif %}
-                                    </td>
                                     <td class="text-center">
                                         {% if invoice.inviata_sts %}
                                         <span class="text-success"
@@ -100,6 +92,14 @@
                                                 onclick="sendToSTS({{ invoice.id }}, {{ 'true' if invoice.inviata_sts else 'false' }})"
                                                 title="{% if invoice.inviata_sts %}Reinvia a STS (protocollo: {{ invoice.protocollo_sts or 'N/D' }}){% else %}Invia a STS{% endif %}">
                                                 <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                            {% endif %}
+                                            {% if invoice.inviata_sts %}
+                                            <button type="button"
+                                                class="btn btn-danger btn-action"
+                                                onclick="cancelSTS({{ invoice.id }})"
+                                                title="Annulla invio STS (protocollo: {{ invoice.protocollo_sts or 'N/D' }})">
+                                                <i class="fas fa-times-circle"></i>
                                             </button>
                                             {% endif %}
                                         </div>

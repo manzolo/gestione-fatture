@@ -1,0 +1,21 @@
+AMBIENTE DI TEST:
+--------------------------------------------------------------------------------------------------------------------
+https://invioSS730pTest.sanita.finanze.it/entrate/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort
+https://invioSS730pTest.sanita.finanze.it/entrate/Ricevute730ServiceWeb/ricevutePdf
+https://invioSS730pTest.sanita.finanze.it/entrate/EsitoStatoInviiWEB/DettaglioErrori730Service
+https://invioSS730pTest.sanita.finanze.it/entrate/EsitoStatoInviiWEB/EsitoInvioDatiSpesa730Service
+https://invioSS730pTest.sanita.finanze.it/entrate/ReportMensile730Web/ReportMensilePort
+https://invioSS730pTest.sanita.finanze.it/entrate/InterrogazionePuntuale730Web/InterrogazionePuntuale730Port
+https://invioSS730pTest.sanita.finanze.it/entrate/Interrogazioni730pWeb/DettaglioSegnalazione730pPort
+https://invioSS730pTest.sanita.finanze.it/entrate/Interrogazioni730pWeb/ReportSegnalazioni730pPort
+
+AMBIENTE DI PRODUZIONE:
+--------------------------------------------------------------------------------------------------------------------
+https://invioSS730p.sanita.finanze.it/entrate/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort
+https://invioSS730p.sanita.finanze.it/entrate/Ricevute730ServiceWeb/ricevutePdf
+https://invioSS730p.sanita.finanze.it/entrate/EsitoStatoInviiWEB/DettaglioErrori730Service
+https://invioSS730p.sanita.finanze.it/entrate/EsitoStatoInviiWEB/EsitoInvioDatiSpesa730Service
+https://invioSS730p.sanita.finanze.it/entrate/ReportMensile730Web/ReportMensilePort
+https://invioSS730p.sanita.finanze.it/entrate/InterrogazionePuntuale730Web/InterrogazionePuntuale730Port
+https://invioSS730p.sanita.finanze.it/entrate/Interrogazioni730pWeb/DettaglioSegnalazione730pPort
+https://invioSS730p.sanita.finanze.it/entrate/Interrogazioni730pWeb/ReportSegnalazioni730pPort

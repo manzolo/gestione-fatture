@@ -1,0 +1,1074 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="730AssociazioneCategoria" resourceRoot="${projectDir}" soapui-version="5.4.0" abortOnError="false" runType="SEQUENTIAL" id="d1a77c9c-85cc-43af-b2d6-df482890c53e" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="DettaglioErrori730PortBinding" type="wsdl" bindingName="{http://dettaglioerrori.p730.sanita.sogei.it/}DettaglioErrori730PortBinding" soapVersion="1_1" anonymous="optional" definition="file:/C:/Users/gndibiase/Desktop/ricevute730/DettaglioErrori730Service.wsdl" id="4c500e10-edfd-46c2-ba02-7d243facfee4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/C:/Users/gndibiase/Desktop/ricevute730/DettaglioErrori730Service.wsdl"><con:part><con:url>file:/C:/Users/gndibiase/Desktop/ricevute730/DettaglioErrori730Service.wsdl</con:url><con:content><![CDATA[<definitions name="DettaglioErrori730Service" targetNamespace="http://dettaglioerrori.p730.sanita.sogei.it/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://dettaglioerrori.p730.sanita.sogei.it/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://dettaglioerrori.p730.sanita.sogei.it/" schemaLocation="DettaglioErrori730Service_schema.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="DettaglioErrori">
+    <part name="parameters" element="tns:DettaglioErrori"></part>
+  </message>
+  <message name="DettaglioErroriResponse">
+    <part name="parameters" element="tns:DettaglioErroriResponse"></part>
+  </message>
+  <portType name="DettaglioErrori730">
+    <operation name="DettaglioErrori">
+      <input message="tns:DettaglioErrori"></input>
+      <output message="tns:DettaglioErroriResponse"></output>
+    </operation>
+  </portType>
+  <binding name="DettaglioErrori730PortBinding" type="tns:DettaglioErrori730">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="DettaglioErrori">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="DettaglioErrori730Service">
+    <port name="DettaglioErrori730Port" binding="tns:DettaglioErrori730PortBinding">
+      <soap:address location="http://localhost:9083/EsitoStatoInviiWEB/DettaglioErrori730Service"/>
+    </port>
+  </service>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\C:\Users\gndibiase\Desktop\ricevute730\DettaglioErrori730Service_schema.xsd</con:url><con:content><![CDATA[<xs:schema version="1.0" targetNamespace="http://dettaglioerrori.p730.sanita.sogei.it/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://dettaglioerrori.p730.sanita.sogei.it/">
+  <xs:element name="DettaglioErrori" type="tns:DettaglioErrori"/>
+  <xs:element name="DettaglioErroriResponse" type="tns:DettaglioErroriResponse"/>
+  <xs:element name="datiInput" type="tns:datiInput"/>
+  <xs:element name="datiOutput" type="tns:datiOutput"/>
+  <xs:complexType name="dettaglioEsitoNegativo">
+    <xs:sequence>
+      <xs:element name="codice" type="xs:string"/>
+      <xs:element name="descrizione" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dettaglioEsitoPositivo">
+    <xs:sequence>
+      <xs:element name="csv" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datiOutput">
+    <xs:sequence>
+      <xs:element name="esitoChiamata" type="xs:string"/>
+      <xs:element name="esitiPositivi" type="tns:esitiPositivi" minOccurs="0"/>
+      <xs:element name="esitiNegativi" type="tns:esitiNegativi" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="esitiPositivi">
+    <xs:sequence>
+      <xs:element name="dettagliEsito" type="tns:dettaglioEsitoPositivo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="esitiNegativi">
+    <xs:sequence>
+      <xs:element name="dettaglioEsitoNegativo" type="tns:dettaglioEsitoNegativo" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datiInput">
+    <xs:sequence>
+      <xs:element name="pinCode" type="xs:string"/>
+      <xs:element name="protocollo" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale1" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale2" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale3" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DettaglioErroriResponse">
+    <xs:sequence>
+      <xs:element name="DatiOutputRichiesta" type="tns:datiOutput" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DettaglioErrori">
+    <xs:sequence>
+      <xs:element name="DatiInputRichiesta" type="tns:datiInput" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://invioSS730pTest.sanita.finanze.it/EsitoStatoInviiWEB/DettaglioErrori730Service</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="DettaglioErrori" bindingOperationName="DettaglioErrori" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional" id="fd6ceeb2-fa2e-43f0-90a7-530bb3fa063e"><con:settings/><con:call name="AssociazioneCategoria" id="2cdf9b31-5229-44b9-b5e5-01f48a4ee7a3"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/EsitoStatoInviiWEB/DettaglioErrori730Service</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:det="http://dettaglioerrori.p730.sanita.sogei.it/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <det:DettaglioErrori>
+         <DatiInputRichiesta>
+            <pinCode>NIajKTU71Cwk24DdeEg2/P8YHfx6OthuHqTgzMxS86DG6in8hQvOrShjrRlBHw6wQ7VPisBG9xOgGMtVwHTZeaxHWqYzvwO8hBXCPnlvqgQ41NZVmiOfD96eLW0pdqr1XXfNWxsTj8RJwPMRplPsyLguhpSamPGowiEHQCa6STo=</pinCode>
+            <protocollo>16102013572983311</protocollo>
+            <opzionale1></opzionale1>
+            <opzionale2></opzionale2>
+            <opzionale3></opzionale3>
+         </DatiInputRichiesta>
+      </det:DettaglioErrori>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://dettaglioerrori.p730.sanita.sogei.it/DettaglioErrori730/DettaglioErroriRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="RicevutaPdf730PortBinding" type="wsdl" bindingName="{http://ricevutapdf.p730.sanita.sogei.it/}RicevutaPdf730PortBinding" soapVersion="1_1" anonymous="optional" definition="file:/C:/Users/gndibiase/Desktop/ricevute730/RicevutaPdf730Service.wsdl" id="e0cf6e3f-5f3f-49a3-a071-6c0899adb60c" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/C:/Users/gndibiase/Desktop/ricevute730/RicevutaPdf730Service.wsdl"><con:part><con:url>file:/C:/Users/gndibiase/Desktop/ricevute730/RicevutaPdf730Service.wsdl</con:url><con:content><![CDATA[<definitions name="RicevutaPdf730Service" targetNamespace="http://ricevutapdf.p730.sanita.sogei.it/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ricevutapdf.p730.sanita.sogei.it/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://ricevutapdf.p730.sanita.sogei.it/" schemaLocation="RicevutaPdf730Service_schema.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="RicevutaPdf">
+    <part name="parameters" element="tns:RicevutaPdf"></part>
+  </message>
+  <message name="RicevutaPdfResponse">
+    <part name="parameters" element="tns:RicevutaPdfResponse"></part>
+  </message>
+  <portType name="RicevutaPdf730">
+    <operation name="RicevutaPdf">
+      <input message="tns:RicevutaPdf"></input>
+      <output message="tns:RicevutaPdfResponse"></output>
+    </operation>
+  </portType>
+  <binding name="RicevutaPdf730PortBinding" type="tns:RicevutaPdf730">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="RicevutaPdf">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="ricevutePdf">
+    <port name="RicevutaPdf730Port" binding="tns:RicevutaPdf730PortBinding">
+      <soap:address location="https://invioSS730pTest.sanita.finanze.it/Ricevute730ServiceWeb/ricevutePdf"/>
+    </port>
+  </service>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\C:\Users\gndibiase\Desktop\ricevute730\RicevutaPdf730Service_schema.xsd</con:url><con:content><![CDATA[<xs:schema version="1.0" targetNamespace="http://ricevutapdf.p730.sanita.sogei.it/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ricevutapdf.p730.sanita.sogei.it/">
+  <xs:element name="RicevutaPdf" type="tns:RicevutaPdf"/>
+  <xs:element name="RicevutaPdfResponse" type="tns:RicevutaPdfResponse"/>
+  <xs:element name="datiInput" type="tns:datiInput"/>
+  <xs:element name="datiOutput" type="tns:datiOutput"/>
+  <xs:complexType name="dettaglioEsitoNegativo">
+    <xs:sequence>
+      <xs:element name="codice" type="xs:string"/>
+      <xs:element name="descrizione" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dettaglioEsitoPositivo">
+    <xs:sequence>
+      <xs:element name="pdf" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datiOutput">
+    <xs:sequence>
+      <xs:element name="esitoChiamata" type="xs:string"/>
+      <xs:element name="esitiPositivi" type="tns:esitiPositivi" minOccurs="0"/>
+      <xs:element name="esitiNegativi" type="tns:esitiNegativi" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="esitiPositivi">
+    <xs:sequence>
+      <xs:element name="dettagliEsito" type="tns:dettaglioEsitoPositivo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="esitiNegativi">
+    <xs:sequence>
+      <xs:element name="dettaglioEsitoNegativo" type="tns:dettaglioEsitoNegativo" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datiInput">
+    <xs:sequence>
+      <xs:element name="pinCode" type="xs:string"/>
+      <xs:element name="protocollo" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale1" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale2" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale3" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RicevutaPdfResponse">
+    <xs:sequence>
+      <xs:element name="DatiOutputRichiesta" type="tns:datiOutput" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RicevutaPdf">
+    <xs:sequence>
+      <xs:element name="DatiInputRichiesta" type="tns:datiInput" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://invioSS730pTest.sanita.finanze.it/Ricevute730ServiceWeb/ricevutePdf</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="RicevutaPdf" bindingOperationName="RicevutaPdf" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional" id="69db864f-9ed4-453e-a6e3-dbb6a551cbc9"><con:settings/><con:call name="AssociazioneCategoria" id="1ab79307-5487-45ea-a123-d3f3621b33c5"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/Ricevute730ServiceWeb/ricevutePdf</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ric="http://ricevutapdf.p730.sanita.sogei.it/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ric:RicevutaPdf>
+         <DatiInputRichiesta>
+            <pinCode>NIajKTU71Cwk24DdeEg2/P8YHfx6OthuHqTgzMxS86DG6in8hQvOrShjrRlBHw6wQ7VPisBG9xOgGMtVwHTZeaxHWqYzvwO8hBXCPnlvqgQ41NZVmiOfD96eLW0pdqr1XXfNWxsTj8RJwPMRplPsyLguhpSamPGowiEHQCa6STo=</pinCode>
+            <protocollo>16102013572983311</protocollo>
+            <opzionale1></opzionale1>
+            <opzionale2></opzionale2>
+            <opzionale3></opzionale3>
+         </DatiInputRichiesta>
+      </ric:RicevutaPdf>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://ricevutapdf.p730.sanita.sogei.it/RicevutaPdf730/RicevutaPdfRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="EsitoInvioDatiSpesa730PortBinding" type="wsdl" bindingName="{http://esitoinvio.p730.sanita.sogei.it/}EsitoInvioDatiSpesa730PortBinding" soapVersion="1_1" anonymous="optional" definition="file:/C:/Users/gndibiase/Desktop/ricevute730/EsitoInvioDatiSpesa730Service.wsdl" id="31ed3d9d-3c5b-485f-9e88-48ce2fccdff9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/C:/Users/gndibiase/Desktop/ricevute730/EsitoInvioDatiSpesa730Service.wsdl"><con:part><con:url>file:/C:/Users/gndibiase/Desktop/ricevute730/EsitoInvioDatiSpesa730Service.wsdl</con:url><con:content><![CDATA[<definitions name="EsitoInvioDatiSpesa730Service" targetNamespace="http://esitoinvio.p730.sanita.sogei.it/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://esitoinvio.p730.sanita.sogei.it/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://esitoinvio.p730.sanita.sogei.it/" schemaLocation="EsitoInvioDatiSpesa730Service_schema.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="Exception_Exception">
+    <part name="fault" element="tns:Exception"></part>
+  </message>
+  <message name="EsitoInvii">
+    <part name="parameters" element="tns:EsitoInvii"></part>
+  </message>
+  <message name="EsitoInviiResponse">
+    <part name="parameters" element="tns:EsitoInviiResponse"></part>
+  </message>
+  <portType name="EsitoInvioDatiSpesa730">
+    <operation name="EsitoInvii">
+      <input message="tns:EsitoInvii"></input>
+      <output message="tns:EsitoInviiResponse"></output>
+      <fault name="Exception_Exception" message="tns:Exception_Exception"></fault>
+    </operation>
+  </portType>
+  <binding name="EsitoInvioDatiSpesa730PortBinding" type="tns:EsitoInvioDatiSpesa730">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="EsitoInvii">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="Exception_Exception">
+        <soap:fault name="Exception_Exception" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="EsitoInvioDatiSpesa730Service">
+    <port name="EsitoInvioDatiSpesa730Port" binding="tns:EsitoInvioDatiSpesa730PortBinding">
+      <soap:address location="http://localhost:9083/EsitoStatoInviiWEB/EsitoInvioDatiSpesa730Service"/>
+    </port>
+  </service>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\C:\Users\gndibiase\Desktop\ricevute730\EsitoInvioDatiSpesa730Service_schema.xsd</con:url><con:content><![CDATA[<xs:schema version="1.0" targetNamespace="http://esitoinvio.p730.sanita.sogei.it/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://esitoinvio.p730.sanita.sogei.it/">
+  <xs:element name="EsitoInvii" type="tns:EsitoInvii"/>
+  <xs:element name="EsitoInviiResponse" type="tns:EsitoInviiResponse"/>
+  <xs:element name="Exception" type="tns:Exception"/>
+  <xs:element name="datiInput" type="tns:datiInput"/>
+  <xs:element name="datiOutput" type="tns:datiOutput"/>
+  <xs:complexType name="dettaglioEsitoNegativo">
+    <xs:sequence>
+      <xs:element name="codice" type="xs:string"/>
+      <xs:element name="descrizione" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dettaglioEsitoPositivo">
+    <xs:sequence>
+      <xs:element name="protocollo" type="xs:string"/>
+      <xs:element name="dataInvio" type="xs:string"/>
+      <xs:element name="stato" type="xs:int"/>
+      <xs:element name="descrizione" type="xs:string"/>
+      <xs:element name="nInviati" type="xs:long"/>
+      <xs:element name="nAccolti" type="xs:long"/>
+      <xs:element name="nWarnings" type="xs:long"/>
+      <xs:element name="nErrori" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Exception">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datiOutput">
+    <xs:sequence>
+      <xs:element name="esitoChiamata" type="xs:string"/>
+      <xs:element name="descrizioneEsito" type="xs:string"/>
+      <xs:element name="esitiPositivi" type="tns:esitiPositivi" minOccurs="0"/>
+      <xs:element name="esitiNegativi" type="tns:esitiNegativi" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="esitiPositivi">
+    <xs:sequence>
+      <xs:element name="dettagliEsito" type="tns:dettaglioEsitoPositivo" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="esitiNegativi">
+    <xs:sequence>
+      <xs:element name="dettaglioEsitoNegativo" type="tns:dettaglioEsitoNegativo" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datiInput">
+    <xs:sequence>
+      <xs:element name="pinCode" type="xs:string"/>
+      <xs:element name="dataInizio" type="xs:string" minOccurs="0"/>
+      <xs:element name="dataFine" type="xs:string" minOccurs="0"/>
+      <xs:element name="protocollo" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale1" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale2" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale3" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EsitoInviiResponse">
+    <xs:sequence>
+      <xs:element name="DatiOutputRichiesta" type="tns:datiOutput" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EsitoInvii">
+    <xs:sequence>
+      <xs:element name="DatiInputRichiesta" type="tns:datiInput" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://invioSS730pTest.sanita.finanze.it/EsitoStatoInviiWEB/EsitoInvioDatiSpesa730Service</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="EsitoInvii" bindingOperationName="EsitoInvii" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional" id="aeec1aea-6820-4a10-be1c-d646fadf201c"><con:settings/><con:call name="AssociazioneCategoria" id="2bd8ed98-13b5-4f6b-a927-a2f6947010c1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/EsitoStatoInviiWEB/EsitoInvioDatiSpesa730Service</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:esit="http://esitoinvio.p730.sanita.sogei.it/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <esit:EsitoInvii>
+         <DatiInputRichiesta>
+            <pinCode>NIajKTU71Cwk24DdeEg2/P8YHfx6OthuHqTgzMxS86DG6in8hQvOrShjrRlBHw6wQ7VPisBG9xOgGMtVwHTZeaxHWqYzvwO8hBXCPnlvqgQ41NZVmiOfD96eLW0pdqr1XXfNWxsTj8RJwPMRplPsyLguhpSamPGowiEHQCa6STo=</pinCode>
+            <dataInizio></dataInizio>
+            <dataFine></dataFine>
+            <protocollo>18091315430826491</protocollo>
+            <opzionale1></opzionale1>
+            <opzionale2></opzionale2>
+            <opzionale3></opzionale3>
+         </DatiInputRichiesta>
+      </esit:EsitoInvii>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://esitoinvio.p730.sanita.sogei.it/EsitoInvioDatiSpesa730/EsitoInviiRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="InvioTelematicoSS730pMtomPortBinding" type="wsdl" bindingName="{http://ejb.invioTelematicoSS730p.sanita.finanze.it/}InvioTelematicoSS730pMtomPortBinding" soapVersion="1_1" anonymous="optional" definition="C:/Users/gndibiase/Desktop/kit730P_ver_20161014/TracciatiWS/WS_AsincronoInvioDati730/InvioTelematicoSpeseSanitarie730p.wsdl" id="f98d903d-ed95-4b29-b9b6-cff9821a1807" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/C:/Users/gndibiase/Desktop/kit730P_ver_20161014/TracciatiWS/WS_AsincronoInvioDati730/InvioTelematicoSpeseSanitarie730p.wsdl"><con:part><con:url>file:/C:/Users/gndibiase/Desktop/kit730P_ver_20161014/TracciatiWS/WS_AsincronoInvioDati730/InvioTelematicoSpeseSanitarie730p.wsdl</con:url><con:content><![CDATA[<definitions name="InvioTelematicoSpeseSanitarie730pService" targetNamespace="http://ejb.invioTelematicoSS730p.sanita.finanze.it/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ejb.invioTelematicoSS730p.sanita.finanze.it/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema>
+      <xsd:import namespace="http://ejb.invioTelematicoSS730p.sanita.finanze.it/" schemaLocation="InvioTelematicoSpeseSanitarie730p_schema1.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="inviaFileMtom">
+    <part element="tns:inviaFileMtom" name="parameters"></part>
+  </message>
+  <message name="inviaFileMtomResponse">
+    <part element="tns:inviaFileMtomResponse" name="parameters"></part>
+  </message>
+  <portType name="InvioTelematicoSS730pMtom">
+    <operation name="inviaFileMtom">
+      <input message="tns:inviaFileMtom"></input>
+      <output message="tns:inviaFileMtomResponse"></output>
+    </operation>
+  </portType>
+  <binding name="InvioTelematicoSS730pMtomPortBinding" type="tns:InvioTelematicoSS730pMtom">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="inviaFileMtom">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="InvioTelematicoSpeseSanitarie730pService">
+    <port binding="tns:InvioTelematicoSS730pMtomPortBinding" name="InvioTelematicoSS730pMtomPort">
+      <soap:address location="http://localhost:9080/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort"/>
+    </port>
+  </service>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\C:\Users\gndibiase\Desktop\kit730P_ver_20161014\TracciatiWS\WS_AsincronoInvioDati730\InvioTelematicoSpeseSanitarie730p_schema1.xsd</con:url><con:content><![CDATA[<xs:schema targetNamespace="http://ejb.invioTelematicoSS730p.sanita.finanze.it/" version="1.0" xmlns:tns="http://ejb.invioTelematicoSS730p.sanita.finanze.it/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="inviaFileMtom" type="tns:inviaFileMtom"/>
+  <xs:element name="inviaFileMtomResponse" type="tns:inviaFileMtomResponse"/>
+  <xs:complexType name="ricevutaInvio">
+    <xs:sequence>
+      <xs:element minOccurs="1" name="codiceEsito" type="xs:string"/>
+      <xs:element minOccurs="1" name="dataAccoglienza" type="xs:string"/>
+      <xs:element minOccurs="1" name="descrizioneEsito" type="xs:string"/>
+      <xs:element minOccurs="1" name="dimensioneFileAllegato" type="xs:string"/>
+      <xs:element minOccurs="1" name="nomeFileAllegato" type="xs:string"/>
+      <xs:element minOccurs="1" name="protocollo" type="xs:string"/>
+      <xs:element minOccurs="0" name="idErrore" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="inviaFileMtom">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="nomeFileAllegato" nillable="false" type="tns:tipoNomeFileAllegato"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="pincodeInvianteCifrato" nillable="false" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="datiProprietario" nillable="false" type="tns:proprietario"/>
+      <xs:element minOccurs="0" name="opzionale1" type="xs:string"/>
+      <xs:element minOccurs="0" name="opzionale2" type="xs:string"/>
+      <xs:element minOccurs="0" name="opzionale3" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="1" name="documento" nillable="false" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="proprietario">
+    <xs:sequence>
+      <xs:element name="codiceRegione" type="tns:varChar3Type" minOccurs="0"/>
+      <xs:element name="codiceAsl" type="tns:varChar3Type" minOccurs="0"/>
+      <xs:element name="codiceSSA" type="tns:codSsaType" minOccurs="0"/>
+      <xs:element name="cfProprietario" type="tns:cfType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="cfType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="varChar3Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{3})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="codSsaType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{5,6})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tipoNomeFileAllegato">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(\p{IsBasicLatin}{6,60})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="inviaFileMtomResponse">
+    <xs:sequence>
+      <xs:element minOccurs="1" name="return" type="tns:ricevutaInvio"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:9080/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort</con:endpoint><con:endpoint>https://invioSS730pTest.sanita.finanze.it/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort </con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="inviaFileMtom" bindingOperationName="inviaFileMtom" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional" id="d94d4f40-ac90-4185-a4d3-b719e57cfd30"><con:settings/><con:call name="AssociazioneCategoria" id="af6e7d5e-bc94-461f-a53c-49435a45a3d6"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@skip_soap_action">false</con:setting><con:setting id="WsdlSettings@enable-mtom">true</con:setting><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@force_mtom">true</con:setting><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@expand-mtom-attachments">false</con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort </con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ejb="http://ejb.invioTelematicoSS730p.sanita.finanze.it/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ejb:inviaFileMtom>
+         <nomeFileAllegato>provaFarmaciaDelega.zip</nomeFileAllegato>
+         <pincodeInvianteCifrato>NIajKTU71Cwk24DdeEg2/P8YHfx6OthuHqTgzMxS86DG6in8hQvOrShjrRlBHw6wQ7VPisBG9xOgGMtVwHTZeaxHWqYzvwO8hBXCPnlvqgQ41NZVmiOfD96eLW0pdqr1XXfNWxsTj8RJwPMRplPsyLguhpSamPGowiEHQCa6STo=</pincodeInvianteCifrato>
+         <datiProprietario>
+            <codiceRegione>130</codiceRegione>
+            <codiceAsl>201</codiceAsl>
+            <codiceSSA>88888</codiceSSA>
+            <cfProprietario>BBTMRZ54L19H501T</cfProprietario>
+         </datiProprietario>
+         <opzionale1></opzionale1>
+         <opzionale2></opzionale2>
+         <opzionale3></opzionale3>
+         <documento>cid:provaFarmaciaDelega.zip</documento>
+      </ejb:inviaFileMtom>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:attachment><con:name>provaFarmaciaDelega.zip</con:name><con:contentType>application/zip</con:contentType><con:size>871</con:size><con:contentId>provaFarmaciaDelega.zip</con:contentId><con:data>UEsDBBQACAgIAFl9LU0AAAAAAAAAAAAAAAAXAAAAcHJvdmFGYXJtYWNpYURlbGVnYS56aXAL8GZmEWFgYOBgcK/V9dXZlf1mMxMDwzMWBgZxoGhBUX5ZoltiUW5icmaiS2pOanqiXkVuztyQ232LHARq5/l+k+9ZP3kj49HTLHMt4gRcUgOufEy9vGXtNqZek6ZfX08f7bWYfLdd9UNA6PLzK61EPPLTj+u13Ehv2XVWKf5RF+sbpV1q77ZFmqT/nV71ce3Xz+1PfkoEHlc240l4eObEau/jFw6eaebwv8hnHbCYg03Te+2Zv6cee6dv0xNLUpy+95j77KOxAhXrGVwCQ7pOqb7KbzxQaBPRt6XnVesOnQa9Q0cjfmleWzbPv4Ch1mnykclTTDo2NG5v2bXj6HRLTptlRSvMNkczHfd+IPds1eXM3aH+epx3hCNrFz8vFb+6Iqiy/v+V8LgnU3XZV158kuQvUhv3el/5BKsJzD5OC865zv4vETd1YyHf9IrjC0/f0enu+Trv6NFC/ZAnyYfjGR8/eXn8cNIqu/cPa0KZ5ZWCzIz/73p+s6Ryac7u91e3HAtkkN5eNE03dKr1ko3rel4F+up/n1Z81uKtBgdrvM3suedqDF7Ht+Wad8xbmTDbl7Mm065QsGZrYFRwSdEG6Qsr2yXPLFN7XS1gvb5lw9GPTkXH/XOSZp3sev3j6jeZQxGvKnpW7i/4wx0/9UCyqvNu9eWzX6hW1R4S2JI/dUaHQb+R0IQJ25I6ayqcn/CrT2i3eMxeLzzBoW7ZlmzZvMSu39e+7p3UZG52x8/mzeFsq06lRv2Zt5eVeAgc+DF7oW6U3Eob82m9j5ef9H27L7XsdsISVnHxL7LpZbEvXwXtuyYt/OL2ZLM3oacn5+XvnfbRtfjo3eNOb9sfsf5wZml3D5tamp3WcWra9rKLiWdSLkVUbbbcOGVufGTTZDOObVpFh1pvRzLeLfk+Xyq69++xhVrveIsXfg0UlTEIf39VRyeaL7h1tYGByOuMG7yCS7OL3tvIqi7heC6uoHAv1/qXLOedxWu8ZPp/dXarGn577z9l5r8TX+YfsTk+1eXd/CtCP7YdEzrxv/bRkfwAb0YmeQZcKV2FAQIUoDSOdM8FVcDIIMFQKOI2Nd37CmPe/9tZyHSANysbRA0jQyaQfsEE4gEAUEsHCPH226NGAwAAZwMAAFBLAQIUABQACAgIAFl9LU3x9tujRgMAAGcDAAAXAAAAAAAAAAAAAAAAAAAAAABwcm92YUZhcm1hY2lhRGVsZWdhLnppcFBLBQYAAAAAAQABAEUAAACLAwAAAAA=</con:data><con:id>9f82e948-a407-4cae-8da6-3960b31baee2</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://ejb.invioTelematicoSS730p.sanita.finanze.it/InvioTelematicoSS730pMtom/inviaFileMtomRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="InterrogazionePuntuale730pServicePortBinding" type="wsdl" bindingName="{http://interrogazionepuntuale.p730.sanita.finanze.it}InterrogazionePuntuale730pServicePortBinding" soapVersion="1_1" anonymous="optional" definition="C:/Users/gndibiase/Desktop/kit730P_ver_20161223/TracciatiWS/WS_Interrogazioni/InterrogazionePuntuale730Service.wsdl" id="c9b73071-8331-47a7-a9ba-6ac67cafd33f" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/C:/Users/gndibiase/Desktop/kit730P_ver_20161223/TracciatiWS/WS_Interrogazioni/InterrogazionePuntuale730Service.wsdl"><con:part><con:url>file:/C:/Users/gndibiase/Desktop/kit730P_ver_20161223/TracciatiWS/WS_Interrogazioni/InterrogazionePuntuale730Service.wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://interrogazionepuntuale.p730.sanita.finanze.it" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://interrogazionepuntuale.p730.sanita.finanze.it" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified">
+      <xsd:import namespace="http://interrogazionepuntuale.p730.sanita.finanze.it" schemaLocation="InterrogazionePuntuale730Service_schema.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="interrogazionePuntualeRequest">
+    <wsdl:part element="tns:interrogazionePuntualeRequest" name="interrogazionePuntualeRequest"/>
+  </wsdl:message>
+  <wsdl:message name="interrogazionePuntualeResponse">
+    <wsdl:part element="tns:interrogazionePuntualeResponse" name="interrogazionePuntualeResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="InterrogazionePuntuale730pPort">
+    <wsdl:operation name="InterrogazionePuntuale">
+      <wsdl:input message="tns:interrogazionePuntualeRequest"/>
+      <wsdl:output message="tns:interrogazionePuntualeResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="InterrogazionePuntuale730pServicePortBinding" type="tns:InterrogazionePuntuale730pPort">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="InterrogazionePuntuale">
+      <soap:operation soapAction="interrogazionepuntuale.p730.sanita.finanze.it"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="InterrogazionePuntuale730pPort">
+    <wsdl:port name="InterrogazionePuntuale730pPort" binding="tns:InterrogazionePuntuale730pServicePortBinding">
+      <soap:address location="http://localhost:9080/InterrogazionePuntuale730Web/InterrogazionePuntuale730Port"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\C:\Users\gndibiase\Desktop\kit730P_ver_20161223\TracciatiWS\WS_Interrogazioni\InterrogazionePuntuale730Service_schema.xsd</con:url><con:content><![CDATA[<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://interrogazionepuntuale.p730.sanita.finanze.it" xmlns="http://interrogazionepuntuale.p730.sanita.finanze.it" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="interrogazionePuntualeRequest" type="interrogazionePuntualeRequest"/>
+  <xs:element name="interrogazionePuntualeResponse" type="interrogazionePuntualeResponse"/>
+  <xs:complexType name="interrogazionePuntualeRequest">
+    <xs:sequence>
+      <xs:element name="opzionale1" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale2" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale3" type="xs:string" minOccurs="0"/>
+      <xs:element name="pincode" type="xs:string"/>
+      <xs:element name="Proprietario" type="ProprietarioType" minOccurs="0"/>
+      <xs:element name="idDocumentoFiscale" type="IdDocumentoFiscaleType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="interrogazionePuntualeResponse">
+    <xs:sequence>
+      <xs:element name="esitoChiamata" type="xs:string"/>
+      <xs:element name="documentoFiscale" type="DocumentoFiscaleType" minOccurs="0"/>
+      <xs:element name="listaMessaggi">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="messaggio" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="codice" type="xs:string"/>
+                  <xs:element name="descrizione" type="xs:string"/>
+                  <xs:element name="tipo" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProprietarioType">
+    <xs:sequence>
+      <xs:element name="codiceRegione" type="String3Type" minOccurs="0"/>
+      <xs:element name="codiceAsl" type="String3Type" minOccurs="0"/>
+      <xs:element name="codiceSSA" type="String6Type" minOccurs="0"/>
+      <xs:element name="cfProprietario" type="CfType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IdDocumentoFiscaleType">
+    <xs:sequence>
+      <xs:element name="pIva" type="String11Type"/>
+      <xs:element name="dataEmissione" type="DataMinType"/>
+      <xs:element name="numDocumentoFiscale">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="dispositivo" type="Int3Type"/>
+            <xs:element name="numDocumento" type="NumDocType"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DocumentoFiscaleType">
+    <xs:sequence>
+      <xs:element name="idDocumentoFiscale" type="IdDocumentoFiscaleType" minOccurs="0"/>
+      <xs:element name="dataPagamento" type="DataMinType" minOccurs="0"/>
+      <xs:element name="totaliVociSpesa" maxOccurs="unbounded" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="tipoSpesa" type="xs:string"/>
+            <xs:element name="importo" type="xs:double"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="totaliVociSpesaRimborsate" maxOccurs="unbounded" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="tipoSpesa" type="xs:string"/>
+            <xs:element name="importo" type="xs:double"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="protocollo" type="xs:string" minOccurs="0"/>
+      <xs:element name="nomeFile" type="xs:string" minOccurs="0"/>
+      <xs:element name="dataInvio" type="DataMinType" minOccurs="0"/>
+      <xs:element name="tipoInvio" type="String1Type" minOccurs="0"/>
+      <xs:element name="listaErroriDocumento" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="errore" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="codice" type="xs:string"/>
+                  <xs:element name="descrizione" type="xs:string"/>
+                  <xs:element name="tipo" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CfType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String3Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{3})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String6Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{5,6})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String1Type">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String11Type">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="11"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DataMinType">
+    <xs:restriction base="xs:date">
+      <xs:minInclusive value="2013-01-01"/>
+      <xs:pattern value="([0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]))"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Int3Type">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="999"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="NumDocType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Za-z0-9_./\\\-]{1,20})"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://invioSS730pTest.sanita.finanze.it/InterrogazionePuntuale730Web/InterrogazionePuntuale730Port</con:endpoint></con:endpoints><con:operation isOneWay="false" action="interrogazionepuntuale.p730.sanita.finanze.it" name="InterrogazionePuntuale" bindingOperationName="InterrogazionePuntuale" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional" id="f6794997-9f6b-4c4b-a86c-db5c61cffc7a"><con:settings/><con:call name="AssociazioneCategoria" id="096881ed-98f4-4001-9488-e32c9a617635"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/InterrogazionePuntuale730Web/InterrogazionePuntuale730Port</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:int="http://interrogazionepuntuale.p730.sanita.finanze.it">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <int:interrogazionePuntualeRequest>
+         <int:opzionale1></int:opzionale1>
+         <int:opzionale2></int:opzionale2>
+         <int:opzionale3></int:opzionale3>
+         <int:pincode>vcjxnb8g0iZEWn2YBTmY2dNTxRHvpBYKtB4WRS2cUiMw8sjLoTo0Whs67Pn07IIGweSq3BgMCd/d7nElO5rFGNUvoZ9BjOiO1133VlofVOFJ/hXS9e8RhvZ/HW1UV8n6M8lhwq1Pwe9KtAz6ii81EbP0pbZCHUpv7OH1K3xmX/s=</int:pincode>
+         <int:Proprietario>
+         	  <int:codiceRegione>130</int:codiceRegione>
+            <int:codiceAsl>201</int:codiceAsl>
+            <int:codiceSSA>88888</int:codiceSSA>
+            <int:cfProprietario>w8X9HVsNk84tEHbkntc73dxKLJ6IRCKfBdGuXsgatrflxx1TnFR7rUOhqhxXT+7T2VirIc8P70c7ufKUjTSZToqmbPTQ9PcjteXeH5uU4+mtogo2XUpch8pDZqW5934qUMP9tKaZBCv6MrGAH1Xs0FoPaGvsG5y4jNprPh0NuOY=</int:cfProprietario>
+         </int:Proprietario>
+         <int:idDocumentoFiscale>
+            <int:pIva>01201200121</int:pIva>
+            <int:dataEmissione>2015-01-01</int:dataEmissione>
+            <int:numDocumentoFiscale>
+               <int:dispositivo>1</int:dispositivo>
+               <int:numDocumento>003</int:numDocumento>
+            </int:numDocumentoFiscale>
+         </int:idDocumentoFiscale>
+      </int:interrogazionePuntualeRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="interrogazionepuntuale.p730.sanita.finanze.it"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="ReportMensile730pServicePortBinding" type="wsdl" bindingName="{http://reportmensile.p730.sanita.finanze.it}ReportMensile730pServicePortBinding" soapVersion="1_1" anonymous="optional" definition="C:/Users/gndibiase/Desktop/kit730P_ver_20161223/TracciatiWS/WS_Interrogazioni/ReportMensile730Service.wsdl" id="dabd7308-5a1c-477a-b2b9-b79dc94dbea9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/C:/Users/gndibiase/Desktop/kit730P_ver_20161223/TracciatiWS/WS_Interrogazioni/ReportMensile730Service.wsdl"><con:part><con:url>file:/C:/Users/gndibiase/Desktop/kit730P_ver_20161223/TracciatiWS/WS_Interrogazioni/ReportMensile730Service.wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://reportmensile.p730.sanita.finanze.it" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://reportmensile.p730.sanita.finanze.it" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified">
+      <xsd:import namespace="http://reportmensile.p730.sanita.finanze.it" schemaLocation="ReportMensile730Service_schema.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="reportMensileRequest">
+    <wsdl:part element="tns:reportMensileRequest" name="reportMensileRequest"/>
+  </wsdl:message>
+  <wsdl:message name="reportMensileResponse">
+    <wsdl:part element="tns:reportMensileResponse" name="reportMensileResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="ReportMensile730pPort">
+    <wsdl:operation name="ReportMensile">
+      <wsdl:input message="tns:reportMensileRequest"/>
+      <wsdl:output message="tns:reportMensileResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ReportMensile730pServicePortBinding" type="tns:ReportMensile730pPort">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ReportMensile">
+      <soap:operation soapAction="reportmensile.p730.sanita.finanze.it"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ReportMensile730pPort">
+    <wsdl:port name="ReportMensile730pPort" binding="tns:ReportMensile730pServicePortBinding">
+      <soap:address location="http://localhost:9080/ReportMensile730Web/ReportMensilePort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\C:\Users\gndibiase\Desktop\kit730P_ver_20161223\TracciatiWS\WS_Interrogazioni\ReportMensile730Service_schema.xsd</con:url><con:content><![CDATA[<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://reportmensile.p730.sanita.finanze.it" xmlns="http://reportmensile.p730.sanita.finanze.it" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="reportMensileRequest" type="reportMensileRequest"/>
+  <xs:element name="reportMensileResponse" type="reportMensileResponse"/>
+  <xs:complexType name="reportMensileRequest">
+    <xs:sequence>
+      <xs:element name="opzionale1" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale2" type="xs:string" minOccurs="0"/>
+      <xs:element name="opzionale3" type="xs:string" minOccurs="0"/>
+      <xs:element name="pincode" type="xs:string"/>
+      <xs:element name="Proprietario" type="ProprietarioType" minOccurs="0"/>
+      <xs:element name="annoMese" type="AnnoMeseType"/>
+      <xs:element name="tipoEstrazione" type="String1Type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="reportMensileResponse">
+    <xs:sequence>
+      <xs:element name="esitoChiamata" type="xs:string"/>
+      <xs:element name="fileCSV" type="FileType" minOccurs="0"/>
+      <xs:element name="listaMessaggi">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="messaggio" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="codice" type="xs:string"/>
+                  <xs:element name="descrizione" type="xs:string"/>
+                  <xs:element name="tipo" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProprietarioType">
+    <xs:sequence>
+      <xs:element name="codiceRegione" type="String3Type" minOccurs="0"/>
+      <xs:element name="codiceAsl" type="String3Type" minOccurs="0"/>
+      <xs:element name="codiceSSA" type="String6Type" minOccurs="0"/>
+      <xs:element name="cfProprietario" type="CfType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CfType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String3Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{3})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String6Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{5,6})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String1Type">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AnnoMeseType">
+    <xs:restriction base="xs:integer">
+      <xs:pattern value="[0-9][0-9][0-9][0-9][0-9][0-9]"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileType">
+    <xs:restriction base="xs:base64Binary"></xs:restriction>
+  </xs:simpleType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://invioSS730pTest.sanita.finanze.it/ReportMensile730Web/ReportMensilePort</con:endpoint></con:endpoints><con:operation isOneWay="false" action="reportmensile.p730.sanita.finanze.it" name="ReportMensile" bindingOperationName="ReportMensile" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional" id="e5dd1a7f-2ddd-4eb4-b963-52eb30f55470"><con:settings/><con:call name="AssociazioneCategoria" id="e881c6ae-39dd-4236-afb4-5988cea778ca"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/ReportMensile730Web/ReportMensilePort</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:rep="http://reportmensile.p730.sanita.finanze.it">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <rep:reportMensileRequest>
+         <rep:opzionale1></rep:opzionale1>
+         <rep:opzionale2></rep:opzionale2>
+         <rep:opzionale3></rep:opzionale3>
+         <rep:pincode>vcjxnb8g0iZEWn2YBTmY2dNTxRHvpBYKtB4WRS2cUiMw8sjLoTo0Whs67Pn07IIGweSq3BgMCd/d7nElO5rFGNUvoZ9BjOiO1133VlofVOFJ/hXS9e8RhvZ/HW1UV8n6M8lhwq1Pwe9KtAz6ii81EbP0pbZCHUpv7OH1K3xmX/s=</rep:pincode>
+         <rep:Proprietario>
+            <rep:codiceRegione>130</rep:codiceRegione>
+            <rep:codiceAsl>201</rep:codiceAsl>
+            <rep:codiceSSA>88888</rep:codiceSSA>
+            <rep:cfProprietario>w8X9HVsNk84tEHbkntc73dxKLJ6IRCKfBdGuXsgatrflxx1TnFR7rUOhqhxXT+7T2VirIc8P70c7ufKUjTSZToqmbPTQ9PcjteXeH5uU4+mtogo2XUpch8pDZqW5934qUMP9tKaZBCv6MrGAH1Xs0FoPaGvsG5y4jNprPh0NuOY=</rep:cfProprietario>
+         </rep:Proprietario>
+         <rep:annoMese>201611</rep:annoMese>
+         <rep:tipoEstrazione>I</rep:tipoEstrazione>
+      </rep:reportMensileRequest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="reportmensile.p730.sanita.finanze.it"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="ca9abeaa-baec-42de-b785-b42992798e98" wsaVersion="NONE" name="DettaglioSegnalazione730pServicePortBinding" type="wsdl" bindingName="{http://dettagliosegnalazione.p730.sanita.finanze.it}DettaglioSegnalazione730pServicePortBinding" soapVersion="1_1" anonymous="optional" definition="p730/DettaglioSegnalazione730Service.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/D:/ProgettiSoapUi/WSDLwebServices/p730/DettaglioSegnalazione730Service.wsdl"><con:part><con:url>file:/D:/ProgettiSoapUi/WSDLwebServices/p730/DettaglioSegnalazione730Service.wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://dettagliosegnalazione.p730.sanita.finanze.it" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://dettagliosegnalazione.p730.sanita.finanze.it" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified">
+      <xsd:import namespace="http://dettagliosegnalazione.p730.sanita.finanze.it" schemaLocation="DettaglioSegnalazione730Service_schema.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="dettaglioSegnalazioneRequest">
+    <wsdl:part element="tns:dettaglioSegnalazioneRequest" name="dettaglioSegnalazioneRequest"/>
+  </wsdl:message>
+  <wsdl:message name="dettaglioSegnalazioneResponse">
+    <wsdl:part element="tns:dettaglioSegnalazioneResponse" name="dettaglioSegnalazioneResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="DettaglioSegnalazione730pPort">
+    <wsdl:operation name="DettaglioSegnalazione">
+      <wsdl:input message="tns:dettaglioSegnalazioneRequest"/>
+      <wsdl:output message="tns:dettaglioSegnalazioneResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DettaglioSegnalazione730pServicePortBinding" type="tns:DettaglioSegnalazione730pPort">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="DettaglioSegnalazione">
+      <soap:operation soapAction="dettagliosegnalazione.p730.sanita.finanze.it"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DettaglioSegnalazione730pPort">
+    <wsdl:port binding="tns:DettaglioSegnalazione730pServicePortBinding" name="DettaglioSegnalazione730pPort">
+      <soap:address location="http://localhost:9080/Interrogazioni730pWeb/DettaglioSegnalazione730pPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\D:\ProgettiSoapUi\WSDLwebServices\p730\DettaglioSegnalazione730Service_schema.xsd</con:url><con:content><![CDATA[<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://dettagliosegnalazione.p730.sanita.finanze.it" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://dettagliosegnalazione.p730.sanita.finanze.it">
+  <xs:element name="dettaglioSegnalazioneRequest" type="dettaglioSegnalazioneRequest"/>
+  <xs:element name="dettaglioSegnalazioneResponse" type="dettaglioSegnalazioneResponse"/>
+  <xs:complexType name="dettaglioSegnalazioneRequest">
+    <xs:sequence>
+      <xs:element name="pincode" type="xs:string"/>
+      <xs:element name="Proprietario" type="ProprietarioType"/>
+      <xs:element name="idDocumentoFiscale" type="IdDocumentoFiscaleType"/>
+      <xs:element minOccurs="0" name="opzionale1" type="xs:string"/>
+      <xs:element minOccurs="0" name="opzionale2" type="xs:string"/>
+      <xs:element minOccurs="0" name="opzionale3" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dettaglioSegnalazioneResponse">
+    <xs:sequence>
+      <xs:element name="esitoChiamata" type="xs:string"/>
+      <xs:element minOccurs="0" name="documentoFiscale" type="DocumentoFiscaleType"/>
+      <xs:element name="listaMessaggi">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="messaggio">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="codice" type="xs:string"/>
+                  <xs:element name="descrizione" type="xs:string"/>
+                  <xs:element name="tipo" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProprietarioType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codiceRegione" type="String3Type"/>
+      <xs:element minOccurs="0" name="codiceAsl" type="String3Type"/>
+      <xs:element minOccurs="0" name="codiceSSA" type="String6Type"/>
+      <xs:element name="cfProprietario" type="CfType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IdDocumentoFiscaleType">
+    <xs:sequence>
+      <xs:element name="pIva" type="String11Type"/>
+      <xs:element name="dataEmissione" type="DataMinType"/>
+      <xs:element name="numDocumentoFiscale">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="dispositivo" type="Int3Type"/>
+            <xs:element name="numDocumento" type="NumDocType"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DocumentoFiscaleType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="idDocumentoFiscale" type="IdDocumentoFiscaleType"/>
+      <xs:element minOccurs="0" name="dataPagamento" type="DataMinType"/>
+      <xs:element minOccurs="0" name="dataInvio" type="DataMinType"/>
+      <xs:element minOccurs="0" name="protocollo" type="xs:string"/>
+      <xs:element minOccurs="0" name="nomeFile" type="xs:string"/>
+      <xs:element minOccurs="0" name="listaSegnalazioniDocumento">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="segnalazione" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="listaVociSpesa" type="VoceSpesaSegnalazioneType"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="listaVociSpesaRimborsate" type="VoceSpesaSegnalazioneType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="VoceSpesaSegnalazioneType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="tipoSpesa" type="xs:string"/>
+      <xs:element minOccurs="0" name="importo" type="xs:double"/>
+      <xs:element minOccurs="0" name="segnalazioneImporto" type="xs:string"/>
+      <xs:element minOccurs="0" name="segnalazioneTipoVoceSpesa" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CfType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String3Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{3})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String6Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{5,6})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String1Type">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String11Type">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="11"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DataMinType">
+    <xs:restriction base="xs:date">
+      <xs:minInclusive value="2013-01-01"/>
+      <xs:pattern value="([0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]))"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Int3Type">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="999"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="NumDocType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Za-z0-9_./\\\-]{1,20})"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://invioSS730pTest.sanita.finanze.it/Interrogazioni730pWeb/DettaglioSegnalazione730pPort</con:endpoint></con:endpoints><con:operation id="5922758a-8317-4b45-890c-955f459865b0" isOneWay="false" action="dettagliosegnalazione.p730.sanita.finanze.it" name="DettaglioSegnalazione" bindingOperationName="DettaglioSegnalazione" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bb26a668-8f6a-4238-97f0-cb64874663c1" name="AssociazioneCategoria"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/Interrogazioni730pWeb/DettaglioSegnalazione730pPort</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:det="http://dettagliosegnalazione.p730.sanita.finanze.it">\r
+   <soapenv:Header/>\r
+   <soapenv:Body>\r
+      <det:dettaglioSegnalazioneRequest>\r
+         <det:pincode>NIajKTU71Cwk24DdeEg2/P8YHfx6OthuHqTgzMxS86DG6in8hQvOrShjrRlBHw6wQ7VPisBG9xOgGMtVwHTZeaxHWqYzvwO8hBXCPnlvqgQ41NZVmiOfD96eLW0pdqr1XXfNWxsTj8RJwPMRplPsyLguhpSamPGowiEHQCa6STo=</det:pincode>\r
+         <det:Proprietario>\r
+            <det:codiceRegione>130</det:codiceRegione>\r
+            <det:codiceAsl>201</det:codiceAsl>\r
+            <det:codiceSSA>88888</det:codiceSSA>\r
+            <det:cfProprietario>w8X9HVsNk84tEHbkntc73dxKLJ6IRCKfBdGuXsgatrflxx1TnFR7rUOhqhxXT+7T2VirIc8P70c7ufKUjTSZToqmbPTQ9PcjteXeH5uU4+mtogo2XUpch8pDZqW5934qUMP9tKaZBCv6MrGAH1Xs0FoPaGvsG5y4jNprPh0NuOY=</det:cfProprietario>\r
+         </det:Proprietario>\r
+         <det:idDocumentoFiscale>\r
+            <det:pIva>01201200121</det:pIva>\r
+            <det:dataEmissione>2018-01-15</det:dataEmissione>\r
+            <det:numDocumentoFiscale>\r
+               <det:dispositivo>1</det:dispositivo>\r
+               <det:numDocumento>1D</det:numDocumento>\r
+            </det:numDocumentoFiscale>\r
+         </det:idDocumentoFiscale>\r
+         <det:opzionale1></det:opzionale1>\r
+         <det:opzionale2></det:opzionale2>\r
+         <det:opzionale3></det:opzionale3>\r
+      </det:dettaglioSegnalazioneRequest>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="dettagliosegnalazione.p730.sanita.finanze.it"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="1598eb47-2d58-4b1e-99d3-5caa0a43d4fa" wsaVersion="NONE" name="ReportSegnalazioni730pServicePortBinding" type="wsdl" bindingName="{http://reportsegnalazioni.p730.sanita.finanze.it}ReportSegnalazioni730pServicePortBinding" soapVersion="1_1" anonymous="optional" definition="p730/ReportSegnalazioni730Service.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/D:/ProgettiSoapUi/WSDLwebServices/p730/ReportSegnalazioni730Service.wsdl"><con:part><con:url>file:/D:/ProgettiSoapUi/WSDLwebServices/p730/ReportSegnalazioni730Service.wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://reportsegnalazioni.p730.sanita.finanze.it" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://reportsegnalazioni.p730.sanita.finanze.it" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xsd:schema elementFormDefault="qualified">
+      <xsd:import namespace="http://reportsegnalazioni.p730.sanita.finanze.it" schemaLocation="ReportSegnalazioni730Service_schema.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="reportSegnalazioniRequest">
+    <wsdl:part element="tns:reportSegnalazioniRequest" name="reportSegnalazioniRequest"/>
+  </wsdl:message>
+  <wsdl:message name="reportSegnalazioniResponse">
+    <wsdl:part element="tns:reportSegnalazioniResponse" name="reportSegnalazioniResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="ReportSegnalazioni730pPort">
+    <wsdl:operation name="ReportSegnalazioni">
+      <wsdl:input message="tns:reportSegnalazioniRequest"/>
+      <wsdl:output message="tns:reportSegnalazioniResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ReportSegnalazioni730pServicePortBinding" type="tns:ReportSegnalazioni730pPort">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ReportSegnalazioni">
+      <soap:operation soapAction="reportsegnalazioni.p730.sanita.finanze.it"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ReportSegnalazioni730pPort">
+    <wsdl:port binding="tns:ReportSegnalazioni730pServicePortBinding" name="ReportSegnalazioni730pPort">
+      <soap:address location="http://localhost:9080/Interrogazioni730pWeb/ReportSegnalazioni730pPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>file:\D:\ProgettiSoapUi\WSDLwebServices\p730\ReportSegnalazioni730Service_schema.xsd</con:url><con:content><![CDATA[<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://reportsegnalazioni.p730.sanita.finanze.it" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://reportsegnalazioni.p730.sanita.finanze.it">
+  <xs:element name="reportSegnalazioniRequest" type="reportSegnalazioniRequest"/>
+  <xs:element name="reportSegnalazioniResponse" type="reportSegnalazioniResponse"/>
+  <xs:complexType name="reportSegnalazioniRequest">
+    <xs:sequence>
+      <xs:element name="pincode" type="xs:string"/>
+      <xs:element name="Proprietario" type="ProprietarioType"/>
+      <xs:element name="dataIniPeriodoSegnalazione" type="DataType"/>
+      <xs:element name="dataFinPeriodoSegnalazione" type="DataType"/>
+      <xs:element minOccurs="0" name="opzionale1" type="xs:string"/>
+      <xs:element minOccurs="0" name="opzionale2" type="xs:string"/>
+      <xs:element minOccurs="0" name="opzionale3" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="reportSegnalazioniResponse">
+    <xs:sequence>
+      <xs:element name="esitoChiamata" type="xs:string"/>
+      <xs:element minOccurs="0" name="fileCSV" type="FileType"/>
+      <xs:element name="listaMessaggi">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="messaggio">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="codice" type="xs:string"/>
+                  <xs:element name="descrizione" type="xs:string"/>
+                  <xs:element name="tipo" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProprietarioType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="codiceRegione" type="String3Type"/>
+      <xs:element minOccurs="0" name="codiceAsl" type="String3Type"/>
+      <xs:element minOccurs="0" name="codiceSSA" type="String6Type"/>
+      <xs:element name="cfProprietario" type="CfType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="CfType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="256"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String3Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{3})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String6Type">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Z0-9]{5,6})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="String1Type">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AnnoMeseType">
+    <xs:restriction base="xs:integer">
+      <xs:pattern value="[0-9][0-9][0-9][0-9][0-9][0-9]"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DataType">
+    <xs:restriction base="xs:date">
+      <xs:minInclusive value="2013-01-01"/>
+      <xs:pattern value="([0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]))"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileType">
+    <xs:restriction base="xs:base64Binary"/>
+  </xs:simpleType>
+</xs:schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>https://invioSS730pTest.sanita.finanze.it/Interrogazioni730pWeb/ReportSegnalazioni730pPort</con:endpoint></con:endpoints><con:operation id="25e83d62-6620-4f1d-a3bc-49d03ebbf06b" isOneWay="false" action="reportsegnalazioni.p730.sanita.finanze.it" name="ReportSegnalazioni" bindingOperationName="ReportSegnalazioni" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8175ce83-d413-4340-b5f2-ce84270e6972" name="AssociazioneCategoria"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>https://invioSS730pTest.sanita.finanze.it/Interrogazioni730pWeb/ReportSegnalazioni730pPort</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:rep="http://reportsegnalazioni.p730.sanita.finanze.it">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <rep:reportSegnalazioniRequest>
+         <rep:pincode>NIajKTU71Cwk24DdeEg2/P8YHfx6OthuHqTgzMxS86DG6in8hQvOrShjrRlBHw6wQ7VPisBG9xOgGMtVwHTZeaxHWqYzvwO8hBXCPnlvqgQ41NZVmiOfD96eLW0pdqr1XXfNWxsTj8RJwPMRplPsyLguhpSamPGowiEHQCa6STo=</rep:pincode>
+         <rep:Proprietario>
+            <rep:codiceRegione>130</rep:codiceRegione>
+            <rep:codiceAsl>201</rep:codiceAsl>
+            <rep:codiceSSA>88888</rep:codiceSSA>
+            <rep:cfProprietario>w8X9HVsNk84tEHbkntc73dxKLJ6IRCKfBdGuXsgatrflxx1TnFR7rUOhqhxXT+7T2VirIc8P70c7ufKUjTSZToqmbPTQ9PcjteXeH5uU4+mtogo2XUpch8pDZqW5934qUMP9tKaZBCv6MrGAH1Xs0FoPaGvsG5y4jNprPh0NuOY=</rep:cfProprietario>
+         </rep:Proprietario>
+         <rep:dataIniPeriodoSegnalazione>2018-01-01</rep:dataIniPeriodoSegnalazione>
+         <rep:dataFinPeriodoSegnalazione>2018-01-31</rep:dataFinPeriodoSegnalazione>
+         <rep:opzionale1></rep:opzionale1>
+         <rep:opzionale2></rep:opzionale2>
+         <rep:opzionale3></rep:opzionale3>
+      </rep:reportSegnalazioniRequest>
+   </soapenv:Body>
+</soapenv:Envelope>
+]]></con:request><con:credentials><con:username>UYIIY4SD</con:username><con:password>P3FHUTTY</con:password><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="reportsegnalazioni.p730.sanita.finanze.it"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>

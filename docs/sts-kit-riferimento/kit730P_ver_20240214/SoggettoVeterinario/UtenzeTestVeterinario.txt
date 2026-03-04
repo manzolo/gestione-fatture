@@ -1,0 +1,8 @@
+VETERINARIO
+-------------------------------------
+User: PNIMRA70A01H501P
+Password: Salve123
+Pincode: 1492034195
+Partita iva: 98765432105
+Pincode cifrato: G7auLbPD3pE1RCZ0R1oTVMu7jF7RMV8aTdPF1Ki/tB0HIEnly/YtMByUKjWzH/LtHYA1lUk5RyLc4chHkZ3hR0urLHzw3OANSlIfNCEIIjclNOzUzDfDKq4iy/yYHnD4kiKRykF/NMNXOw6vWmeSPgh4/eyh1IhF9tQZRF4TUyI=
+CF proprietario cifrato: e4XbRBmI7LeqtcT2aH+5lmgvpXCsHkjRTCkSWW0GS4Uhp80R1dtdbVmmu7u9spJeS+HoWqA91ib/cqAke2Pq90yn2/LgNdDTnUzXc25+WERnYcoMnFbO0seQvWYpGxRB4CQyojJOYrul23qQvNyyCB5WlvnoNZqI0FWGYzVRee0=

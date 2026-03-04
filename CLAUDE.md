@@ -145,7 +145,8 @@ Gotenberg URL: `http://invoice_gotenberg:3000` (configured via GOTENBERG_URL env
 - id, anno, progressivo, data_fattura, data_pagamento, metodo_pagamento
 - cliente_id (FK), importo_prestazione, bollo, descrizione, totale
 - numero_sedute (float - supports fractional sessions)
-- inviata_sns (boolean flag)
+- inviata_sts (boolean - sent to Sistema Tessera Sanitaria, via API or manual)
+- protocollo_sts, data_invio_sts
 
 **FatturaProgressivo** (yearly invoice counter):
 - anno (PK), last_progressivo

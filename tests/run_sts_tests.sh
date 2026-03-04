@@ -157,8 +157,8 @@ else
 
     if [ "$DETAIL_HTTP" = "200" ]; then
         pass "GET /api/invoices/$INV_ID → HTTP 200"
-        SENT=$(echo "$DETAIL_BODY" | python3 -c "import sys,json; print(json.load(sys.stdin).get('inviata_sns',''))" 2>/dev/null || echo "")
-        info "inviata_sns: $SENT"
+        SENT=$(echo "$DETAIL_BODY" | python3 -c "import sys,json; print(json.load(sys.stdin).get('inviata_sts',''))" 2>/dev/null || echo "")
+        info "inviata_sts: $SENT"
     else
         fail "GET /api/invoices/$INV_ID → HTTP $DETAIL_HTTP (atteso 200)"
     fi

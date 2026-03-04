@@ -114,9 +114,9 @@ echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━�
 echo -e "${CYAN}  SEZIONE: Gestione Fatture (Proxy)${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-curl_check POST "$BASE_URL/api/invoices" '{"data_fattura":"2025-01-15","data_pagamento":"2025-01-20","metodo_pagamento":"Bonifico","cliente_id":1,"numero_sedute":1,"inviata_sns":false}' "Crea fattura"
+curl_check POST "$BASE_URL/api/invoices" '{"data_fattura":"2025-01-15","data_pagamento":"2025-01-20","metodo_pagamento":"Bonifico","cliente_id":1,"numero_sedute":1,"inviata_sts":false}' "Crea fattura"
 curl_check GET "$BASE_URL/api/invoices/1" "" "Dettaglio fattura"
-curl_check PUT "$BASE_URL/api/invoices/1" '{"data_fattura":"2025-02-01","data_pagamento":"2025-02-05","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":2,"inviata_sns":true}' "Aggiorna fattura"
+curl_check PUT "$BASE_URL/api/invoices/1" '{"data_fattura":"2025-02-01","data_pagamento":"2025-02-05","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":2,"inviata_sts":true}' "Aggiorna fattura"
 curl_check GET "$BASE_URL/download_invoice_zip/1" "" "Download ZIP fattura"
 
 echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

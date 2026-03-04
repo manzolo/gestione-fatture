@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://reportsegnalazioni.p730.sanita.finanze.it" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://reportsegnalazioni.p730.sanita.finanze.it" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<wsdl:types>
+		<xsd:schema elementFormDefault="qualified">
+			<xsd:import namespace="http://reportsegnalazioni.p730.sanita.finanze.it" schemaLocation="ReportSegnalazioni730Service_schema.xsd"/>
+		</xsd:schema>		
+	</wsdl:types>	  
+	<wsdl:message name="reportSegnalazioniRequest">
+		<wsdl:part element="tns:reportSegnalazioniRequest" name="reportSegnalazioniRequest"/>
+	</wsdl:message>
+	<wsdl:message name="reportSegnalazioniResponse">
+		<wsdl:part element="tns:reportSegnalazioniResponse" name="reportSegnalazioniResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="ReportSegnalazioni730pPort">
+		<wsdl:operation name="ReportSegnalazioni">
+			<wsdl:input message="tns:reportSegnalazioniRequest"/>
+			<wsdl:output message="tns:reportSegnalazioniResponse"/>      
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ReportSegnalazioni730pServicePortBinding" type="tns:ReportSegnalazioni730pPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="ReportSegnalazioni">
+		<soap:operation soapAction="reportsegnalazioni.p730.sanita.finanze.it"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>     
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="ReportSegnalazioni730pPort">
+		<wsdl:port binding="tns:ReportSegnalazioni730pServicePortBinding" name="ReportSegnalazioni730pPort">
+			<soap:address location="http://localhost:9080/Interrogazioni730pWeb/ReportSegnalazioni730pPort"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

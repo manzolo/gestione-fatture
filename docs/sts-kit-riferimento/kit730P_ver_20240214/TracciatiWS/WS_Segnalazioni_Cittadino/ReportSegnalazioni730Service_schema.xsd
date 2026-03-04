@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://reportsegnalazioni.p730.sanita.finanze.it" xmlns="http://reportsegnalazioni.p730.sanita.finanze.it">
+	<xs:element name="reportSegnalazioniRequest" type="reportSegnalazioniRequest"/>
+	<xs:element name="reportSegnalazioniResponse" type="reportSegnalazioniResponse"/>
+	<xs:complexType name="reportSegnalazioniRequest">
+		<xs:sequence>
+			<xs:element name="pincode" type="xs:string"/>
+			<xs:element name="Proprietario" type="ProprietarioType"/>
+			<xs:element name="dataIniPeriodoSegnalazione" type="DataType"/>
+			<xs:element name="dataFinPeriodoSegnalazione" type="DataType"/>
+			<xs:element minOccurs="0" name="opzionale1" type="xs:string"/>
+			<xs:element minOccurs="0" name="opzionale2" type="xs:string"/>
+			<xs:element minOccurs="0" name="opzionale3" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="reportSegnalazioniResponse">
+		<xs:sequence>
+			<xs:element name="esitoChiamata" type="xs:string"/>
+			<xs:element minOccurs="0" name="fileCSV" type="FileType"/>
+			<xs:element name="listaMessaggi">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element maxOccurs="unbounded" name="messaggio">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="codice" type="xs:string"/>
+									<xs:element name="descrizione" type="xs:string"/>
+									<xs:element name="tipo" type="xs:string"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProprietarioType">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="codiceRegione" type="String3Type"/>
+			<xs:element minOccurs="0" name="codiceAsl" type="String3Type"/>
+			<xs:element minOccurs="0" name="codiceSSA" type="String6Type"/>
+			<xs:element name="cfProprietario" type="CfType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="CfType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="256"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String3Type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([A-Z0-9]{3})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String6Type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([A-Z0-9]{5,6})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String1Type">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AnnoMeseType">
+		<xs:restriction base="xs:integer">
+			<xs:pattern value="[0-9][0-9][0-9][0-9][0-9][0-9]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DataType">
+		<xs:restriction base="xs:date">
+			<xs:minInclusive value="2013-01-01"/>
+			<xs:pattern value="([0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]))"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FileType">
+		<xs:restriction base="xs:base64Binary"/>
+	</xs:simpleType>
+</xs:schema>

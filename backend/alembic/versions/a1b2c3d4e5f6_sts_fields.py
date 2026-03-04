@@ -19,15 +19,22 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    """Add STS-related fields."""
+    """Add STS-related fields and unify inviata_sns into inviata_sts."""
     op.add_column('fattura', sa.Column('inviata_sts', sa.Boolean(), nullable=True, server_default='false'))
     op.add_column('fattura', sa.Column('protocollo_sts', sa.String(100), nullable=True))
     op.add_column('fattura', sa.Column('data_invio_sts', sa.DateTime(), nullable=True))
     op.add_column('cliente', sa.Column('flag_opposizione', sa.Boolean(), nullable=True, server_default='false'))
 
+    # Copia valori manuali esistenti: inviata_sns=true → inviata_sts=true
+    op.execute("UPDATE fattura SET inviata_sts = true WHERE inviata_sns = true")
+    op.drop_column('fattura', 'inviata_sns')
+
 
 def downgrade() -> None:
-    """Remove STS-related fields."""
+    """Remove STS-related fields and restore inviata_sns."""
+    op.add_column('fattura', sa.Column('inviata_sns', sa.Boolean(), nullable=True, server_default='false'))
+    # Copia indietro: inviata_sts=true → inviata_sns=true
+    op.execute("UPDATE fattura SET inviata_sns = true WHERE inviata_sts = true")
     op.drop_column('fattura', 'inviata_sts')
     op.drop_column('fattura', 'protocollo_sts')
     op.drop_column('fattura', 'data_invio_sts')

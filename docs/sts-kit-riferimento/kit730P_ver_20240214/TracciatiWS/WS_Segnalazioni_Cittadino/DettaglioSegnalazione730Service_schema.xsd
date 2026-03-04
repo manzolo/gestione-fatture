@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://dettagliosegnalazione.p730.sanita.finanze.it" xmlns="http://dettagliosegnalazione.p730.sanita.finanze.it">
+					   
+	<xs:element name="dettaglioSegnalazioneRequest" type="dettaglioSegnalazioneRequest"/>
+	<xs:element name="dettaglioSegnalazioneResponse" type="dettaglioSegnalazioneResponse"/>
+	<xs:complexType name="dettaglioSegnalazioneRequest">
+		<xs:sequence>                
+			<xs:element name="pincode" type="xs:string"/>     
+			<xs:element name="Proprietario" type="ProprietarioType"/>
+			<xs:element name="idDocumentoFiscale" type="IdDocumentoFiscaleType"/>   
+			<xs:element minOccurs="0" name="opzionale1" type="xs:string"/>
+			<xs:element minOccurs="0" name="opzionale2" type="xs:string"/>
+			<xs:element minOccurs="0" name="opzionale3" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="dettaglioSegnalazioneResponse">
+		<xs:sequence>
+			<xs:element name="esitoChiamata" type="xs:string"/>     
+			<xs:element minOccurs="0" name="documentoFiscale" type="DocumentoFiscaleType"/>
+			<xs:element name="listaMessaggi">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element maxOccurs="unbounded" name="messaggio">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="codice" type="xs:string"/>
+									<xs:element name="descrizione" type="xs:string"/>
+									<xs:element name="tipo" type="xs:string"/>
+								</xs:sequence> 
+							</xs:complexType>
+						</xs:element>                                 
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ProprietarioType">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="codiceRegione" type="String3Type"/>
+			<xs:element minOccurs="0" name="codiceAsl" type="String3Type"/>
+			<xs:element minOccurs="0" name="codiceSSA" type="String6Type"/>
+			<xs:element name="cfProprietario" type="CfType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IdDocumentoFiscaleType">
+		<xs:sequence>
+			<xs:element name="pIva" type="String11Type"/>
+			<xs:element name="dataEmissione" type="DataMinType"/>
+			<xs:element name="numDocumentoFiscale">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="dispositivo" type="Int3Type"/>
+						<xs:element name="numDocumento" type="NumDocType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType> 
+	<xs:complexType name="DocumentoFiscaleType">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="idDocumentoFiscale" type="IdDocumentoFiscaleType"/>    
+			<xs:element minOccurs="0" name="dataPagamento" type="DataMinType"/>
+			<xs:element minOccurs="0" name="dataInvio" type="DataMinType"/>
+			<xs:element minOccurs="0" name="protocollo" type="xs:string"/>
+			<xs:element minOccurs="0" name="nomeFile" type="xs:string"/>
+			<xs:element minOccurs="0" name="listaSegnalazioniDocumento">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element maxOccurs="unbounded" name="segnalazione" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="listaVociSpesa" type="VoceSpesaSegnalazioneType"/>
+				
+			<xs:element maxOccurs="unbounded" minOccurs="0" name="listaVociSpesaRimborsate" type="VoceSpesaSegnalazioneType"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="VoceSpesaSegnalazioneType">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="tipoSpesa" type="xs:string"/>
+			<xs:element minOccurs="0" name="importo" type="xs:double"/>
+			<xs:element minOccurs="0" name="segnalazioneImporto" type="xs:string"/>
+			<xs:element minOccurs="0" name="segnalazioneTipoVoceSpesa" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType> 
+	
+	<xs:simpleType name="CfType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="256"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String3Type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([A-Z0-9]{3})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String6Type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([A-Z0-9]{5,6})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String1Type">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String11Type">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="11"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DataMinType">
+		<xs:restriction base="xs:date">
+			<xs:minInclusive value="2013-01-01"/>
+			<xs:pattern value="([0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]))"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Int3Type">
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="1"/>
+			<xs:maxInclusive value="999"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NumDocType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([A-Za-z0-9_./\\\-]{1,20})"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

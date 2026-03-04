@@ -57,7 +57,7 @@ def invoices_api():
         numero_sedute_formattato = format_numero_sedute(numero_sedute)
         descrizione = f"n. {numero_sedute_formattato} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
 
-        inviata_sns_bool = data.get('inviata_sns', False)
+        inviata_sts_bool = data.get('inviata_sts', False)
 
         nuova_fattura = Fattura(
             anno=current_year,
@@ -71,7 +71,7 @@ def invoices_api():
             descrizione=descrizione,
             totale=calcoli['totale'],
             numero_sedute=numero_sedute,
-            inviata_sns=inviata_sns_bool
+            inviata_sts=inviata_sts_bool
         )
         
         db.session.add(nuova_fattura)
@@ -93,7 +93,6 @@ def invoices_api():
                 'cliente': f"{i.cliente.nome} {i.cliente.cognome}" if i.cliente else None,
                 'descrizione': i.descrizione,
                 'totale': f"{i.totale:.2f}",
-                'inviata_sns': i.inviata_sns,
                 'inviata_sts': i.inviata_sts or False,
                 'protocollo_sts': i.protocollo_sts,
                 'data_invio_sts': i.data_invio_sts.isoformat() if i.data_invio_sts else None,
@@ -129,7 +128,7 @@ def invoice_api_detail(invoice_id):
             'totale': f"{fattura.totale:.2f}",
             'bollo_applicato': fattura.bollo,
             'descrizione': fattura.descrizione,
-            'inviata_sns': fattura.inviata_sns,
+            'inviata_sts': fattura.inviata_sts,
             'calcoli': {
                 'subtotale_prestazioni': f"{calcoli['subtotale_base']:.2f}",
                 'contributo': f"{calcoli['contributo']:.2f}",
@@ -140,7 +139,7 @@ def invoice_api_detail(invoice_id):
     elif request.method == 'PUT':
         data = request.get_json()
         fattura.cliente_id = data.get('cliente_id', fattura.cliente_id)
-        inviata_sns_bool = data.get('inviata_sns', False)
+        inviata_sts_bool = data.get('inviata_sts', False)
         fattura.data_fattura = datetime.strptime(data['data_fattura'], '%Y-%m-%d').date()
         fattura.data_pagamento = datetime.strptime(data['data_pagamento'], '%Y-%m-%d').date() if data.get('data_pagamento') else None
         fattura.metodo_pagamento = data.get('metodo_pagamento')
@@ -177,7 +176,7 @@ def invoice_api_detail(invoice_id):
         calcoli = calculate_invoice_totals(fattura.numero_sedute, prezzo_base)
         fattura.totale = calcoli['totale']
         fattura.bollo = calcoli['bollo_flag']
-        fattura.inviata_sns = inviata_sns_bool
+        fattura.inviata_sts = inviata_sts_bool
         numero_sedute_formattato = format_numero_sedute(fattura.numero_sedute)
         fattura.descrizione = f"n. {numero_sedute_formattato} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
         db.session.commit()

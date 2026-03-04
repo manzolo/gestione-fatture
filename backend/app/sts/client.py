@@ -109,7 +109,7 @@ def _parse_response(xml_text: str) -> dict:
     Analizza la risposta XML di STS ed estrae esito, protocollo e messaggi.
 
     Struttura attesa (namespace http://documentospesap730.sanita.finanze.it):
-      <esitoChiamata>OK|KO</esitoChiamata>
+      <esitoChiamata>0|1|2</esitoChiamata>  (0=ok, 1=errore, 2=ok+warning)
       <protocollo>...</protocollo>
       <listaMessaggi>
         <messaggio><codice>...</codice><descrizione>...</descrizione></messaggio>
@@ -137,7 +137,8 @@ def _parse_response(xml_text: str) -> dict:
         if codice or descrizione:
             errors.append({"codice": codice, "descrizione": descrizione})
 
-    success = esito.upper() == "OK"
+    # PDF pag.18: esitoChiamata = 0 (ok), 1 (errore), 2 (ok con warning)
+    success = esito in ("0", "2")
     return {"success": success, "protocollo": protocollo, "errors": errors, "raw": xml_text}
 
 

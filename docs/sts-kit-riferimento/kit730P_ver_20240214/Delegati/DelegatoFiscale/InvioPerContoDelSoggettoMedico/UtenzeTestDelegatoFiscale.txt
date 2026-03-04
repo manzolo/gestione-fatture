@@ -1,0 +1,14 @@
+COMMERCIALISTA
+-----------------------------------------------------------
+ 
+User: MSSSMN78C13C773M
+Password: sotcat00
+Pincode: 4B64AA1D
+Sede: 07874631000-000
+
+La sede va indicata nel tag opzionale1.
+
+DELEGANTE MEDICO:
+Medico delegante: FBNFBA62S28H501F
+cf proprietario cifrato: RKmBWxIwIlnJZ+XZll/DP4Km6aVOM+lvtZ9dlifRoQUlrqEnG/ZhWHenbnDagVZduhCAatPkzKQIFusRNuPMQ/rGuIeaccKDBL7UX9LPjHIc0GeFDuvErcRUhh8MWNql+GFJNXDPys1UPAgFH65ifWLg4pBjsGgQE3hTL49b2Qg=
+partita iva: 00265910661

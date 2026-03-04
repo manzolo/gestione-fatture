@@ -1,0 +1,9 @@
+La classe ValidatoreXml730.java consente di effettuare lo schema-validation di un file xml relativo alle spese sanitarie del 730 
+
+Il file deve essere inviato con il servizio .../InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort
+
+Per modificare la classe occorre un IDE di sviluppo java, es. Eclipse
+
+Nella classe java occorre impostare:
+- il path assoluto del file 730_precompilata.xsd (primo parametro in ingresso del metodo validateXMLSchema(...,...))
+- il path assoluto del file xml da validare  (secondo parametro in ingresso del metodo validateXMLSchema(...,...))

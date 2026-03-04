@@ -1,0 +1,230 @@
+VALLE D'AOSTA
+------------------------------
+Codice ufficio: 020-101-888888
+User: UXN6VMDD
+Password: P2SPDVF4
+Pincode: 1426073406
+Pincode cifrato: txIO+4Z3DqZvxrol9o6KmkQjlWSD4SOLdeUigRadhoxVNv7rM3RytJlT1jCHdMEg337cD3D1bvYd/uFLeBT+uZzzZy67Rx5UlWD6bvqXlRQjAMxDH/oGcsxmLtBqLPe8i/ZHdiE1xgEPWj+OX6bOdZJOaQgCa9LY8WQaWOWSvbA=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+CF proprietario cifrato: HKver8cExmJ9akjAPGC49ZvEq+Iglm9M5XmveC1/siETi7t4W+baC53vthafm4G6c5vhnFqkciJJV5GzsfqRuliUVMEKh7bcxvD4AQ6BE/dGz4ry+RprN3iok6HeINM+fipZIJJR9wQxRx784FgCT48nNSPkxrqqNg7rOX5D/8c=
+
+TOSCANA
+------------------------------
+Codice ufficio: 090-202-888888
+User: USZV5FMF
+Password: P17WAPFZ
+Pincode: 8672142422
+Pincode cifrato: OcTBndoRndcPwDd4GiR3k1Uq5z2eDzkr86xCQleYgHbYPrUPqSoQW5k75aRDHyJ9rKLyiIXWIJ4kvx7rPYhNpjGIowxHiGnLfgpyOz4QS5+LPx3D0n4yZ9vjFgOsUcQkPEs1bOZBYtb5cK+4srwRF7GTYL+PCYVFYAD7eK77Avc=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+LAZIO
+------------------------------
+Codice ufficio: 120-201-888888
+User: UYBP8F4G
+Password: PXXCLMBE
+Pincode: 4143408326
+Pincode cifrato: QhABebPIFsgHj9g2tkvYhR8NJdplbgetRkYZDjPs3NZbZz2PYhCS0WQ622dVSzMukZskuvM7fQRvLAzHyGKsNmHkmPD3WIRvgq6Dxo2rcaJIHiE0ZjU975PIGGffWLTU0sJKwNWe7+7pnHDkmdbQOvRnS5KBZwNbO1azh4EvIks=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+ABRUZZO
+------------------------------
+Codice ufficio: 130-203-777777
+User: UKEPEG9U
+Password: P2TNJYRT
+Pincode: 2486268069
+Pincode cifrato: xexly2Qmn1xE1m5IMompGRo5pUsTmaJ4wbHIQcSNGy9RQGO5/yV8k8qANPmmduEBwF/7nPNWtnP3oqmYPqeL6R+klqDbu6erdjrJyDdLzzbwgCA4ZIYIoXVLwaJZeE2rk5keOPeseAiicyhqq5uwqhzZWfnbiozL4OA6S8QTrxY=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+MOLISE
+------------------------------
+Codice ufficio: 140-201-888888
+User: USPZRZ1Q
+Password: P1MIPC4L
+Pincode: 9107350306
+Pincode cifrato: vvJa5z7bBjDPMIoSfdjdLX5FoR9wD+YWJdlCbwXmBM9Cfn46ikPnMuK6OMSjtyuRk1GvrV91KMSYTnThQI7WThxHPmF4wsnt7UQdfh1Dfi5G8XmJrMd5EgbiiMhbgmT10tI/IBDERcaNS7CQ0wG04mv9Mpo3kp3UXFLDuAR4em0=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+CAMPANIA
+------------------------------
+Codice ufficio: 150-201-888888
+User: U86H32YM
+Password: PQDR5R2U
+Pincode: 9871318126
+Pincode cifrato: L4oHd3SOK7hH8l3Hx1yuDeWhEfNyXbXWNbFU03GeE66zQQj1yK8+9Xzfem/boLg8aG3Mo1snsd2G9NiA8hOylJ4mBVKD7cDyN3Rmo9QSQ+qoeQfFCLJqEJ7c5H5jPXXgcM1JqzJeHn3NY4I+JoeUtKlmkrgL/DO8kRnk1qn5BsQ=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+BASILICATA
+------------------------------
+Codice ufficio: 170-201-888888
+User: UAFXSL2X
+Password: P76PRAG7
+Pincode: 1010167105
+Pincode cifrato: FsYOXLGysSKWIcWU2e8wIzqfRdaHPUR2YHPSEFwmLpe2lyPRELcEfhgNvf+3i0EC1PYose0vHhVMr5aUCgBAwDuZY9jKzGwVFX/VWgdMC5hjHdxfcy96gB6hxiVjuS2aFRQrPhl65Mv7AQBuJEcOpsN/tCI2q/I5iJNJ3qmYzj8=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+CALABRIA
+------------------------------
+Codice ufficio: 180-201-888888
+User: UA38N276
+Password: PIMH7IU1
+Pincode: 5613571057
+Pincode cifrato: a8z/3EqyrK4kdmsaY3vwWMEiEDXLFIe9ByRaJ+2PVhqmlYIO7jSP0uQItIt4zmOjEmkMtkEw0s7QwatGY/V9cGcB8Vnk5hv5xuh5pr8deAuVpUfjwtXzKfM1lGNlH14Y1kbcHSdrcH+WuRD3uVZUJPZ/U+/+B41nlyzTdWfd4Zo=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SICILIA
+------------------------------
+Codice ufficio: 190-201-888888
+User: UWT3CBXX
+Password: PBUW9EBP
+Pincode: 1302170925
+Pincode cifrato: 0Gv1vsTpzlvRD9kBd8FVLo2/441rZ8rRZVf0Zi9eO6+L7kme0KC8Vx6ZjRj/4JjA4aHPTCi3D6YW9OtmYkIpW7sfchmhqHdVORBZHPitiPHdr5iIipAhIzBhFOQIPfpYasW5cQmU//uNB4GSWSNDIkaqdMrDjTPpIkbKKeoA4dQ=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 1
+------------------------------
+Codice ufficio: 200-101-888888
+User: U1EJBCFB
+Password: PZKG3DDA
+Pincode: 3810237944
+Pincode cifrato: QQKIsKJU2jWjlwu9MkYpvx5a8nKrsHv8P5NhTSog4PsMu/5qBJlKhZXZOeZZuBYEXr7f3dhYfQ0V6NbpmtnzhU61EY8dsskP2W41E/4pWBHQv7KJ45qIGJtLinOGv01vO9g5hId46Pwfo61LizJYnoNf9LP3JhvKLa5KNLGfegE=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 2
+------------------------------
+Codice ufficio: 200-102-888888
+User: URNPRDXQ
+Password: PHLVANKQ
+Pincode: 1807534165
+Pincode cifrato: NriLhlMENQu6b48hovpVSdRETSX93ZRTBVkUhn7a06/0im20FGX37yGlozLjR/rjrwmpyAPx+e4kj3ZGYhOxexqKcMojHrqMB+b68EKjIdO6C/FDYPQZrfGiCMXjrFSGUu8MV2uGom2ZGq0QXySy0Ie2DdaLddBom8eon9Guve0=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 3
+------------------------------
+Codice ufficio: 200-103-888888
+User: UXKS72DZ
+Password: PYMR2DJE
+Pincode: 6454682767
+Pincode cifrato: W6CYrfr1a49mS4egYLufClGZgO0zxYVNMGNC5E3MF6QBQkGPsYdmldm/1X2Mnzvo2SEEen12Uq4kGsNQtBIlAzHvdTUGSFk1Ja95n3lR3brwj3UCejxtA3R7cCjBkG7uGzbh7s7UNKMF6ImhCDYX3oy2JtGoZT++6Wg6SDRjHXc=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 4
+------------------------------
+Codice ufficio: 200-104-888888
+User: UCR94ARS
+Password: P284ZCLQ
+Pincode: 1769091343
+Pincode cifrato: YUqi8Nqanf0ux0VdDZLo4DPiFUBoAp+Gvk1+CatG2/Uj1LzlBGYgxd9YvSmlRTKAMFyZyif2WEHb9kyKWWE7E/GXSCbwXqpKwkW2AVokrsc7pxt5tXjuQM1plk9xHZ4l8RQRVIE2GztHirIDqXUVuhvCuB1m91405QFrynoUmxQ=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 5
+------------------------------
+Codice ufficio: 200-105-888888
+User: U8IE3XPA
+Password: PAFTX1RB
+Pincode: 7671576085
+Pincode cifrato: P5FKrOovhZYg9y53FYo9B3H5CuI10VkhR7CHgn+y+9OrWDSJBRNCRikLLqWiHC2jCOvUzVONnU/BpMsz5rqSEAzdnmuxWB3O1lYWMbavMREJBxunfDQTinii3hX/wJT8Mjt8fJjfboaoocZ4PGOFSghTI5rHWmQXBQsTRuzGXF4=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 6
+------------------------------
+Codice ufficio: 200-106-888888
+User: UCSCMEDH
+Password: PZJDADAA
+Pincode: 2097234066
+Pincode cifrato: H5mkseJb2YIr3Rsr7h8ESQ+gAcCsUA9m6iupnAcBJ3pAAfo0qrEyf3IKJwC51UiE7Eo8nq098DLCnA6jRhdM7oxay0M69fFc+JPS8SlVhkZe6pjgfddNrmh82sdqex7hQMKvUEuZD/+J7z1ICI0c9Oo49DpR0nXMKtOOiaNSeNA=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 7
+------------------------------
+Codice ufficio: 200-107-888888
+User: UVG9UT9L
+Password: PXSTS52Z
+Pincode: 1328428766
+Pincode cifrato: bWKUqohqgjqUJ3HFM4Tkgg+BQQZuUGPJs58y9VLoaXl0mGhky/zSyFgOtFD6fd/F/THLexT2fp5rSK0LdsYitcTk4hvguCHFPnf6ScipLrE7J/lpSIG5BCWHKeNTo0HW0/SN1+olDPIWHM8eT8LCJAWZazcj0KCwUhg8ofnsU9M=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 8
+------------------------------
+Codice ufficio: 200-108-888888
+User: UD2HQV1Z
+Password: PHL5NG1K
+Pincode: 1749642846
+Pincode cifrato: Df8QsD8565xEdWPNI0B1vyK6g7F6WHmZtB1BIFBedpBH2rwRJmF6OIFfsge48DzFRh04+ViCziriBvTeoPUKd8hblz6JKFYULPHI+mm1ItTcb/BMP73yNgvo1GcZeKE3zmnTQjdj7qzjzIy6xkSmppWpFjPdS7NRx9uUteDrBXA=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 9
+------------------------------
+Codice ufficio: 200-103-888886
+User: U6XQIDS2
+Password: PISBZKIJ
+Pincode: 1798604514
+Pincode cifrato: jMWC8zEmNUmqPpk1fh0AvLERIQjZKGOw4LOm0LGKISa1i4MtNwo5Trhd33IyBbHUd6J5/aiVrqukU3f5NbyTXnJ+ehHcEuGcBbaltstA9/Vn9PCqQQ9ADvpm22xHWKaeShid59p6n9tDTarsS4p1/e7zKMdt0UKAzlPGV3ascLQ=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 10
+------------------------------
+Codice ufficio: 200-103-888887
+User: U2LXDQ6U
+Password: P67EZM9A
+Pincode: 7594043485
+Pincode cifrato: L6Ox4FBrUUHbiohXGM2DK6GEfr80ca8dTpk3f0XzeLMG94Spcr1ydk9YhdCUvxjxfLJTyXVewQrd+5kxDLWziKIoYMsBcdFrd5xmqUeM+1jqadvlT/izjv+g/wG9H3pN5k+8KQ/wj0/XjCznfogtGwJpc/Gf8vnd4WTsGy2qgmg=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 11
+------------------------------
+Codice ufficio: 200-107-888886
+User: UBZDWDB7
+Password: PVEVHXUW
+Pincode: 7047020755
+Pincode cifrato: LjX0cbwYaB9OyMw6Y7cGPz3ryVpLWbYBzBbQdogjxGBbcBW8cfeZTO4WXzFAhcjdFtIwJzBQ3+9IKcq9RWZl1Ox1OPpRCNITWUuCoWhI7zv7I4PJHySRTonoiQ3GlWETLkyWxIX3oYNOSNtV3kNOa+eh5lLAPt3PcHDmIdobcQE=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 12
+------------------------------
+Codice ufficio: 200-107-888887
+User: UC3LPSJ3
+Password: PCHZTDPU
+Pincode: 1630341684
+Pincode cifrato: banosSEBZRCmcR1Mn7DlcE/uTx6wCrq/PCR6KQ8keU5zCPy03EuyMPU3t+UiRV0SOcurVglSsYHEtf4B6Eg54ouxS8cHqcKxvnJxpTDDmCKNV0rxs1ejNEhSjqMzRW2GvIGQwQ4wVTNFFGd2lpHw6u0Osc1vd8+su8lkGO3mUME=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 13
+------------------------------
+Codice ufficio: 200-108-888886
+User: UZRKDSNA
+Password: PC91AFW5
+Pincode: 1427159205
+Pincode cifrato: AV8o++2Mp2O/pKBJRzrPVZAELStwWlRcFBuDDU746LffT7JO/Oj/vOTj/jU6OAlAJn32bY4fFy9+7QmNnUeA5yVNpTPLduGcym9LOBKIAQcMU10bLzdity6/UKqeVgsD1ejm82lN4ckEOdL/pXkNga/q65gG113GD4z7RIHcj6k=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210
+
+SARDEGNA - 14
+------------------------------
+Codice ufficio: 200-108-888887
+User: UC5XZBDP
+Password: PGXXNIQU
+Pincode: 4913205405
+Pincode cifrato: Uv3CXzbfq83LjY4e/jyHSfzXX6vAFRrTxnm1Q9jAEw8O6g5o8IiMoZY5nL/SXhkMbOEbJ7W5PkaaSst4lmxUOTXsFTLmIz65wnzxu1yVcbDo97IRt241BEQATESvLvVi04S63D+M6HUAMbZPB+Xfme/zYcfdVr71dwOHC/7ZRU4=
+cfProprietario: CCSRMO77A09H501E
+pIva: 03213213210

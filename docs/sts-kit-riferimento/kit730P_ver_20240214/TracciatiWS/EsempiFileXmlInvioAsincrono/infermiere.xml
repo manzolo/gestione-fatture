@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<precompilata xsi:noNamespaceSchemaLocation="730_precompilata.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<proprietario>
+		<cfProprietario>nFO/PSGVRL8n6dEk4ss3qpCJsYk/yCCTy3UqSGrEFAEDb0ft6m5zLRlp4kraHSvvk+oWfg7RpQm1CYB9jBo0mmf3aBSRTUPGs9fO4IrgcF9sU26J7pVFwWxB8TOcuzuAextgjJ09Wf3u9WTMH8ZAtMrCXHsOsaHVh0iyO7GzuAQ=</cfProprietario>
+	</proprietario>
+	<documentoSpesa>
+		<idSpesa>
+			<pIva>87654321098</pIva>
+			<dataEmissione>2020-12-20</dataEmissione>
+			<numDocumentoFiscale>
+				<dispositivo>1</dispositivo>
+				<numDocumento>I9999A</numDocumento>
+			</numDocumentoFiscale>
+		</idSpesa>
+		<dataPagamento>2020-12-20</dataPagamento>
+		<flagOperazione>I</flagOperazione>
+		<cfCittadino>iKvd9JQntqxPBT2UA/OFfztSNLidocP8Op+NfODzfTdxFWzkcdZrJz5gvCuqv7Dh/r3Cin1ZQMmg/BofIqYCyq2PcC+PJzbvQCocDdl6FrXVXs3W5JhnX7VpWFGCLPYYY2WL+RWKxhfkGqeY8+NCVfQ1lEA15g3W5AabJ15Tthk=</cfCittadino>
+		<pagamentoTracciato>NO</pagamentoTracciato>
+		<tipoDocumento>F</tipoDocumento>
+        <flagOpposizione>0</flagOpposizione>
+		<voceSpesa>
+			<tipoSpesa>SP</tipoSpesa>
+			<importo>120.56</importo>
+			<aliquotaIVA>10.00</aliquotaIVA>
+		</voceSpesa>
+	</documentoSpesa>
+</precompilata>

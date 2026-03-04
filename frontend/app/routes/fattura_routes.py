@@ -123,6 +123,18 @@ def sts_send_proxy(invoice_id):
     except requests.exceptions.RequestException as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@fattura_bp.route('/api/sts/invoices/<int:invoice_id>/cancel', methods=['POST'])
+def sts_cancel_proxy(invoice_id):
+    """Proxy per la cancellazione di un invio STS."""
+    try:
+        response = requests.post(
+            f"{BACKEND_URL}/api/sts/invoices/{invoice_id}/cancel",
+            timeout=35,
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @fattura_bp.route('/api/invoices/years', methods=['GET'])
 def get_invoices_years_proxy():
     """Proxy per ottenere gli anni disponibili delle fatture dal backend."""

@@ -1,0 +1,141 @@
+PIEMONTE
+-----------------------------
+Codice ufficio: 010-301-88888
+User: USW5AUTR
+Password: P4U93QML
+Pincode: 1365306105
+Pincode cifrato: ZGtN9ScdE3mECnQfabH12vyu0JzQKOwGNocRTznxVMNow7ualOdFaxoteoA/Tdc3rDRBbkZfCzPxDF4Kh6N+g59jVaPI5k39kJrfi4ap/Ytgezv/Ln9209gWO472Szb6z4avM29qII4Ya2sTfwjN0LEPWjeReiCUcgCTRonu4qo=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+VALLE D'AOSTA
+-----------------------------
+Codice ufficio: 020-101-88888
+User: U5GFSHZY
+Password: PCN8R984
+Pincode: 2762720183
+Pincode cifrato: rYddknDl+L+A0ct6s/d/h5QfYvPyBJD9zi+wuDNaXn3aZ8cji62d6fPc9hIxT948/QOpVjuNOXF0C6j9S+9LKWUMFdwlmNM5IP6Cj+pYVUmXMeKGXZvj5qse6wkmHLscwF7KyWdpIo6kvlrCxoCfN7DQllhH6uaH086Wbawr1SE=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+LIGURIA
+-----------------------------
+Codice ufficio: 070-101-88888
+User: ULK74UFN
+Password: P2PNL5AX
+Pincode: 6253539366
+Pincode cifrato: m6VeLeDmrANXOzxdFM4liKztqCqorXRMHuaBXjbP/9slBayWVLYGoYkyKaxNUyYFS7HEXCixW46P1IEcBwnOOB8EvqyZJ8DukedQrOzeCdhiOAuiu33Q3iULdF43ZvKpbsh7998J1TsFEWMG12lFS0KzVk5eYKTCaalnHhVbvjY=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+TOSCANA
+-----------------------------
+Codice ufficio: 090-202-88888
+User: U5SF72UZ
+Password: PJ8AS7UZ
+Pincode: 1767216845
+Pincode cifrato: nqpVFA5acQMvuItWEssKSKtg2XRAPCejhwXNKehrijyz/2Pb7lcXO6TuT9rEdDZZZZLwrpm57Bnzwkte3kD9QaqKSVIotU4IK05h7rMUs2y6ATTuiTUFLakY5AgJ8rLIHM5sULNoqH/GWxgo+S9vfe2IE6c7bH1PU1ytA86yFBM=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+UMBRIA
+-----------------------------
+Codice ufficio: 100-201-88888
+User: U92SGBKC
+Password: PXVHGPTW
+Pincode: 2049194863
+Pincode cifrato: Z2FKQrvrf9Y0plkwhnlxpOCfF10uWBpyLwFYY95/cKTuZXdw92noszT0oqN5YtkIQLZW/mUKTGFT3uGfdA66Wb56OluN9x3rkz+JMJnQKim9yQ/UIeQ98uGTh/ETT1twtQlhUL7nno0vB+nZig400Kjx/Mly+px22+KTDf35cFA=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+MARCHE
+-----------------------------
+Codice ufficio: 110-201-88888
+User: UZVS6BWS
+Password: PXNDEK6P
+Pincode: 1363020415
+Pincode cifrato: AjCLYMxZneFOVdsG6Aoh6LX+uMOOQ9jX38hJeN3rVHYEjjnHEiky1Vm1YgpaCh8j8griCc5IILdfSFE3GP0cBrIBrcovJdr7SkWA8qdJvdw8x12aCk8lIaa5qBsB2xzIbN5Lbq+ZKCBpWeUj6tZBUzepCM29Cp+M46ejsrPzheM=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+LAZIO
+-----------------------------
+Codice ufficio: 120-201-88888
+User: U6YKDTAM
+Password: FarmaLazio!1
+Pincode: 1938658054
+Pincode cifrato: nIwilRiq/RXSKAl5G/92GnKuLRNxaweItV499cwjOA3zhCG7PlgVDSR0K/vTA6G7S20lNnpoqICQSshTc4ZnsanGEvlXvI1qOrlVpZ4JCwQdkfUW0ynDIb6uuPAyQCnN2CNlMwSM3kcpUHWTCqqRUgSJ6TqBpkgJD0mBTP+eoWs=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+ABRUZZO
+-----------------------------
+Codice ufficio: 130-204-78909
+User: UV386Q5B
+Password: SALVE
+Pincode: 1729594276
+Pincode cifrato: nhcmV5a/uhRRoI+Hyk64sYq3vo8zvUoHO71vsVuIu6NyG+eTH70bDmh2llUlNku996Ymej6zXbBybTgv9hHmgOaDmdPALA2Mb8VSl4L91QzM30MEsE+Rq4cK2fAdK0TRwBb78VfSnQ5v+KNHxs/+0PjLPFfiyTWKdEqDCQEt3vM=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+CF proprietario cifrato: WqV6IULqS43g8hxr9znr1Mwc3LYzmVSU7SrhYIUueJF30lvi7LTzTxIRGBDTJSM/c1r1Zk82RSpMGtIqMoYqolW7F8JtVbMHGG9wSljED5baFMvK0VLhQzY7aZI4NxN1rU8+VG7YEo7HGpE1+Kb9W0vKBtQqfepxfsIZyumPTYc=
+
+MOLISE
+-----------------------------
+Codice ufficio: 140-201-88888
+User: UQW5WXF5
+Password: PY7B5AYM
+Pincode: 1369639572
+Pincode cifrato: DXkIZ0I5xLgKCPM9RzxLf4ZR5S0YJu2pSAJRVWuLuQlmpx8ldBb+GrpM7FQVXmr8EsPWG10Qb+/47tbZxTR4VwEZmDPpBPl9wkNUQIusCjxTvCaX/gbGIza9K5B1tQMjYNbIPzcCuVBRZEt49EeGBRh+ppHtFGNuJMAJ00O5CoQ=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+CAMPANIA
+-----------------------------
+Codice ufficio: 150-201-88888
+User: URRMKMY6
+Password: PI4HXJ83
+Pincode: 8268106362
+Pincode cifrato: MP1JttA53vQ1gREUkEFYOmSN8JIgJEYx3vPOM8mWx6SVQWks4NY8O/gQqV3ga3qhY1f35gwrhXBQvx/66oJRuqhhSjhubzIQGRnY+HZGmJziZjAy3p4gBsXfQGfBTw1g2qiCtVIOxJ4v4IjTozhcgRVi+IHc6Dv8JwJPl5gZOpQ=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+BASILICATA
+-----------------------------
+Codice ufficio: 170-201-88888
+User: UFYBRJJP
+Password: P7WKKDHD
+Pincode: 1385878285
+Pincode cifrato: b/T3r86JzskHUyqzHIZW16YY5Byfm5NdujODyGYeY/mZtghvN6CnCjQcIP72EtRpQO287Vmg41m6jj9reUwZ3tlbWgYfR20niUAdES0Q47oYp29KJCcEPhdjNfant8DYeTlq5cw9AjLG4JzBDhBWevso66Fni5MKfxw78M+Ks5k=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+CALABRIA
+-----------------------------
+Codice ufficio: 180-201-88888
+User: URUQP7H7
+Password: PKI4HC9K
+Pincode: 1840925324
+Pincode cifrato: JL3v/pZYi+GbsFttXev5dBbf9dRCXj+j4J7FrwlO3+A6XIkcQVEW9GDCDx3Y+/PN3NbEKj0+1shvhqKwcEXbW4cE9Rljht23+KL6r338CWxLGyI7qUesjiyuuX1Ra8VWLUq0E9qvupwuYI2dhzkIKzbgTaa18JjdZmtrS/4iFiY=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+SICILIA
+-----------------------------
+Codice ufficio: 190-201-88888
+User: UT4RDFM1
+Password: PNADY7DT
+Pincode: 1740575616
+Pincode cifrato: LkngR71k/MoPVKtiI8WMBJgOWcB0cX/y6QmWj0gUCROQg6tFoRgyXAZ9vXhXL/4o6trIAxOHEOIYc7HN3ZItoIUWo5s0LyT4ln6kZhi2ASPux628W5indLb6MDEBlYn/by3aFT5mTUgpPFwOHkSQZI5kOrjK1Fc6AvlZewTr0XI=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+
+SARDEGNA
+-----------------------------
+Codice ufficio: 200-201-88888
+User: URF7P151
+Password: PGTANQJ4
+Pincode: 1945419783
+Pincode cifrato: Gj+OlGzWvrSbA91u42U1lFtSYUncQ+yxowZ0mbqEqki+QnXDVJGvcJLe26Vd+dZYzaK7v3nQFaJNzeEBBz9R1fq93EMk0AAa47snHpxE9mFjHZLZrbQeJ0kVODY9dKL0U2qM2cp/te/OD2RTxI8kEj243W6KO9eOqTKQG3m8lwQ=
+cfProprietario: BBTMRZ54L19H501T
+pIva: 01201200121
+

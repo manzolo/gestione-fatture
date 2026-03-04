@@ -1,0 +1,28 @@
+SanitelCF.zip -> contiene il certificato per cifrare tutti i campi previsti dalle specifiche
+
+La cartelle:
+TracciatiWS/WS_AsincronoInvioDati730 -> contiene i tracciati relativi all'invio con attachment
+TracciatiWS/WS_AsincronoInvioDati730/schemaFileAllegatoInvio -> contiene lo schema del file xml da inviare in attachment
+TracciatiWS/WS_SincronoSingoloDato730 -> contiene i tracciati relativi ai servizi sincroni per l'invio del singolo documento fiscale in tempo reale
+TracciatiWS/EsempiFileXmlInvioAsincrono -> contiene gli esempi di file xml per l'invio con attachment
+TracciatiWS/WS_Ricevute -> contiene i tracciati relativi ai servizi degli esiti, ricevute e dettaglio errori
+TracciatiWS/WS_Interrogazioni -> contiene i tracciati relativi ai servizi di interrogazione (interrogazione puntuale e Report Mensile)
+
+Delegati/DelegatoAssociazioneCategoria -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il delegato fiscale
+Delegati/DelegatoFiscale -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per le associazioni di categoria
+
+SoggettoAltriProfessionisti -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per le altre categorie di Professionisti
+SoggettoFarmacia -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Farmacia
+SoggettoInfermiere -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Infermiere
+SoggettoMedico -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Medico
+SoggettoOstetrica -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Ostetrica
+SoggettoOttico -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Ottico
+SoggettoParafarmacia -> contiene le utenze  che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Parafarmacia
+SoggettoPsicologo -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Psicologo
+SoggettoRadiologo -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Radiologo
+SoggettoStrutturaAccreditata -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Struttura Accreditata
+SoggettoStrutturaAutorizzata -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Struttura Autorizzata
+SoggettoStrutturaAutorizzataVenditaDettaglio -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Struttura Autorizzata con Vendita di Dettaglio
+SoggettoVeterinario ->  -> contiene le utenze che possono essere usate in ambiente di test, il progetto SoapUi di prova e gli endpoint per il soggetto inviante Veterinario
+
+Nei progetti SoapUi di prova la modalità di invio usata per l'attachment è di tipo MTOM. Si consiglia di usare tale modalità di trasferimento, in quanto la modalita b64 in futuro potrebbe essere inibita.

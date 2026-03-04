@@ -1,0 +1,10 @@
+STRUTTURA AUTORIZZATA VENDITA DETTAGLIO
+-------------------------------------------------
+User: A12DZ3UP
+Password: Salve123
+Pincode: 3892871271
+Pincode cifrato: leMHrAKZuIlqqX5OGmdEqbCP3sNQlOXkAhmSejMBdSp9bj5AsIUn4Ydd83vlAWi4H4uVLu7e1ReE13vmYz1tPbv3bTJ6QQtDRK8MjUYCzhlhTIHlZHwlaEd1+aTKvc/JV1QdUhRc1qMjfWfwnR2vkFdC5/w3qa9HfnRgZJfspVM=
+cfProprietario: PROVAX00X00X000Y
+pIva: 98765432102
+Codice ufficio: 602-120-010009
+CF proprietario cifrato: x42Ft28lh/e4WGpFQmpIrmwaXeii0e8k2F/59MHVLoyhSf//ZDrpTWsFFqZXlJgMq9+blw63F2UMy2IchdXBJn8j9AAVPwShVLsWZ9bv4cotqNJHxvBee4Y/O1r1G3MAm2/uH0NL8vgS5mfp11GCVwm1j63fpx+CcL/fjQHiLlk=
