@@ -31,9 +31,10 @@ def build_inserimento_payload(fattura, cliente, config: dict) -> str:
     dispositivo = int(config.get("dispositivo", 1))
 
     data_emissione = _esc(fattura.data_fattura.isoformat())
-    num_documento = _esc(f"F{fattura.anno}{fattura.progressivo:04d}")
+    num_documento = _esc(f"{fattura.progressivo}/{fattura.anno}")
     data_pagamento = _esc(fattura.data_pagamento.isoformat())
 
+    natura_iva = _esc(config.get("natura_iva", "N2.2"))
     importo = f"{round(fattura.totale, 2):.2f}"
     flag_opposizione = "1" if getattr(cliente, "flag_opposizione", False) else "0"
     pagamento_tracciato = (
@@ -72,7 +73,7 @@ def build_inserimento_payload(fattura, cliente, config: dict) -> str:
         <doc:voceSpesa>
           <doc:tipoSpesa>SP</doc:tipoSpesa>
           <doc:importo>{importo}</doc:importo>
-          <doc:naturaIVA>N4</doc:naturaIVA>
+          <doc:naturaIVA>{natura_iva}</doc:naturaIVA>
         </doc:voceSpesa>
         <doc:pagamentoTracciato>{pagamento_tracciato}</doc:pagamentoTracciato>
         <doc:tipoDocumento>F</doc:tipoDocumento>
@@ -99,7 +100,7 @@ def build_cancellazione_payload(fattura, cliente, config: dict) -> str:
     dispositivo = int(config.get("dispositivo", 1))
 
     data_emissione = _esc(fattura.data_fattura.isoformat())
-    num_documento = _esc(f"F{fattura.anno}{fattura.progressivo:04d}")
+    num_documento = _esc(f"{fattura.progressivo}/{fattura.anno}")
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <soapenv:Envelope

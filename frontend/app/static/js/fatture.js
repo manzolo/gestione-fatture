@@ -352,6 +352,19 @@ export function initializeInvoices() {
     });
 }
 
+// Helper per risposte STS in debug mode
+function _handleSTSDebugResponse(data, operation) {
+    console.group(`%c[STS DEBUG] ${operation}`, 'color: orange; font-weight: bold;');
+    console.log('Risposta:', data);
+    console.log('SOAP Payload:');
+    console.log(data.soap_payload);
+    console.groupEnd();
+    notifications.warning(
+        `[STS DEBUG] ${operation}: payload SOAP generato ma NON inviato. Vedi console per dettagli.`,
+        6000,
+    );
+}
+
 // Cancellazione invio STS
 window.cancelSTS = function (invoiceId) {
     if (!confirm('Annullare l\'invio di questa fattura su STS?')) return;
@@ -361,6 +374,10 @@ window.cancelSTS = function (invoiceId) {
     fetch(`/api/sts/invoices/${invoiceId}/cancel`, { method: 'POST' })
         .then(response => response.json().then(data => ({ status: response.status, data })))
         .then(({ status, data }) => {
+            if (data.debug_mode) {
+                _handleSTSDebugResponse(data, 'Cancellazione');
+                return;
+            }
             if (data.success) {
                 notifications.success('Invio STS annullato con successo!');
                 saveActiveTab();
@@ -394,6 +411,10 @@ window.sendToSTS = function (invoiceId, alreadySent) {
     fetch(url, { method: 'POST' })
         .then(response => response.json().then(data => ({ status: response.status, data })))
         .then(({ status, data }) => {
+            if (data.debug_mode) {
+                _handleSTSDebugResponse(data, 'Inserimento');
+                return;
+            }
             if (data.success) {
                 const protocollo = data.protocollo ? ` — Protocollo: ${data.protocollo}` : '';
                 notifications.success(`Fattura inviata a STS con successo!${protocollo}`);

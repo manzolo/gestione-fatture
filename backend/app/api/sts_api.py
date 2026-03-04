@@ -81,7 +81,9 @@ def sts_send_single(invoice_id):
     client = _sts_client()
     result = client.send_inserimento(fattura, cliente)
 
-    if result["success"]:
+    is_debug = result.get("debug_mode", False)
+
+    if result["success"] and not is_debug:
         fattura.inviata_sts = True
         fattura.protocollo_sts = result.get("protocollo")
         fattura.data_invio_sts = datetime.utcnow()
@@ -91,12 +93,17 @@ def sts_send_single(invoice_id):
             invoice_id, fattura.protocollo_sts,
         )
 
-    return jsonify({
+    response = {
         "success": result["success"],
         "fattura_id": invoice_id,
         "protocollo": result.get("protocollo"),
         "errors": result.get("errors", []),
-    }), 200 if result["success"] else 422
+    }
+    if is_debug:
+        response["debug_mode"] = True
+        response["soap_payload"] = result.get("soap_payload", "")
+
+    return jsonify(response), 200 if result["success"] else 422
 
 
 @sts_bp.route("/sts/invoices/send-batch", methods=["POST"])
@@ -140,18 +147,25 @@ def sts_send_batch():
 
         result = client.send_inserimento(fattura, cliente)
 
-        if result["success"]:
+        is_debug = result.get("debug_mode", False)
+
+        if result["success"] and not is_debug:
             fattura.inviata_sts = True
             fattura.protocollo_sts = result.get("protocollo")
             fattura.data_invio_sts = datetime.utcnow()
             db.session.commit()
 
-        results.append({
+        entry = {
             "fattura_id": fattura.id,
             "success": result["success"],
             "protocollo": result.get("protocollo"),
             "errors": result.get("errors", []),
-        })
+        }
+        if is_debug:
+            entry["debug_mode"] = True
+            entry["soap_payload"] = result.get("soap_payload", "")
+
+        results.append(entry)
 
     total = len(results)
     sent = sum(1 for r in results if r["success"])
@@ -191,15 +205,22 @@ def sts_cancel_single(invoice_id):
     client = _sts_client()
     result = client.send_cancellazione(fattura, cliente)
 
-    if result["success"]:
+    is_debug = result.get("debug_mode", False)
+
+    if result["success"] and not is_debug:
         fattura.inviata_sts = False
         fattura.protocollo_sts = None
         fattura.data_invio_sts = None
         db.session.commit()
         logger.info("Fattura %d cancellata da STS.", invoice_id)
 
-    return jsonify({
+    response = {
         "success": result["success"],
         "fattura_id": invoice_id,
         "errors": result.get("errors", []),
-    }), 200 if result["success"] else 422
+    }
+    if is_debug:
+        response["debug_mode"] = True
+        response["soap_payload"] = result.get("soap_payload", "")
+
+    return jsonify(response), 200 if result["success"] else 422

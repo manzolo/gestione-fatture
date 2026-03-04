@@ -26,7 +26,9 @@ services:
       STS_DISPOSITIVO: ${STS_DISPOSITIVO:-1}
       STS_CERTIFICATE_PATH: ${STS_CERTIFICATE_PATH:-/app/certs/sts_cert.pem}
       STS_CA_BUNDLE: ${STS_CA_BUNDLE:-/app/certs/CAAgenziadelleEntrateTest.pem}
+      STS_NATURA_IVA: ${STS_NATURA_IVA:-N2.2}
       STS_SSL_VERIFY: ${STS_SSL_VERIFY:-true}
+      STS_DEBUG: ${STS_DEBUG:-false}
     volumes:
       - ./invoices_data:/app/backend/invoices
       - ./certs:/app/certs:ro

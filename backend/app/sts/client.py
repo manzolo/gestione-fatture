@@ -160,6 +160,7 @@ class STSClient:
     def __init__(self):
         env = os.getenv("STS_ENVIRONMENT", "test").lower()
         self.endpoint = STS_ENDPOINTS.get(env, STS_ENDPOINTS["test"])
+        self.debug = os.getenv("STS_DEBUG", "false").lower() in ("true", "1", "yes")
         self.username = os.getenv("STS_USERNAME", "")
         self.password = os.getenv("STS_PASSWORD", "")
         self.config = {
@@ -168,6 +169,7 @@ class STSClient:
             "cf_proprietario_encrypted": os.getenv("STS_CF_PROPRIETARIO_ENCRYPTED", ""),
             "dispositivo": int(os.getenv("STS_DISPOSITIVO", "1")),
             "cert_path": os.getenv("STS_CERTIFICATE_PATH", None),
+            "natura_iva": os.getenv("STS_NATURA_IVA", "N2.2"),
         }
         self._ca_bundle = os.getenv("STS_CA_BUNDLE", None)
         ssl_verify_env = os.getenv("STS_SSL_VERIFY", "true").lower()
@@ -221,6 +223,17 @@ class STSClient:
         payload = build_inserimento_payload(fattura, cliente, self.config)
         logger.debug("STS inserimento payload:\n%s", payload)
 
+        if self.debug:
+            logger.info("STS DEBUG MODE: inserimento payload generato, invio saltato.")
+            return {
+                "success": True,
+                "debug_mode": True,
+                "soap_payload": payload,
+                "protocollo": f"DEBUG-{int(time.time())}",
+                "errors": [],
+                "raw": "",
+            }
+
         try:
             resp = self._post_soap(payload, SOAP_ACTION_INSERIMENTO)
         except RuntimeError as exc:
@@ -249,6 +262,17 @@ class STSClient:
 
         payload = build_cancellazione_payload(fattura, cliente, self.config)
         logger.debug("STS cancellazione payload:\n%s", payload)
+
+        if self.debug:
+            logger.info("STS DEBUG MODE: cancellazione payload generato, invio saltato.")
+            return {
+                "success": True,
+                "debug_mode": True,
+                "soap_payload": payload,
+                "protocollo": fattura.protocollo_sts,
+                "errors": [],
+                "raw": "",
+            }
 
         try:
             resp = self._post_soap(payload, SOAP_ACTION_CANCELLAZIONE)
