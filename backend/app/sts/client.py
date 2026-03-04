@@ -58,6 +58,10 @@ class _STSSSLAdapter(HTTPAdapter):
         else:
             ctx = create_urllib3_context(ciphers=_STS_CIPHERS)
             ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+            # Carica prima i certificati di sistema, poi eventualmente il CA bundle
+            # aggiuntivo. Questo garantisce che la catena completa sia verificabile
+            # anche se il bundle custom contiene solo certificati intermedi.
+            ctx.set_default_verify_paths()
             if self._ca_bundle:
                 ctx.load_verify_locations(cafile=self._ca_bundle)
         return ctx
