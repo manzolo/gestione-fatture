@@ -3,7 +3,11 @@
 Genera i valori cifrati RSA per STS_PINCODE_ENCRYPTED e STS_CF_PROPRIETARIO_ENCRYPTED.
 
 Uso:
-    python3 scripts/sts_encrypt.py --pincode 1234567890 --cf RSSMRA80A01H501U
+    python3 scripts/sts_encrypt.py --cf RSSMRA80A01H501U
+    python3 scripts/sts_encrypt.py --cf RSSMRA80A01H501U --pincode 1234567890
+
+Il pincode è opzionale: dal 2023 potrebbe non essere più richiesto dal Sistema TS.
+Se non lo specifichi, STS_PINCODE_ENCRYPTED verrà lasciato vuoto.
 
 Requisiti:
     pip install cryptography
@@ -35,7 +39,8 @@ def encrypt(value: str, cert_path: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Cifra pincode e CF per STS")
-    parser.add_argument("--pincode", required=True, help="Pincode in chiaro (es: 1234567890)")
+    parser.add_argument("--pincode", required=False, default=None,
+                        help="Pincode in chiaro (opzionale, potrebbe non servire dal 2023)")
     parser.add_argument("--cf", required=True, help="Codice Fiscale proprietario in chiaro")
     parser.add_argument(
         "--cert",
@@ -48,11 +53,19 @@ def main():
     print(f"Certificato: {cert_path}")
     print()
 
-    pincode_enc = encrypt(args.pincode, cert_path)
     cf_enc = encrypt(args.cf, cert_path)
 
     print("Copia questi valori nel file .env:\n")
-    print(f"STS_PINCODE_ENCRYPTED={pincode_enc}")
+
+    if args.pincode:
+        pincode_enc = encrypt(args.pincode, cert_path)
+        print(f"STS_PINCODE_ENCRYPTED={pincode_enc}")
+    else:
+        print("STS_PINCODE_ENCRYPTED=")
+        print()
+        print("  (pincode non specificato — lasciato vuoto)")
+        print("  Se il Sistema TS lo richiede, riesegui con: --pincode <PINCODE>")
+
     print(f"STS_CF_PROPRIETARIO_ENCRYPTED={cf_enc}")
     print()
     print("NOTA: RSA PKCS#1 v1.5 è non-deterministico: ogni esecuzione produce")
