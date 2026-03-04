@@ -180,6 +180,12 @@ def sts_cancel_single(invoice_id):
             "error": "Fattura non risulta inviata a STS.",
         }), 400
 
+    if not fattura.protocollo_sts:
+        return jsonify({
+            "success": False,
+            "error": "Fattura flaggata manualmente come inviata: impossibile annullare su STS senza protocollo.",
+        }), 400
+
     cliente = Cliente.query.get_or_404(fattura.cliente_id)
 
     client = _sts_client()

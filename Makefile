@@ -7,7 +7,7 @@ BACKUP_DIR := ./backups
 DOCKER_USER := manzolo
 BACKEND_IMAGE := $(DOCKER_USER)/invoice_backend
 FRONTEND_IMAGE := $(DOCKER_USER)/invoice_frontend
-DOCKER_TAG := latest
+DOCKER_TAG := $(or $(TAG),latest)
 
 # Importa variabili d'ambiente
 include .env
@@ -38,7 +38,8 @@ help: ## 📖 Mostra questo messaggio di aiuto
 	@echo "$(YELLOW)💡 Esempi di utilizzo:$(NC)"
 	@echo "  make start             - Avvia i container"
 	@echo "  make test-all          - Esegue tutti i test"
-	@echo "  make docker-push       - Publica le immagini su Docker Hub"
+	@echo "  make docker-push       - Publica le immagini su Docker Hub (tag: latest)"
+	@echo "  make docker-push TAG=v1.0.0  - Publica con tag specifico (+ latest)"
 	@echo ""
 
 # ============================================================================
@@ -95,30 +96,36 @@ docker-login: ## 🔐 Effettua il login a Docker Hub
 	@docker login
 
 .PHONY: docker-tag
-docker-tag: ## 🏷️  Tagga le immagini per Docker Hub
-	@echo "$(BLUE)🏷️  Tagging delle immagini...$(NC)"
+docker-tag: ## 🏷️  Tagga le immagini per Docker Hub (TAG=v1.0.0)
+	@echo "$(BLUE)🏷️  Tagging delle immagini con tag '$(DOCKER_TAG)'...$(NC)"
 	@docker tag $(BACKEND_IMAGE):latest $(BACKEND_IMAGE):$(DOCKER_TAG)
 	@docker tag $(FRONTEND_IMAGE):latest $(FRONTEND_IMAGE):$(DOCKER_TAG)
-	@echo "$(GREEN)✅ Immagini taggate!$(NC)"
+	@echo "$(GREEN)✅ Immagini taggate come $(DOCKER_TAG)!$(NC)"
 
 .PHONY: docker-push
-docker-push: docker-tag ## 📤 Publica le immagini su Docker Hub
-	@echo "$(YELLOW)📤 Push delle immagini su Docker Hub...$(NC)"
+docker-push: docker-tag ## 📤 Publica le immagini su Docker Hub (TAG=v1.0.0)
+	@echo "$(YELLOW)📤 Push delle immagini su Docker Hub (tag: $(DOCKER_TAG))...$(NC)"
 	@echo "$(CYAN)Pushing $(BACKEND_IMAGE):$(DOCKER_TAG)...$(NC)"
 	@docker push $(BACKEND_IMAGE):$(DOCKER_TAG)
 	@echo "$(CYAN)Pushing $(FRONTEND_IMAGE):$(DOCKER_TAG)...$(NC)"
 	@docker push $(FRONTEND_IMAGE):$(DOCKER_TAG)
+	@if [ "$(DOCKER_TAG)" != "latest" ]; then \
+		echo "$(CYAN)Pushing anche $(BACKEND_IMAGE):latest...$(NC)"; \
+		docker push $(BACKEND_IMAGE):latest; \
+		echo "$(CYAN)Pushing anche $(FRONTEND_IMAGE):latest...$(NC)"; \
+		docker push $(FRONTEND_IMAGE):latest; \
+	fi
 	@echo "$(GREEN)✅ Immagini pubblicate con successo!$(NC)"
 
 .PHONY: docker-pull
-docker-pull: ## 📥 Scarica le immagini da Docker Hub
-	@echo "$(BLUE)📥 Download immagini da Docker Hub...$(NC)"
+docker-pull: ## 📥 Scarica le immagini da Docker Hub (TAG=v1.0.0)
+	@echo "$(BLUE)📥 Download immagini da Docker Hub (tag: $(DOCKER_TAG))...$(NC)"
 	@docker pull $(BACKEND_IMAGE):$(DOCKER_TAG)
 	@docker pull $(FRONTEND_IMAGE):$(DOCKER_TAG)
 	@echo "$(GREEN)✅ Immagini scaricate!$(NC)"
 
 .PHONY: docker-build-push
-docker-build-push: rebuild docker-push ## 🔨📤 Ricostruisce e pubblica le immagini
+docker-build-push: rebuild docker-push ## 🔨📤 Ricostruisce e pubblica le immagini (TAG=v1.0.0)
 	@echo "$(GREEN)✅ Build e push completati!$(NC)"
 
 # ============================================================================

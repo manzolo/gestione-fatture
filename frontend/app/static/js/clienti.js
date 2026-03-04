@@ -144,6 +144,7 @@ export function initializeClients() {
             
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
+            data.flag_opposizione = document.getElementById('flag_opposizione').checked;
 
             try {
                 const response = await fetch('/api/clients', {
@@ -200,6 +201,7 @@ export function initializeClients() {
             const clientId = document.getElementById('edit-client-id').value;
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
+            data.flag_opposizione = document.getElementById('edit-flag_opposizione').checked;
 
             try {
                 const response = await fetch(`/api/clients/${clientId}`, {
@@ -311,6 +313,7 @@ export function initializeClients() {
             document.getElementById('edit-indirizzo').value = data.indirizzo || '';
             document.getElementById('edit-citta').value = data.citta || '';
             document.getElementById('edit-cap').value = data.cap || '';
+            document.getElementById('edit-flag_opposizione').checked = data.flag_opposizione || false;
 
             const editModal = new bootstrap.Modal(document.getElementById('editClientModal'));
             editModal.show();

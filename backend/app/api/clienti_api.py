@@ -101,13 +101,18 @@ def clients_api():
                 return jsonify({"message": "Il CAP deve essere composto da 5 cifre."}), 400
             
             # Creazione nuovo cliente
+            # flag_opposizione: checkbox manda "on"/"true"/true, assente = False
+            raw_flag = data.get('flag_opposizione', False)
+            flag_opposizione = raw_flag in (True, 'true', 'on', '1', 1)
+
             new_client = Cliente(
                 nome=data['nome'].strip(),
                 cognome=data['cognome'].strip(),
                 codice_fiscale=codice_fiscale,
                 indirizzo=data.get('indirizzo', '').strip() or None,
                 citta=data.get('citta', '').strip() or None,
-                cap=cap or None
+                cap=cap or None,
+                flag_opposizione=flag_opposizione
             )
             
             db.session.add(new_client)
@@ -140,7 +145,8 @@ def clients_api():
                 'codice_fiscale': c.codice_fiscale,
                 'indirizzo': c.indirizzo,
                 'citta': c.citta,
-                'cap': c.cap
+                'cap': c.cap,
+                'flag_opposizione': c.flag_opposizione or False
             } for c in clients]
             return jsonify(clients_list)
         except Exception as e:
@@ -162,7 +168,8 @@ def client_api_detail(client_id):
                 'codice_fiscale': client.codice_fiscale,
                 'indirizzo': client.indirizzo,
                 'citta': client.citta,
-                'cap': client.cap
+                'cap': client.cap,
+                'flag_opposizione': client.flag_opposizione or False
             })
         
         elif request.method == 'PUT':
@@ -214,7 +221,10 @@ def client_api_detail(client_id):
                     client.citta = data['citta'].strip() or None
                 if 'cap' in data:
                     client.cap = data['cap'].strip() or None
-                
+                if 'flag_opposizione' in data:
+                    raw_flag = data['flag_opposizione']
+                    client.flag_opposizione = raw_flag in (True, 'true', 'on', '1', 1)
+
                 db.session.commit()
                 
                 return jsonify({

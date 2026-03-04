@@ -94,11 +94,11 @@
                                                 <i class="fas fa-paper-plane"></i>
                                             </button>
                                             {% endif %}
-                                            {% if invoice.inviata_sts %}
+                                            {% if invoice.inviata_sts and invoice.protocollo_sts %}
                                             <button type="button"
                                                 class="btn btn-danger btn-action"
                                                 onclick="cancelSTS({{ invoice.id }})"
-                                                title="Annulla invio STS (protocollo: {{ invoice.protocollo_sts or 'N/D' }})">
+                                                title="Annulla invio STS (protocollo: {{ invoice.protocollo_sts }})">
                                                 <i class="fas fa-times-circle"></i>
                                             </button>
                                             {% endif %}
