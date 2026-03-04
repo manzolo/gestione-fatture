@@ -14,6 +14,25 @@ from app.utils import calculate_invoice_totals, calculate_prezzo_base_da_totale,
 
 invoices_bp = Blueprint('invoices_bp', __name__)
 
+
+def _build_pagamento_descrizione(fattura):
+    """Costruisce la descrizione del pagamento per il template della fattura."""
+    metodo = fattura.metodo_pagamento or ''
+    if fattura.data_pagamento:
+        return f"Pagato con {metodo} in data {fattura.data_pagamento.strftime('%d/%m/%Y')}"
+    elif metodo.lower() == 'bonifico':
+        iban = os.getenv('INVOICE_IBAN', '')
+        intestatario = os.getenv('INVOICE_INTESTATARIO', '')
+        if iban and intestatario:
+            return f"Il pagamento dovrà essere effettuato a mezzo bonifico bancario sull'IBAN {iban} intestato a {intestatario}"
+        elif iban:
+            return f"Il pagamento dovrà essere effettuato a mezzo bonifico bancario sull'IBAN {iban}"
+        else:
+            return "Il pagamento dovrà essere effettuato a mezzo bonifico bancario"
+    else:
+        return f"Pagato con {metodo} in data Non pagato"
+
+
 @invoices_bp.route('/invoices', methods=['GET', 'POST'])
 def invoices_api():
     if request.method == 'POST':
@@ -191,7 +210,10 @@ def download_invoice_zip(invoice_id):
         
         SAVE_DIR = os.path.join(app_root, 'invoices')
         os.makedirs(SAVE_DIR, exist_ok=True)
-        template_path = os.path.join(app_root, 'templates', 'invoice_template.docx')
+        # Cerca prima un template custom (montato via volume), altrimenti usa quello built-in
+        custom_template_path = os.path.join(app_root, 'templates', 'custom', 'invoice_template.docx')
+        builtin_template_path = os.path.join(app_root, 'templates', 'invoice_template.docx')
+        template_path = custom_template_path if os.path.exists(custom_template_path) else builtin_template_path
         if not os.path.exists(template_path):
             return jsonify({"error": "Template file not found"}), 404
 
@@ -227,8 +249,17 @@ def download_invoice_zip(invoice_id):
             'bollo_descrizione_semplice': bollo_descrizione_semplice,
             'bollo_importo_formattato': bollo_importo_formattato,
             'totale': f"€ {calcoli['totale']:.2f}".replace('.', ','),
-            'metodo_pagamento': fattura.metodo_pagamento,
-            'data_pagamento': fattura.data_pagamento.strftime('%d/%m/%Y') if fattura.data_pagamento else 'Non pagato',
+            'pagamento_descrizione': _build_pagamento_descrizione(fattura),
+            # Dati intestatario (professionista) da env vars
+            'intestatario_titolo': os.getenv('INVOICE_INTESTATARIO_TITOLO', ''),
+            'intestatario_professione': os.getenv('INVOICE_INTESTATARIO_PROFESSIONE', ''),
+            'intestatario_indirizzo': os.getenv('INVOICE_INTESTATARIO_INDIRIZZO', ''),
+            'intestatario_cap_citta': os.getenv('INVOICE_INTESTATARIO_CAP_CITTA', ''),
+            'intestatario_cf': os.getenv('INVOICE_INTESTATARIO_CF', ''),
+            'intestatario_piva': os.getenv('INVOICE_INTESTATARIO_PIVA', ''),
+            'intestatario_email': os.getenv('INVOICE_INTESTATARIO_EMAIL', ''),
+            'intestatario_pec': os.getenv('INVOICE_INTESTATARIO_PEC', ''),
+            'intestatario_nome': os.getenv('INVOICE_INTESTATARIO_NOME', ''),
         }
 
         with tempfile.TemporaryDirectory() as tmpdir:
