@@ -1,5 +1,4 @@
 <!-- Sezione Fatture -->
-<div class="tab-pane fade show active" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mt-4 mb-4">Elenco Fatture Emesse</h2>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInvoiceModal">
@@ -44,7 +43,7 @@
                             </thead>
                             <tbody>
                                 {% for invoice in fatture_anno %}
-                                <tr>
+                                <tr data-invoice-id="{{ invoice.id }}">
                                     <td>{{ invoice.numero_fattura }}</td>
                                     <td>{{ invoice.data_fattura | to_italian_date }}</td>
                                     <td>{{ invoice.data_pagamento | to_italian_date if
@@ -117,4 +116,3 @@
     {% else %}
     <p class="alert alert-info mt-4">Nessuna fattura emessa.</p>
     {% endif %}
-</div>

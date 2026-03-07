@@ -1,4 +1,5 @@
 /* Importazione dei file CSS modulari */
+@import url('sidebar.css');
 @import url('base.css');
 @import url('components.css');
 @import url('dashboard.css');

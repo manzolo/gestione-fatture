@@ -1,23 +1,11 @@
 // ====== COSTI CRUD CON NOTIFICHE UNIFICATE =======
 import { notifications } from './notifications.js';
 
-// Funzione per salvare la tab attiva
+// Funzione per salvare la sezione attiva
 function saveActiveTab() {
-    const activeTab = document.querySelector('.nav-link.active');
-    if (activeTab) {
-        localStorage.setItem('activeTab', activeTab.id);
-    }
-}
-
-// Funzione per ripristinare la tab attiva
-function restoreActiveTab() {
-    const activeTabId = localStorage.getItem('activeTab');
-    if (activeTabId) {
-        const tabElement = document.getElementById(activeTabId);
-        if (tabElement) {
-            const tab = new bootstrap.Tab(tabElement);
-            tab.show();
-        }
+    const activePanel = document.querySelector('.section-panel.active');
+    if (activePanel) {
+        localStorage.setItem('activeSection', activePanel.id.replace('section-', ''));
     }
 }
 
