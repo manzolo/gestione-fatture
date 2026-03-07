@@ -96,3 +96,21 @@
     margin-bottom: 0.5rem;
     color: #2d3748;
 }
+
+/* Gradient top-border sulle stat card */
+.stat-card.primary::before { background: linear-gradient(90deg, #007bff, #66b2ff); }
+.stat-card.info::before    { background: linear-gradient(90deg, #6f42c1, #a370f7); }
+.stat-card.success::before { background: linear-gradient(90deg, #28a745, #5dd97a); }
+.stat-card.danger::before  { background: linear-gradient(90deg, #dc3545, #f07080); }
+.stat-card.warning::before { background: linear-gradient(90deg, #fd7e14, #fdbb6a); }
+.stat-card.primary::before,
+.stat-card.info::before,
+.stat-card.success::before,
+.stat-card.danger::before,
+.stat-card.warning::before {
+    content: '';
+    display: block;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
+    margin-bottom: 0;
+}

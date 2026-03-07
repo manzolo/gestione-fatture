@@ -409,32 +409,14 @@ function renderCharts(invoicesData, costsData) {
     }
 }
 
-export function initializeDashboard() {
-    const dashboardTab = document.getElementById('dashboard-tab');
-    if (dashboardTab) {
-        // Rimuovi eventuali listener precedenti
-        const newDashboardTab = dashboardTab.cloneNode(true);
-        dashboardTab.parentNode.replaceChild(newDashboardTab, dashboardTab);
-
-        newDashboardTab.addEventListener('shown.bs.tab', async function () {
-            // Pulisci le notifiche quando si entra nella dashboard
-            notifications.clearAll();
-
-            if (!isInitialized) {
-                await setupDashboard();
-                isInitialized = true;
-            } else {
-                // Se già inizializzato, ricarica solo i dati
-                const yearSelector = document.getElementById('yearSelector');
-                const selectedYear = yearSelector ? (yearSelector.value || new Date().getFullYear()) : new Date().getFullYear();
-                await fetchDashboardStats(selectedYear, false); // false = non mostrare notifica di caricamento
-            }
-        });
-
-        // Pulisci le notifiche quando si esce dalla dashboard
-        newDashboardTab.addEventListener('hide.bs.tab', function () {
-            notifications.clearAll();
-        });
+export async function initializeDashboard() {
+    if (!isInitialized) {
+        await setupDashboard();
+        isInitialized = true;
+    } else {
+        const yearSelector = document.getElementById('yearSelector');
+        const selectedYear = yearSelector ? (yearSelector.value || new Date().getFullYear()) : new Date().getFullYear();
+        await fetchDashboardStats(selectedYear, false);
     }
 }
 

@@ -311,6 +311,21 @@ def get_available_years():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@invoices_bp.route('/invoices/unpaid', methods=['GET'])
+def get_unpaid_invoices():
+    fatture = Fattura.query.filter(Fattura.data_pagamento.is_(None)) \
+        .order_by(Fattura.anno.desc(), Fattura.progressivo.desc()).all()
+    result = []
+    for f in fatture:
+        result.append({
+            'id': f.id,
+            'numero_fattura': f'{f.progressivo}/{f.anno}',
+            'data_fattura': f.data_fattura.isoformat(),
+            'cliente': f'{f.cliente.nome} {f.cliente.cognome}' if f.cliente else None,
+            'totale': float(f.totale),
+        })
+    return jsonify(result)
+
 @invoices_bp.route('/invoices/stats', methods=['GET'])
 def get_invoice_stats():
     try:

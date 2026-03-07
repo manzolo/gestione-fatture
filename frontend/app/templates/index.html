@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <title>Gestionale - Fatture & Clienti</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    
+
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/select2.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/fontawesome.min.css') }}">
@@ -15,60 +15,106 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1 class="mb-4 text-center text-primary">Gestionale Fatture & Clienti 📊👥</h1>
-        
-        <!-- Navigation Tabs -->
-        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices"
-                    type="button" role="tab" aria-controls="invoices" aria-selected="true">
-                    <i class="fas fa-list-alt me-2"></i>Fatture
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients" type="button"
-                    role="tab" aria-controls="clients" aria-selected="false">
-                    <i class="fas fa-users me-2"></i>Clienti
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses" type="button"
-                    role="tab" aria-controls="expenses" aria-selected="false">
-                    <i class="fas fa-euro-sign me-2"></i>Costi
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard"
-                    type="button" role="tab" aria-controls="dashboard" aria-selected="false">
-                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                </button>
-            </li>
-        </ul>
 
-        <!-- Tab Content -->
-        <div class="tab-content" id="mainTabContent">
-            {% include 'sections/invoices.html' %}
-            {% include 'sections/clients.html' %}
-            {% include 'sections/expenses.html' %}
-            {% include 'sections/dashboard.html' %}
-        </div>
+<!-- Overlay per mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- Modals -->
-        {% include 'modals/invoice_modals.html' %}
-        {% include 'modals/client_modals.html' %}
-        {% include 'modals/expense_modals.html' %}
-    </div>
+<div class="app-shell">
 
-    <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='js/lib/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/select2.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/chart.min.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/fatture.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/costi.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <a class="sidebar-brand" href="#">
+            <i class="fas fa-file-invoice-dollar sidebar-brand-icon"></i>
+            <div>
+                <span class="sidebar-brand-text">Gestionale</span>
+                <span class="sidebar-brand-sub">Fatture & Clienti</span>
+            </div>
+        </a>
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-item active" data-section="invoices">
+                <i class="fas fa-list-alt"></i>
+                <span>Fatture</span>
+            </div>
+            <div class="sidebar-nav-item" data-section="clients">
+                <i class="fas fa-users"></i>
+                <span>Clienti</span>
+            </div>
+            <div class="sidebar-nav-item" data-section="expenses">
+                <i class="fas fa-euro-sign"></i>
+                <span>Costi</span>
+            </div>
+            <div class="sidebar-nav-item" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main wrapper -->
+    <div class="main-wrapper">
+
+        <!-- Top header -->
+        <header class="top-header">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 id="pageTitle">Fatture</h1>
+
+            <!-- Notification bell -->
+            <div class="notification-bell-wrapper">
+                <button class="notification-bell-btn" id="bellBtn" aria-label="Notifiche">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="bellBadge" style="display:none">0</span>
+                </button>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-dropdown-header">
+                        <h6><i class="fas fa-bell me-2 text-primary"></i>Notifiche</h6>
+                        <small class="text-muted" id="bellLastUpdate"></small>
+                    </div>
+                    <div class="notification-dropdown-body" id="notificationDropdownBody">
+                        <div class="notif-empty">
+                            <i class="fas fa-check-circle"></i>
+                            Tutto in ordine!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <div class="section-panel active" id="section-invoices">
+                {% include 'sections/invoices.html' %}
+            </div>
+            <div class="section-panel" id="section-clients">
+                {% include 'sections/clients.html' %}
+            </div>
+            <div class="section-panel" id="section-expenses">
+                {% include 'sections/expenses.html' %}
+            </div>
+            <div class="section-panel" id="section-dashboard">
+                {% include 'sections/dashboard.html' %}
+            </div>
+        </main>
+
+    </div><!-- /.main-wrapper -->
+</div><!-- /.app-shell -->
+
+<!-- Modals -->
+{% include 'modals/invoice_modals.html' %}
+{% include 'modals/client_modals.html' %}
+{% include 'modals/expense_modals.html' %}
+
+<!-- JavaScript -->
+<script src="{{ url_for('static', filename='js/lib/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/select2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/chart.min.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/fatture.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/costi.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/bell_notifications.js') }}"></script>
+
 </body>
-
 </html>

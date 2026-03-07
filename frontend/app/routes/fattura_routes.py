@@ -135,6 +135,26 @@ def sts_cancel_proxy(invoice_id):
     except requests.exceptions.RequestException as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@fattura_bp.route('/api/invoices/unpaid', methods=['GET'])
+def get_unpaid_invoices_proxy():
+    """Proxy per ottenere le fatture non pagate dal backend."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/invoices/unpaid")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'message': f"Errore: {e}"}), 500
+
+@fattura_bp.route('/api/sts/invoices/unsent', methods=['GET'])
+def get_sts_unsent_proxy():
+    """Proxy per ottenere le fatture non inviate a STS dal backend."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/sts/invoices/unsent")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'message': f"Errore: {e}"}), 500
+
 @fattura_bp.route('/api/invoices/years', methods=['GET'])
 def get_invoices_years_proxy():
     """Proxy per ottenere gli anni disponibili delle fatture dal backend."""

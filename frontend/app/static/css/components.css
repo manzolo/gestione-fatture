@@ -69,7 +69,6 @@
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* Tab content */
-.tab-content {
-    padding: 20px 0;
+.card {
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07) !important;
 }

@@ -1,95 +1,105 @@
-// ====== MAIN.JS CON SISTEMA NOTIFICHE UNIFICATE ======
+// main.js - Navigazione sidebar + inizializzazione moduli
 
-// Importa le funzioni di inizializzazione dagli altri moduli
 import { initializeClients } from './clienti.js';
 import { initializeInvoices } from './fatture.js';
-import { initializeDashboard, fetchDashboardStats } from './dashboard.js';
+import { initializeDashboard } from './dashboard.js';
 import { notifications } from './notifications.js';
 
-// Rendi il sistema di notifiche disponibile globalmente
 window.notifications = notifications;
 
-// Funzione per salvare la tab attiva
+const SECTION_TITLES = {
+    invoices:  'Fatture',
+    clients:   'Clienti',
+    expenses:  'Costi',
+    dashboard: 'Dashboard',
+};
+
+let dashboardInitialized = false;
+
+// ---- Navigazione ----
+
+function showSection(sectionId) {
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
+
+    const panel = document.getElementById(`section-${sectionId}`);
+    if (panel) panel.classList.add('active');
+
+    const navItem = document.querySelector(`.sidebar-nav-item[data-section="${sectionId}"]`);
+    if (navItem) navItem.classList.add('active');
+
+    const title = document.getElementById('pageTitle');
+    if (title) title.textContent = SECTION_TITLES[sectionId] || sectionId;
+
+    localStorage.setItem('activeSection', sectionId);
+
+    if (sectionId === 'dashboard' && !dashboardInitialized) {
+        dashboardInitialized = true;
+        initializeDashboard();
+    }
+}
+window.showSection = showSection;
+
+function restoreSection() {
+    const saved = localStorage.getItem('activeSection') || 'invoices';
+    showSection(saved);
+}
+
 function saveActiveTab() {
-    const activeTab = document.querySelector('.nav-link.active');
-    if (activeTab) {
-        localStorage.setItem('activeTab', activeTab.id);
-        //console.log('Tab salvata:', activeTab.id); // Debug
+    const activePanel = document.querySelector('.section-panel.active');
+    if (activePanel) {
+        localStorage.setItem('activeSection', activePanel.id.replace('section-', ''));
     }
 }
+window.saveActiveTab = saveActiveTab;
 
-// Funzione per ripristinare la tab attiva
-function restoreActiveTab() {
-    const activeTabId = localStorage.getItem('activeTab');
-    //console.log('Tab da ripristinare:', activeTabId); // Debug
-    if (activeTabId) {
-        const tabElement = document.getElementById(activeTabId);
-        if (tabElement) {
-            const tab = new bootstrap.Tab(tabElement);
-            tab.show();
-            //console.log('Tab ripristinata:', activeTabId); // Debug
-        }
-    }
-}
+// ---- DOMContentLoaded ----
 
-// ----- Helper per mostrare tab -----
-function showTabById(tabButtonSelector) {
-    const tabEl = document.querySelector(tabButtonSelector);
-    if (tabEl) {
-        new bootstrap.Tab(tabEl).show();
-        // Mostra notifica di navigazione
-        notifications.info('Navigazione completata', 2000);
-    }
-}
+document.addEventListener('DOMContentLoaded', function () {
+    restoreSection();
 
-// Inizializzazione principale
-document.addEventListener('DOMContentLoaded', function() {
-    // Ripristina la tab attiva se presente
-    restoreActiveTab();
-    
-    // Aggiungi listener per salvare automaticamente la tab quando cambia
-    const tabButtons = document.querySelectorAll('.nav-tabs button[data-bs-toggle="tab"]');
-    tabButtons.forEach(button => {
-        button.addEventListener('shown.bs.tab', function(event) {
-            //console.log('Tab cambiata a:', event.target.id); // Debug
-            saveActiveTab();
+    // Sidebar nav clicks
+    document.querySelectorAll('.sidebar-nav-item[data-section]').forEach(item => {
+        item.addEventListener('click', function () {
+            showSection(this.dataset.section);
+            // Chiudi sidebar su mobile dopo click
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
         });
     });
-    
-    // Inizializzazione bottone vai a clienti
-    const gotoClientsBtn = document.getElementById('gotoClientsBtn');
-    if (gotoClientsBtn) {
-        gotoClientsBtn.addEventListener('click', function () {
-            showTabById('#clients-tab');
+
+    // Hamburger (mobile)
+    const hamburger = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (hamburger && sidebar && overlay) {
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
         });
     }
-    
-    // Inizializzazione dei moduli
+
+    // Bottone vai a clienti
+    const gotoClientsBtn = document.getElementById('gotoClientsBtn');
+    if (gotoClientsBtn) {
+        gotoClientsBtn.addEventListener('click', () => showSection('clients'));
+    }
+
+    // Inizializzazione moduli
     try {
         initializeClients();
         initializeInvoices();
-        
-        // Quando il tab della dashboard è attivato, carica le statistiche
-        const dashboardTab = document.getElementById('dashboard-tab');
-        if (dashboardTab) {
-            dashboardTab.addEventListener('shown.bs.tab', function(event) {
-                initializeDashboard();
-            });
-        }
-        
-        // Carica le statistiche anche se la dashboard è già attiva al caricamento della pagina
-        const statsContainer = document.getElementById('dashboard-stats');
-        if (statsContainer) {
-            initializeDashboard();
-        }
-        
     } catch (error) {
         console.error('Errore durante l\'inizializzazione:', error);
         notifications.error('Errore durante il caricamento del gestionale. Ricarica la pagina.', 10000);
     }
-    
-    // Gestione errori globali per richieste AJAX
-    window.addEventListener('unhandledrejection', function(event) {
+
+    // Gestione errori globali AJAX
+    window.addEventListener('unhandledrejection', function (event) {
         console.error('Errore non gestito:', event.reason);
         notifications.error('Si è verificato un errore imprevisto.', 7000);
     });

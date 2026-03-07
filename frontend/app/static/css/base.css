@@ -1,14 +1,10 @@
 /* base.css - Stili di base e layout generale */
 
 body {
-    padding: 20px;
     background-color: #f8f9fa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
-}
-
-.container {
-    max-width: 1200px;
+    margin: 0;
+    padding: 0;
 }
 
 /* Colori globali */
