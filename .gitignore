@@ -15,6 +15,7 @@ __pycache__/
 .mypy_cache/   # Se usi mypy per il type checking
 
 # STS certificates (never commit real certs — eccezione: CA pubblica di test)
+certs/*.pem
 certs/*.crt
 certs/*.key
 # Solo i cert privati/produzione: escludere i CA cert pubblici del kit
