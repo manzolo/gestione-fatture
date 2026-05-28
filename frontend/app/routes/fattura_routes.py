@@ -32,6 +32,10 @@ def fatture():
         costs_response = requests.get(f"{BACKEND_URL}/api/costs")
         costs_response.raise_for_status()
         costs_data = costs_response.json()
+
+        recurring_costs_response = requests.get(f"{BACKEND_URL}/api/recurring-costs")
+        recurring_costs_response.raise_for_status()
+        recurring_costs = recurring_costs_response.json()
         
         # Raggruppa i costi per anno
         costs_grouped = defaultdict(list)
@@ -47,8 +51,16 @@ def fatture():
         clients = []
         invoices = []
         costs = {}
+        recurring_costs = []
 
-    return render_template('index.html', clients=clients, invoices=invoices, costs=costs, now=datetime.now())
+    return render_template(
+        'index.html',
+        clients=clients,
+        invoices=invoices,
+        costs=costs,
+        recurring_costs=recurring_costs,
+        now=datetime.now()
+    )
 
 # --- Proxy API per le fatture e le statistiche ---
 @fattura_bp.route('/api/invoices', methods=['POST'])

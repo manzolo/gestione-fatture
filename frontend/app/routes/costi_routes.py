@@ -70,6 +70,66 @@ def delete_costo_proxy(costo_id):
         flash(f"Errore durante l'eliminazione del costo: {e}", 'danger')
         return jsonify({'message': f"Errore: {e}"}), 500
 
+@costi_bp.route('/api/recurring-costs', methods=['GET'])
+def get_recurring_costs_proxy():
+    """Proxy per ottenere le regole dei costi ricorrenti."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/recurring-costs")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante il recupero dei costi ricorrenti: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
+
+@costi_bp.route('/api/recurring-costs', methods=['POST'])
+def add_recurring_cost_proxy():
+    """Proxy per la creazione di un costo ricorrente."""
+    data = request.get_json()
+    try:
+        response = requests.post(f"{BACKEND_URL}/api/recurring-costs", json=data)
+        response.raise_for_status()
+        flash("Costo ricorrente aggiunto con successo!", 'success')
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante l'aggiunta del costo ricorrente: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
+
+@costi_bp.route('/api/recurring-costs/<int:ricorrenza_id>', methods=['GET'])
+def get_recurring_cost_by_id_proxy(ricorrenza_id):
+    """Proxy per ottenere un singolo costo ricorrente."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/recurring-costs/{ricorrenza_id}")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante il recupero del costo ricorrente: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
+
+@costi_bp.route('/api/recurring-costs/<int:ricorrenza_id>', methods=['PUT'])
+def edit_recurring_cost_proxy(ricorrenza_id):
+    """Proxy per la modifica di un costo ricorrente."""
+    data = request.get_json()
+    try:
+        response = requests.put(f"{BACKEND_URL}/api/recurring-costs/{ricorrenza_id}", json=data)
+        response.raise_for_status()
+        flash("Costo ricorrente aggiornato con successo!", 'success')
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante la modifica del costo ricorrente: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
+
+@costi_bp.route('/api/recurring-costs/<int:ricorrenza_id>', methods=['DELETE'])
+def delete_recurring_cost_proxy(ricorrenza_id):
+    """Proxy per disattivare un costo ricorrente."""
+    try:
+        response = requests.delete(f"{BACKEND_URL}/api/recurring-costs/{ricorrenza_id}")
+        response.raise_for_status()
+        flash("Costo ricorrente disattivato con successo!", 'success')
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante la disattivazione del costo ricorrente: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
+
 @costi_bp.route('/api/costs/stats', methods=['GET'])
 def get_costs_stats_proxy():
     """Proxy per ottenere le statistiche dei costi."""

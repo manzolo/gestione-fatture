@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.21
--- Dumped by pg_dump version 13.21
+\restrict WgtVK9f5UkLhXanvxGvBmilMDYQPW1Vg1Rs6yV3CUHQE0LCZ2MRBizPHN1tJ8h4
+
+-- Dumped from database version 13.23
+-- Dumped by pg_dump version 13.23
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -21,7 +23,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: alembic_version; Type: TABLE; Schema: public; Owner: manzolo
+-- Name: alembic_version; Type: TABLE; Schema: public; Owner: user
 --
 
 CREATE TABLE public.alembic_version (
@@ -29,10 +31,10 @@ CREATE TABLE public.alembic_version (
 );
 
 
-ALTER TABLE public.alembic_version OWNER TO manzolo;
+ALTER TABLE public.alembic_version OWNER TO "user";
 
 --
--- Name: cliente; Type: TABLE; Schema: public; Owner: manzolo
+-- Name: cliente; Type: TABLE; Schema: public; Owner: user
 --
 
 CREATE TABLE public.cliente (
@@ -47,10 +49,10 @@ CREATE TABLE public.cliente (
 );
 
 
-ALTER TABLE public.cliente OWNER TO manzolo;
+ALTER TABLE public.cliente OWNER TO "user";
 
 --
--- Name: cliente_id_seq; Type: SEQUENCE; Schema: public; Owner: manzolo
+-- Name: cliente_id_seq; Type: SEQUENCE; Schema: public; Owner: user
 --
 
 CREATE SEQUENCE public.cliente_id_seq
@@ -62,17 +64,17 @@ CREATE SEQUENCE public.cliente_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.cliente_id_seq OWNER TO manzolo;
+ALTER TABLE public.cliente_id_seq OWNER TO "user";
 
 --
--- Name: cliente_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: manzolo
+-- Name: cliente_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
 --
 
 ALTER SEQUENCE public.cliente_id_seq OWNED BY public.cliente.id;
 
 
 --
--- Name: costo; Type: TABLE; Schema: public; Owner: manzolo
+-- Name: costo; Type: TABLE; Schema: public; Owner: user
 --
 
 CREATE TABLE public.costo (
@@ -81,14 +83,16 @@ CREATE TABLE public.costo (
     anno_riferimento integer NOT NULL,
     data_pagamento date NOT NULL,
     totale double precision NOT NULL,
-    pagato boolean
+    pagato boolean,
+    ricorrenza_id integer,
+    periodo_riferimento character varying(7)
 );
 
 
-ALTER TABLE public.costo OWNER TO manzolo;
+ALTER TABLE public.costo OWNER TO "user";
 
 --
--- Name: costo_id_seq; Type: SEQUENCE; Schema: public; Owner: manzolo
+-- Name: costo_id_seq; Type: SEQUENCE; Schema: public; Owner: user
 --
 
 CREATE SEQUENCE public.costo_id_seq
@@ -100,17 +104,58 @@ CREATE SEQUENCE public.costo_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.costo_id_seq OWNER TO manzolo;
+ALTER TABLE public.costo_id_seq OWNER TO "user";
 
 --
--- Name: costo_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: manzolo
+-- Name: costo_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
 --
 
 ALTER SEQUENCE public.costo_id_seq OWNED BY public.costo.id;
 
 
 --
--- Name: fattura; Type: TABLE; Schema: public; Owner: manzolo
+-- Name: costo_ricorrente; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.costo_ricorrente (
+    id integer NOT NULL,
+    descrizione character varying(255) NOT NULL,
+    totale double precision NOT NULL,
+    frequenza character varying(20) NOT NULL,
+    giorno_scadenza integer NOT NULL,
+    data_inizio date NOT NULL,
+    data_fine date,
+    pagato_default boolean,
+    attivo boolean
+);
+
+
+ALTER TABLE public.costo_ricorrente OWNER TO "user";
+
+--
+-- Name: costo_ricorrente_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.costo_ricorrente_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.costo_ricorrente_id_seq OWNER TO "user";
+
+--
+-- Name: costo_ricorrente_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.costo_ricorrente_id_seq OWNED BY public.costo_ricorrente.id;
+
+
+--
+-- Name: fattura; Type: TABLE; Schema: public; Owner: user
 --
 
 CREATE TABLE public.fattura (
@@ -122,7 +167,7 @@ CREATE TABLE public.fattura (
     bollo boolean,
     descrizione character varying(255) NOT NULL,
     totale double precision NOT NULL,
-    numero_sedute integer NOT NULL,
+    numero_sedute double precision NOT NULL,
     data_fattura date NOT NULL,
     data_pagamento date,
     metodo_pagamento character varying(50),
@@ -132,10 +177,10 @@ CREATE TABLE public.fattura (
 );
 
 
-ALTER TABLE public.fattura OWNER TO manzolo;
+ALTER TABLE public.fattura OWNER TO "user";
 
 --
--- Name: fattura_id_seq; Type: SEQUENCE; Schema: public; Owner: manzolo
+-- Name: fattura_id_seq; Type: SEQUENCE; Schema: public; Owner: user
 --
 
 CREATE SEQUENCE public.fattura_id_seq
@@ -147,17 +192,17 @@ CREATE SEQUENCE public.fattura_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.fattura_id_seq OWNER TO manzolo;
+ALTER TABLE public.fattura_id_seq OWNER TO "user";
 
 --
--- Name: fattura_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: manzolo
+-- Name: fattura_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
 --
 
 ALTER SEQUENCE public.fattura_id_seq OWNED BY public.fattura.id;
 
 
 --
--- Name: fattura_progressivo; Type: TABLE; Schema: public; Owner: manzolo
+-- Name: fattura_progressivo; Type: TABLE; Schema: public; Owner: user
 --
 
 CREATE TABLE public.fattura_progressivo (
@@ -166,10 +211,10 @@ CREATE TABLE public.fattura_progressivo (
 );
 
 
-ALTER TABLE public.fattura_progressivo OWNER TO manzolo;
+ALTER TABLE public.fattura_progressivo OWNER TO "user";
 
 --
--- Name: fattura_progressivo_anno_seq; Type: SEQUENCE; Schema: public; Owner: manzolo
+-- Name: fattura_progressivo_anno_seq; Type: SEQUENCE; Schema: public; Owner: user
 --
 
 CREATE SEQUENCE public.fattura_progressivo_anno_seq
@@ -181,114 +226,129 @@ CREATE SEQUENCE public.fattura_progressivo_anno_seq
     CACHE 1;
 
 
-ALTER TABLE public.fattura_progressivo_anno_seq OWNER TO manzolo;
+ALTER TABLE public.fattura_progressivo_anno_seq OWNER TO "user";
 
 --
--- Name: fattura_progressivo_anno_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: manzolo
+-- Name: fattura_progressivo_anno_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
 --
 
 ALTER SEQUENCE public.fattura_progressivo_anno_seq OWNED BY public.fattura_progressivo.anno;
 
 
 --
--- Name: cliente id; Type: DEFAULT; Schema: public; Owner: manzolo
+-- Name: cliente id; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.cliente ALTER COLUMN id SET DEFAULT nextval('public.cliente_id_seq'::regclass);
 
 
 --
--- Name: costo id; Type: DEFAULT; Schema: public; Owner: manzolo
+-- Name: costo id; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.costo ALTER COLUMN id SET DEFAULT nextval('public.costo_id_seq'::regclass);
 
 
 --
--- Name: fattura id; Type: DEFAULT; Schema: public; Owner: manzolo
+-- Name: costo_ricorrente id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.costo_ricorrente ALTER COLUMN id SET DEFAULT nextval('public.costo_ricorrente_id_seq'::regclass);
+
+
+--
+-- Name: fattura id; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.fattura ALTER COLUMN id SET DEFAULT nextval('public.fattura_id_seq'::regclass);
 
 
 --
--- Name: fattura_progressivo anno; Type: DEFAULT; Schema: public; Owner: manzolo
+-- Name: fattura_progressivo anno; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.fattura_progressivo ALTER COLUMN anno SET DEFAULT nextval('public.fattura_progressivo_anno_seq'::regclass);
 
 
 --
--- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: manzolo
+-- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: user
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
-a1b2c3d4e5f6
+b7c9d1e2f3a4
 \.
 
 
 --
--- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: manzolo
+-- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.cliente (id, nome, cognome, codice_fiscale, indirizzo, citta, cap) FROM stdin;
-1	Mario	Rossi	RSSMRA80A01H501Z	Via Roma, 1	Roma (RM)	00100
-2	Anna	Bianchi	BNCNNA85B42F205X	Via Milano, 10	Milano (MI)	20100
-3	Luca	Verdi	VRDLCU90C15D612Y	Via Firenze, 5	Firenze (FI)	50100
-4	Sara	Neri	NRESRA92D45H501W	Via Napoli, 20	Napoli (NA)	80100
-5	Elena	Ferri	FRRLNE88E60G702V	Via Torino, 8	Torino (TO)	10100
-6	Marco	Galli	GLLMRC95A17B354U	Via Bologna, 15	Bologna (BO)	40100
-7	Rita	Conti	CNTRTA75F44D969T	Via Genova, 3	Genova (GE)	16100
-8	Laura	Mori	MROLRA82G67L219S	Via Venezia, 12	Venezia (VE)	30100
-9	Giulia	Serra	SRRGLI86H62A944R	Via Palermo, 7	Palermo (PA)	90100
-10	Paolo	Longo	LNGPLA83L25C351Q	Via Bari, 22	Bari (BA)	70100
-11	Franco	Costa	CSTFNC70M05E625P	Via Cagliari, 9	Cagliari (CA)	09100
+COPY public.cliente (id, nome, cognome, codice_fiscale, indirizzo, citta, cap, flag_opposizione) FROM stdin;
+1	Lapo	Schmid	SCHLPA14L24B036G	Via Campomigliaio, 20	Scarperia e San Piero (FI)	50038	f
+2	Stefania	Galeotti	GLTSFN89R42B036T	Via Pietro Nenni, 19	Borgo San Lorenzo (FI)	50032	f
+3	Isabel Maya	Lasagni	LSGSLM12C45B036L	Via Casanuova, 107	Firenzuola (FI)	50033	f
+4	Daniela	Paladini	PLDDNL94M45B036F	Via Molezzano, 61	Vicchio (FI)	50039	f
+5	Giorgia	D’Orilia	DRLGRG03A60B036C	Via Alessandro Pieri Stella, 66/A	Ronta - Borgo San Lorenzo (FI)	50032	f
+6	Paolo	Borselli	BRSPLA97A17B036L	Via Faentina, 144	Ronta - Borgo San Lorenzo (FI)	50032	f
+7	Rita	Piccini	PCCRTI54E44I085O	Via Rabatta, 27	Borgo San Lorenzo (FI)	50032	f
+8	Laura	Paladini	PLDLRA77E67B036M	Via dell’Azzurro, 5	Scarperia e San Piero (FI)	50038	f
+9	Adele	Salimbeni	SLMDLA82S62D612M	Via Solferino, 4	Scarperia e San Piero (FI)	50038	f
+11	Raimondo 	Della Rocca	DLLRND48M05E971M	Via Piave, 41/26	Borgo San Lorenzo (FI)	50032	f
+10	Dario	Bulletti	BLLDRA83L25D575Z	Via Stefaneschi, 39A	Ronta - Borgo San Lorenzo (FI)	50032	f
 \.
 
 
 --
--- Data for Name: costo; Type: TABLE DATA; Schema: public; Owner: manzolo
+-- Data for Name: costo; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.costo (id, descrizione, anno_riferimento, data_pagamento, totale, pagato) FROM stdin;
+COPY public.costo (id, descrizione, anno_riferimento, data_pagamento, totale, pagato, ricorrenza_id, periodo_riferimento) FROM stdin;
 \.
 
 
 --
--- Data for Name: fattura; Type: TABLE DATA; Schema: public; Owner: manzolo
+-- Data for Name: costo_ricorrente; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.fattura (id, anno, progressivo, cliente_id, importo_prestazione, bollo, descrizione, totale, numero_sedute, data_fattura, data_pagamento, metodo_pagamento, inviata_sts) FROM stdin;
-1	2025	3	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-01	2025-04-01	Carta di credito/debito	t
-3	2025	1	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-03-07	2025-03-07	Carta di credito/debito	t
-2	2025	4	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-29	2025-04-29	Carta di credito/debito	t
-5	2025	5	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-06-12	2025-06-12	Carta di credito/debito	t
-6	2025	6	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-16	2025-07-16	Carta di credito/debito	t
-7	2025	7	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-18	2025-07-18	Carta di credito/debito	t
-8	2025	8	4	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-07-18	2025-07-18	Carta di credito/debito	t
-9	2025	9	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-21	2025-08-21	Carta di credito/debito	t
-10	2025	10	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-22	2025-07-22	Carta di credito/debito	t
-11	2025	11	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t
-12	2025	12	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t
-13	2025	13	8	58.82	t	n. 5 di Sedute di consulenza psicologica	302	5	2025-07-24	2025-07-24	Carta di credito/debito	t
-14	2025	14	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-25	2025-07-25	Carta di credito/debito	t
-15	2025	15	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t
-16	2025	16	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t
-17	2025	17	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-31	2025-07-31	Carta di credito/debito	t
-18	2025	18	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-01	2025-08-01	Carta di credito/debito	t
-19	2025	19	9	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t
-20	2025	20	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t
-21	2025	21	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t
-22	2025	22	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t
-23	2025	23	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t
-4	2025	2	11	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-03-21	2025-03-21	Carta di credito/debito	t
-24	2025	24	10	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-08-11	2025-08-11	Carta di credito/debito	t
-25	2025	25	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-11	2025-08-11	Carta di credito/debito	t
+COPY public.costo_ricorrente (id, descrizione, totale, frequenza, giorno_scadenza, data_inizio, data_fine, pagato_default, attivo) FROM stdin;
 \.
 
 
 --
--- Data for Name: fattura_progressivo; Type: TABLE DATA; Schema: public; Owner: manzolo
+-- Data for Name: fattura; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.fattura (id, anno, progressivo, cliente_id, importo_prestazione, bollo, descrizione, totale, numero_sedute, data_fattura, data_pagamento, metodo_pagamento, inviata_sts, protocollo_sts, data_invio_sts) FROM stdin;
+1	2025	3	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-01	2025-04-01	Carta di credito/debito	t	\N	\N
+3	2025	1	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-03-07	2025-03-07	Carta di credito/debito	t	\N	\N
+2	2025	4	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-29	2025-04-29	Carta di credito/debito	t	\N	\N
+5	2025	5	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-06-12	2025-06-12	Carta di credito/debito	t	\N	\N
+6	2025	6	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-16	2025-07-16	Carta di credito/debito	t	\N	\N
+7	2025	7	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-18	2025-07-18	Carta di credito/debito	t	\N	\N
+8	2025	8	4	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-07-18	2025-07-18	Carta di credito/debito	t	\N	\N
+9	2025	9	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-21	2025-08-21	Carta di credito/debito	t	\N	\N
+10	2025	10	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-22	2025-07-22	Carta di credito/debito	t	\N	\N
+11	2025	11	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N
+12	2025	12	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N
+13	2025	13	8	58.82	t	n. 5 di Sedute di consulenza psicologica	302	5	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N
+14	2025	14	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-25	2025-07-25	Carta di credito/debito	t	\N	\N
+15	2025	15	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t	\N	\N
+16	2025	16	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t	\N	\N
+17	2025	17	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-31	2025-07-31	Carta di credito/debito	t	\N	\N
+18	2025	18	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-01	2025-08-01	Carta di credito/debito	t	\N	\N
+19	2025	19	9	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N
+20	2025	20	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N
+21	2025	21	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N
+22	2025	22	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t	\N	\N
+23	2025	23	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t	\N	\N
+4	2025	2	11	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-03-21	2025-03-21	Carta di credito/debito	t	\N	\N
+24	2025	24	10	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-08-11	2025-08-11	Carta di credito/debito	t	\N	\N
+25	2025	25	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-11	2025-08-11	Carta di credito/debito	t	\N	\N
+\.
+
+
+--
+-- Data for Name: fattura_progressivo; Type: TABLE DATA; Schema: public; Owner: user
 --
 
 COPY public.fattura_progressivo (anno, last_progressivo) FROM stdin;
@@ -297,35 +357,42 @@ COPY public.fattura_progressivo (anno, last_progressivo) FROM stdin;
 
 
 --
--- Name: cliente_id_seq; Type: SEQUENCE SET; Schema: public; Owner: manzolo
+-- Name: cliente_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.cliente_id_seq', 11, true);
 
 
 --
--- Name: costo_id_seq; Type: SEQUENCE SET; Schema: public; Owner: manzolo
+-- Name: costo_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.costo_id_seq', 1, false);
 
 
 --
--- Name: fattura_id_seq; Type: SEQUENCE SET; Schema: public; Owner: manzolo
+-- Name: costo_ricorrente_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.costo_ricorrente_id_seq', 1, false);
+
+
+--
+-- Name: fattura_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.fattura_id_seq', 25, true);
 
 
 --
--- Name: fattura_progressivo_anno_seq; Type: SEQUENCE SET; Schema: public; Owner: manzolo
+-- Name: fattura_progressivo_anno_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.fattura_progressivo_anno_seq', 1, false);
 
 
 --
--- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: manzolo
+-- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.alembic_version
@@ -333,7 +400,7 @@ ALTER TABLE ONLY public.alembic_version
 
 
 --
--- Name: cliente cliente_codice_fiscale_key; Type: CONSTRAINT; Schema: public; Owner: manzolo
+-- Name: cliente cliente_codice_fiscale_key; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.cliente
@@ -341,7 +408,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- Name: cliente cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: manzolo
+-- Name: cliente cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.cliente
@@ -349,7 +416,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- Name: costo costo_pkey; Type: CONSTRAINT; Schema: public; Owner: manzolo
+-- Name: costo costo_pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.costo
@@ -357,7 +424,15 @@ ALTER TABLE ONLY public.costo
 
 
 --
--- Name: fattura fattura_pkey; Type: CONSTRAINT; Schema: public; Owner: manzolo
+-- Name: costo_ricorrente costo_ricorrente_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.costo_ricorrente
+    ADD CONSTRAINT costo_ricorrente_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fattura fattura_pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.fattura
@@ -365,7 +440,7 @@ ALTER TABLE ONLY public.fattura
 
 
 --
--- Name: fattura_progressivo fattura_progressivo_pkey; Type: CONSTRAINT; Schema: public; Owner: manzolo
+-- Name: fattura_progressivo fattura_progressivo_pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.fattura_progressivo
@@ -373,7 +448,15 @@ ALTER TABLE ONLY public.fattura_progressivo
 
 
 --
--- Name: fattura fattura_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: manzolo
+-- Name: costo uq_costo_ricorrenza_periodo; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.costo
+    ADD CONSTRAINT uq_costo_ricorrenza_periodo UNIQUE (ricorrenza_id, periodo_riferimento);
+
+
+--
+-- Name: fattura fattura_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.fattura
@@ -381,5 +464,16 @@ ALTER TABLE ONLY public.fattura
 
 
 --
+-- Name: costo fk_costo_ricorrenza_id_costo_ricorrente; Type: FK CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.costo
+    ADD CONSTRAINT fk_costo_ricorrenza_id_costo_ricorrente FOREIGN KEY (ricorrenza_id) REFERENCES public.costo_ricorrente(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
+
+\unrestrict WgtVK9f5UkLhXanvxGvBmilMDYQPW1Vg1Rs6yV3CUHQE0LCZ2MRBizPHN1tJ8h4
+

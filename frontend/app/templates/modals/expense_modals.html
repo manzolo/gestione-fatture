@@ -12,7 +12,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="anno_costo" class="form-label">Anno di riferimento</label>
-                    <input type="number" class="form-control" id="anno_costo" name="anno_riferimento" value="2024"
+                    <input type="number" class="form-control" id="anno_costo" name="anno_riferimento" value="{{ now.year }}"
                         min="2020" max="2030" required>
                 </div>
                 <div class="mb-3">
@@ -26,6 +26,38 @@
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" id="pagato_costo" name="pagato">
                     <label class="form-check-label" for="pagato_costo">Costo Pagato</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="ricorrente_costo" name="ricorrente">
+                    <label class="form-check-label" for="ricorrente_costo">Costo ricorrente</label>
+                </div>
+                <div id="recurringCostFields" class="d-none">
+                    <div class="mb-3">
+                        <label for="frequenza_costo" class="form-label">Frequenza</label>
+                        <select class="form-select" id="frequenza_costo" name="frequenza">
+                            <option value="mensile">Mensile</option>
+                            <option value="trimestrale">Trimestrale</option>
+                            <option value="annuale">Annuale</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="giorno_scadenza_costo" class="form-label">Giorno di scadenza</label>
+                        <input type="number" class="form-control" id="giorno_scadenza_costo" name="giorno_scadenza"
+                            min="1" max="31" value="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="data_inizio_ricorrenza_costo" class="form-label">Data inizio ricorrenza</label>
+                        <input type="date" class="form-control" id="data_inizio_ricorrenza_costo" name="data_inizio">
+                    </div>
+                    <div class="mb-3">
+                        <label for="data_fine_ricorrenza_costo" class="form-label">Data fine ricorrenza</label>
+                        <input type="date" class="form-control" id="data_fine_ricorrenza_costo" name="data_fine">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="pagato_default_costo"
+                            name="pagato_default">
+                        <label class="form-check-label" for="pagato_default_costo">Crea le occorrenze come pagate</label>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -65,6 +97,68 @@
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" id="edit-pagato-costo" name="pagato">
                     <label class="form-check-label" for="edit-pagato-costo">Costo Pagato</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal per la Modifica di un Costo Ricorrente -->
+<div class="modal fade" id="editRecurringExpenseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editRecurringExpenseForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifica Costo Ricorrente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-recurring-cost-id" name="id">
+                <div class="mb-3">
+                    <label for="edit-recurring-descrizione-costo" class="form-label">Descrizione</label>
+                    <input type="text" class="form-control" id="edit-recurring-descrizione-costo"
+                        name="descrizione" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-recurring-totale-costo" class="form-label">Totale</label>
+                    <input type="number" step="0.01" class="form-control" id="edit-recurring-totale-costo"
+                        name="totale" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-recurring-frequenza-costo" class="form-label">Frequenza</label>
+                    <select class="form-select" id="edit-recurring-frequenza-costo" name="frequenza">
+                        <option value="mensile">Mensile</option>
+                        <option value="trimestrale">Trimestrale</option>
+                        <option value="annuale">Annuale</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-recurring-giorno-scadenza-costo" class="form-label">Giorno di scadenza</label>
+                    <input type="number" class="form-control" id="edit-recurring-giorno-scadenza-costo"
+                        name="giorno_scadenza" min="1" max="31" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-recurring-data-inizio-costo" class="form-label">Data inizio ricorrenza</label>
+                    <input type="date" class="form-control" id="edit-recurring-data-inizio-costo"
+                        name="data_inizio" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-recurring-data-fine-costo" class="form-label">Data fine ricorrenza</label>
+                    <input type="date" class="form-control" id="edit-recurring-data-fine-costo" name="data_fine">
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="edit-recurring-pagato-default-costo"
+                        name="pagato_default">
+                    <label class="form-check-label" for="edit-recurring-pagato-default-costo">
+                        Crea le occorrenze come pagate
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="edit-recurring-attivo-costo" name="attivo">
+                    <label class="form-check-label" for="edit-recurring-attivo-costo">Costo ricorrente attivo</label>
                 </div>
             </div>
             <div class="modal-footer">

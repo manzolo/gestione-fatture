@@ -50,3 +50,24 @@ class Costo(db.Model):
     data_pagamento = db.Column(db.Date, nullable=False, default=datetime.now)
     totale = db.Column(db.Float, nullable=False)
     pagato = db.Column(db.Boolean, default=False)
+    ricorrenza_id = db.Column(db.Integer, db.ForeignKey('costo_ricorrente.id'), nullable=True)
+    periodo_riferimento = db.Column(db.String(7), nullable=True)
+
+    ricorrenza = db.relationship('CostoRicorrente', backref=db.backref('costi_generati', lazy=True))
+
+    __table_args__ = (
+        db.UniqueConstraint('ricorrenza_id', 'periodo_riferimento', name='uq_costo_ricorrenza_periodo'),
+    )
+
+class CostoRicorrente(db.Model):
+    __tablename__ = 'costo_ricorrente'
+
+    id = db.Column(db.Integer, primary_key=True)
+    descrizione = db.Column(db.String(255), nullable=False)
+    totale = db.Column(db.Float, nullable=False)
+    frequenza = db.Column(db.String(20), nullable=False, default='mensile')
+    giorno_scadenza = db.Column(db.Integer, nullable=False, default=1)
+    data_inizio = db.Column(db.Date, nullable=False)
+    data_fine = db.Column(db.Date, nullable=True)
+    pagato_default = db.Column(db.Boolean, default=False)
+    attivo = db.Column(db.Boolean, default=True)
