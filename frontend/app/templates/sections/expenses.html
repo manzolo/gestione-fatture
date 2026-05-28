@@ -14,60 +14,73 @@
     </div>
 
     {% if recurring_costs %}
-    <div class="mb-4">
-        <h5 class="mb-3">Costi ricorrenti</h5>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover table-bordered mb-0">
-                <thead>
-                    <tr>
-                        <th>Descrizione</th>
-                        <th>Frequenza</th>
-                        <th>Scadenza</th>
-                        <th>Totale</th>
-                        <th>Default</th>
-                        <th>Stato</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for recurring_cost in recurring_costs %}
-                    <tr>
-                        <td>{{ recurring_cost.descrizione }}</td>
-                        <td>{{ recurring_cost.frequenza | capitalize }}</td>
-                        <td>Giorno {{ recurring_cost.giorno_scadenza }}</td>
-                        <td class="cost-value">€{{ recurring_cost.totale }}</td>
-                        <td>
-                            {% if recurring_cost.pagato_default %}
-                            <span class="badge bg-success">Pagato</span>
-                            {% else %}
-                            <span class="badge bg-danger">Non Pagato</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if recurring_cost.attivo %}
-                            <span class="badge bg-success">Attivo</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Disattivato</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-warning btn-action edit-recurring-cost-btn"
-                                    data-id="{{ recurring_cost.id }}" title="Modifica">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                {% if recurring_cost.attivo %}
-                                <button class="btn btn-danger btn-action delete-recurring-cost-btn"
-                                    data-id="{{ recurring_cost.id }}" title="Disattiva">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                                {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="accordion mb-4" id="recurringCostsAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-recurring-costs">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse-recurring-costs" aria-expanded="false"
+                    aria-controls="collapse-recurring-costs">
+                    Costi ricorrenti ({{ recurring_costs | length }})
+                </button>
+            </h2>
+            <div id="collapse-recurring-costs" class="accordion-collapse collapse"
+                aria-labelledby="heading-recurring-costs" data-bs-parent="#recurringCostsAccordion">
+                <div class="accordion-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Descrizione</th>
+                                    <th>Frequenza</th>
+                                    <th>Scadenza</th>
+                                    <th>Totale</th>
+                                    <th>Default</th>
+                                    <th>Stato</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for recurring_cost in recurring_costs %}
+                                <tr>
+                                    <td>{{ recurring_cost.descrizione }}</td>
+                                    <td>{{ recurring_cost.frequenza | capitalize }}</td>
+                                    <td>Giorno {{ recurring_cost.giorno_scadenza }}</td>
+                                    <td class="cost-value">€{{ recurring_cost.totale }}</td>
+                                    <td>
+                                        {% if recurring_cost.pagato_default %}
+                                        <span class="badge bg-success">Pagato</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Non Pagato</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if recurring_cost.attivo %}
+                                        <span class="badge bg-success">Attivo</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Disattivato</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-warning btn-action edit-recurring-cost-btn"
+                                                data-id="{{ recurring_cost.id }}" title="Modifica">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            {% if recurring_cost.attivo %}
+                                            <button class="btn btn-danger btn-action delete-recurring-cost-btn"
+                                                data-id="{{ recurring_cost.id }}" title="Disattiva">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     {% endif %}

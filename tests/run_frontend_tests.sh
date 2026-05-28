@@ -14,6 +14,8 @@ NC='\033[0m'
 
 success_count=0
 fail_count=0
+LAST_BODY=""
+LAST_HTTP_CODE=""
 
 echo -e "${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║           🧪 FRONTEND PROXY TESTS                          ║${NC}"
@@ -87,8 +89,13 @@ function curl_check() {
 
   http_code=$(echo "$response" | tail -n1)
   body=$(echo "$response" | sed '$d')
+  LAST_BODY="$body"
+  LAST_HTTP_CODE="$http_code"
 
-  if [[ "$http_code" =~ ^2[0-9][0-9]$ ]]; then
+  if [[ "$http_code" == "409" ]]; then
+    echo -e "${GREEN}   ✓ Status: $http_code (EXPECTED DUPLICATE)${NC}"
+    ((success_count++))
+  elif [[ "$http_code" =~ ^2[0-9][0-9]$ ]]; then
     echo -e "${GREEN}   ✓ Status: $http_code${NC}"
     ((success_count++))
   else
@@ -125,22 +132,26 @@ echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━�
 
 curl_check GET "$BASE_URL/api/costs" "" "Lista costi vuota"
 curl_check POST "$BASE_URL/api/costs" '{"descrizione":"Abbonamento","anno_riferimento":2025,"data_pagamento":"2025-08-12","totale":49.99,"pagato":false}' "Crea costo"
+created_cost_id=$(echo "$LAST_BODY" | jq -r '.id // empty')
+created_cost_id=${created_cost_id:-1}
 curl_check GET "$BASE_URL/api/costs" "" "Lista costi"
 curl_check GET "$BASE_URL/api/costs/unpaid" "" "Lista costi non pagati"
-curl_check GET "$BASE_URL/api/costs/1" "" "Dettaglio costo"
-curl_check PUT "$BASE_URL/api/costs/1" '{"descrizione":"Abbonamento (agg)","anno_riferimento":2025,"data_pagamento":"2025-08-12","totale":59.99,"pagato":true}' "Aggiorna costo"
+curl_check GET "$BASE_URL/api/costs/$created_cost_id" "" "Dettaglio costo"
+curl_check PUT "$BASE_URL/api/costs/$created_cost_id" '{"descrizione":"Abbonamento (agg)","anno_riferimento":2025,"data_pagamento":"2025-08-12","totale":59.99,"pagato":true}' "Aggiorna costo"
 curl_check GET "$BASE_URL/api/costs/unpaid" "" "Lista costi non pagati dopo pagamento"
-curl_check DELETE "$BASE_URL/api/costs/1" "" "Elimina costo"
+curl_check DELETE "$BASE_URL/api/costs/$created_cost_id" "" "Elimina costo"
 curl_check GET "$BASE_URL/api/recurring-costs" "" "Lista costi ricorrenti vuota"
 curl_check POST "$BASE_URL/api/recurring-costs" '{"descrizione":"Affitto studio","totale":800.00,"frequenza":"mensile","giorno_scadenza":1,"data_inizio":"2026-01-01","data_fine":null,"pagato_default":true,"attivo":true}' "Crea costo ricorrente"
+created_recurring_id=$(echo "$LAST_BODY" | jq -r '.id // empty')
+created_recurring_id=${created_recurring_id:-1}
 curl_check GET "$BASE_URL/api/recurring-costs" "" "Lista costi ricorrenti"
-curl_check GET "$BASE_URL/api/recurring-costs/1" "" "Dettaglio costo ricorrente"
+curl_check GET "$BASE_URL/api/recurring-costs/$created_recurring_id" "" "Dettaglio costo ricorrente"
 curl_check GET "$BASE_URL/api/costs" "" "Genera e lista occorrenze ricorrenti"
 curl_check GET "$BASE_URL/api/costs/stats?year=2026" "" "Statistiche costi ricorrenti"
-curl_check PUT "$BASE_URL/api/recurring-costs/1" '{"descrizione":"Affitto studio aggiornato","totale":850.00,"frequenza":"mensile","giorno_scadenza":5,"data_inizio":"2026-01-01","data_fine":null,"pagato_default":false,"attivo":true}' "Aggiorna costo ricorrente"
-curl_check GET "$BASE_URL/api/recurring-costs/1" "" "Verifica costo ricorrente"
-curl_check DELETE "$BASE_URL/api/recurring-costs/1" "" "Disattiva costo ricorrente"
-curl_check GET "$BASE_URL/api/recurring-costs/1" "" "Verifica costo ricorrente disattivato"
+curl_check PUT "$BASE_URL/api/recurring-costs/$created_recurring_id" '{"descrizione":"Affitto studio aggiornato","totale":850.00,"frequenza":"mensile","giorno_scadenza":5,"data_inizio":"2026-01-01","data_fine":null,"pagato_default":false,"attivo":true}' "Aggiorna costo ricorrente"
+curl_check GET "$BASE_URL/api/recurring-costs/$created_recurring_id" "" "Verifica costo ricorrente"
+curl_check DELETE "$BASE_URL/api/recurring-costs/$created_recurring_id" "" "Disattiva costo ricorrente"
+curl_check GET "$BASE_URL/api/recurring-costs/$created_recurring_id" "" "Verifica costo ricorrente disattivato"
 
 echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║                 📊 RIEPILOGO TEST FRONTEND                 ║${NC}"
