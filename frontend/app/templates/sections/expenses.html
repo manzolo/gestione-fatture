@@ -101,7 +101,7 @@
                             </thead>
                             <tbody>
                                 {% for costo in costi_anno %}
-                                <tr>
+                                <tr data-cost-id="{{ costo.id }}">
                                     <td>{{ costo.descrizione }}</td>
                                     <td>{{ costo.anno_riferimento }}</td>
                                     <td>{{ costo.data_pagamento | to_italian_date }}</td>

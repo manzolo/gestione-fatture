@@ -45,6 +45,17 @@ def get_costo_by_id_proxy(costo_id):
         flash(f"Errore durante il recupero del costo: {e}", 'danger')
         return jsonify({'message': f"Errore: {e}"}), 500
 
+@costi_bp.route('/api/costs/unpaid', methods=['GET'])
+def get_unpaid_costs_proxy():
+    """Proxy per ottenere i costi non pagati."""
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/costs/unpaid")
+        response.raise_for_status()
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante il recupero dei costi non pagati: {e}", 'danger')
+        return jsonify({'message': f"Errore: {e}"}), 500
+
 @costi_bp.route('/api/costs/<int:costo_id>', methods=['PUT'])
 def edit_costo_proxy(costo_id):
     """Proxy per la modifica di un costo."""

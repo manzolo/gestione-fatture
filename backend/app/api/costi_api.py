@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app.models import db, Costo, CostoRicorrente
 from datetime import date, datetime
 from sqlalchemy import extract, func
+from sqlalchemy.exc import IntegrityError
 import calendar
 
 # Crea un Blueprint per le rotte API dei costi
@@ -114,27 +115,47 @@ def generate_recurring_costs(until_date=None, commit=True):
         step_months = FREQUENZE_RICORRENZA[ricorrenza.frequenza]
         current = date(ricorrenza.data_inizio.year, ricorrenza.data_inizio.month, 1)
         end_date = min(ricorrenza.data_fine or until_date, until_date)
+        periods_to_generate = []
 
         while current <= end_date:
             due_date = due_date_for_period(current.year, current.month, ricorrenza.giorno_scadenza)
             if due_date >= ricorrenza.data_inizio and due_date <= end_date:
                 periodo = f"{current.year:04d}-{current.month:02d}"
-                exists = Costo.query.filter_by(
-                    ricorrenza_id=ricorrenza.id,
-                    periodo_riferimento=periodo
-                ).first()
-                if not exists:
+                periods_to_generate.append((periodo, due_date, current.year))
+            current = add_months(current, step_months)
+
+        if not periods_to_generate:
+            continue
+
+        existing_periods = {
+            row[0] for row in db.session.query(Costo.periodo_riferimento)
+            .filter(
+                Costo.ricorrenza_id == ricorrenza.id,
+                Costo.periodo_riferimento.in_([period for period, _, _ in periods_to_generate])
+            )
+            .all()
+        }
+
+        for periodo, due_date, anno_riferimento in periods_to_generate:
+            if periodo in existing_periods:
+                continue
+            try:
+                with db.session.begin_nested():
                     db.session.add(Costo(
                         descrizione=f"{ricorrenza.descrizione} - {periodo}",
-                        anno_riferimento=current.year,
+                        anno_riferimento=anno_riferimento,
                         data_pagamento=due_date,
                         totale=ricorrenza.totale,
                         pagato=ricorrenza.pagato_default,
                         ricorrenza_id=ricorrenza.id,
                         periodo_riferimento=periodo
                     ))
-                    created += 1
-            current = add_months(current, step_months)
+                    db.session.flush()
+                created += 1
+                existing_periods.add(periodo)
+            except IntegrityError:
+                # Un altro worker ha generato lo stesso periodo tra lookup e insert.
+                existing_periods.add(periodo)
 
     if created and commit:
         db.session.commit()
@@ -164,9 +185,10 @@ def add_costo():
 def get_costs():
     """Endpoint per ottenere tutti i costi."""
     try:
-        generate_recurring_costs()
+        generate_recurring_costs(commit=False)
         costs = Costo.query.order_by(Costo.data_pagamento.desc()).all()
         costs_data = [serialize_cost(c) for c in costs]
+        db.session.commit()
         return jsonify(costs_data), 200
     except Exception as e:
         db.session.rollback()
@@ -177,7 +199,7 @@ def get_costs():
 def get_costs_stats():
     """Endpoint per ottenere le statistiche dei costi."""
     try:
-        generate_recurring_costs()
+        generate_recurring_costs(commit=False)
         year = request.args.get('year', type=int)
         query = Costo.query
 
@@ -198,14 +220,16 @@ def get_costs_stats():
                 .order_by(mese_expr)
                 .all()
             )
-            return jsonify({
+            data = {
                 "anno_selezionato": year,
                 "totale_annuo": float(totale_annuo),
                 "per_mese": [
                     {"mese": int(row.mese), "totale": float(row.totale)}
                     for row in per_mese_rows
                 ]
-            }), 200
+            }
+            db.session.commit()
+            return jsonify(data), 200
 
         per_anno_rows = (
             db.session.query(
@@ -216,17 +240,38 @@ def get_costs_stats():
             .order_by(Costo.anno_riferimento)
             .all()
         )
-        return jsonify({
+        data = {
             "anno_selezionato": None,
             "totale_annuo": float(totale_annuo),
             "per_anno": [
                 {"anno": int(row.anno), "totale": float(row.totale)}
                 for row in per_anno_rows
             ]
-        }), 200
+        }
+        db.session.commit()
+        return jsonify(data), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Errore durante il recupero delle statistiche dei costi: {str(e)}"}), 500
+
+
+@costi_bp.route('/costs/unpaid', methods=['GET'])
+def get_unpaid_costs():
+    """Endpoint per ottenere i costi non pagati."""
+    try:
+        generate_recurring_costs(commit=False)
+        costs = (
+            Costo.query
+            .filter(Costo.pagato == False)
+            .order_by(Costo.data_pagamento.asc())
+            .all()
+        )
+        costs_data = [serialize_cost(c) for c in costs]
+        db.session.commit()
+        return jsonify(costs_data), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Errore durante il recupero dei costi non pagati: {str(e)}"}), 500
 
 @costi_bp.route('/costs/<int:costo_id>', methods=['GET'])
 def get_single_cost(costo_id):

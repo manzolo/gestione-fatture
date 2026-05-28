@@ -291,6 +291,11 @@
     color: #007bff;
 }
 
+.notif-icon.cost {
+    background: rgba(220, 53, 69, 0.12);
+    color: #dc3545;
+}
+
 .notif-text {
     flex: 1;
     min-width: 0;
