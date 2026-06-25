@@ -3,8 +3,9 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # Installa netcat, postgresql-client, build-essential, LibreOffice headless e Java
+# tzdata serve perché la variabile TZ (es. Europe/Rome) sia effettiva
 RUN apt-get update && \
-    apt-get install -y curl netcat-traditional postgresql-client build-essential && \
+    apt-get install -y curl netcat-traditional postgresql-client build-essential tzdata && \
     rm -rf /var/lib/apt/lists/*
 
 # Copia requirements e installa le dipendenze Python
