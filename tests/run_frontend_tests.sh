@@ -54,7 +54,7 @@ function curl_check() {
   fi
   echo -e "${YELLOW}   [$method] $url${NC}"
 
-  if [[ "$url" == *"/download_invoice_zip/"* ]]; then
+  if [[ "$url" == *"/download_invoice_zip/"* || "$url" == *"/download_giustificativo/"* ]]; then
     local tmpfile=$(mktemp /tmp/zip_XXXXXX.zip)
     local http_code=$(curl -s -w "%{http_code}" -o "$tmpfile" "$url" 2>&1 | tail -n1)
     
@@ -112,10 +112,11 @@ echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━�
 echo -e "${CYAN}  SEZIONE: Gestione Clienti (Proxy)${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-curl_check POST "$BASE_URL/api/clients" '{"nome":"Test","cognome":"User","codice_fiscale":"TSTUSR80A01H501X"}' "Crea cliente Test"
+curl_check POST "$BASE_URL/api/clients" '{"nome":"Test","cognome":"User","codice_fiscale":"TSTUSR80A01H501X","luogo_nascita":"Scarperia"}' "Crea cliente Test"
 curl_check GET "$BASE_URL/api/clients/1" "" "Dettaglio cliente 1"
 #curl_check PUT "$BASE_URL/api/clients/1" '{"nome":"Test","cognome":"Updated","codice_fiscale":"TSTUSR80A01H501X","indirizzo":"Via Test 42"}' "Aggiorna cliente"
 curl_check PUT "$BASE_URL/api/clients/1" '{"nome":"Test","cognome":"Updated","indirizzo":"Via Test 42"}' "Aggiorna cliente (nome e indirizzo)"
+curl_check GET "$BASE_URL/download_giustificativo/1" "" "Download giustificativo cliente"
 
 echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}  SEZIONE: Gestione Fatture (Proxy)${NC}"

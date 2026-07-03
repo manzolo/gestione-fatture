@@ -1,8 +1,50 @@
+from datetime import date
+
 # --- Voci e parametri predefiniti ---
 PRESTAZIONE_BASE = 58.82
 CONTRIBUTO_PERCENTUALE = 0.02  # 2% - contributo calcolato sul prezzo base
 BOLLO_COSTO = 2.00
 BOLLO_SOGLIA = 77.47
+
+# Omocodia: lettere sostitutive delle cifre nelle posizioni numeriche del CF
+_CF_OMOCODIA = {'L': '0', 'M': '1', 'N': '2', 'P': '3', 'Q': '4',
+                'R': '5', 'S': '6', 'T': '7', 'U': '8', 'V': '9'}
+_CF_MESI = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'H': 6,
+            'L': 7, 'M': 8, 'P': 9, 'R': 10, 'S': 11, 'T': 12}
+
+
+def _cf_digit(char: str) -> int:
+    if char.isdigit():
+        return int(char)
+    return int(_CF_OMOCODIA[char.upper()])
+
+
+def decode_codice_fiscale(codice_fiscale: str):
+    """
+    Decodifica sesso e data di nascita da un codice fiscale italiano.
+    Gestisce anche i codici con omocodia. Il luogo di nascita non viene
+    decodificato (richiederebbe la tabella dei codici catastali).
+
+    Ritorna {'sesso': 'M'|'F', 'data_nascita': date} oppure None se il
+    codice non è decodificabile.
+    """
+    try:
+        cf = (codice_fiscale or '').strip().upper()
+        if len(cf) != 16:
+            return None
+        anno = _cf_digit(cf[6]) * 10 + _cf_digit(cf[7])
+        mese = _CF_MESI[cf[8]]
+        giorno = _cf_digit(cf[9]) * 10 + _cf_digit(cf[10])
+        sesso = 'F' if giorno > 40 else 'M'
+        if giorno > 40:
+            giorno -= 40
+        # Secolo: se l'anno a due cifre supera quello corrente si assume il 1900
+        anno_corrente = date.today().year % 100
+        anno += 2000 if anno <= anno_corrente else 1900
+        return {'sesso': sesso, 'data_nascita': date(anno, mese, giorno)}
+    except (KeyError, ValueError):
+        return None
+
 
 def format_numero_sedute(numero: float) -> str:
     """

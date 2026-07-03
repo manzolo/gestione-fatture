@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, request, jsonify, flash
+from flask import Blueprint, render_template, request, jsonify, flash, send_file, redirect
+from io import BytesIO
 import requests
 import os
+import re
 
 # Crea un Blueprint per le rotte dei clienti
 cliente_bp = Blueprint('cliente_bp', __name__)
@@ -122,6 +124,35 @@ def edit_client_proxy(client_id):
         error_msg = f"Errore durante l'aggiornamento: {str(e)}"
         flash(error_msg, 'danger')
         return jsonify({'message': error_msg}), 500
+
+@cliente_bp.route('/download_giustificativo/<int:client_id>')
+def download_giustificativo_proxy(client_id):
+    """Scarica lo ZIP (DOCX+PDF) del giustificativo di presenza, proxato dal backend."""
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/api/clients/{client_id}/giustificativo",
+            params=request.args,
+            timeout=70,
+        )
+        response.raise_for_status()
+
+        # Riusa il nome file deciso dal backend, se presente
+        disposition = response.headers.get('Content-Disposition', '')
+        download_name = f"giustificativo_{client_id}.zip"
+        match = re.search(r'filename="?([^";]+)"?', disposition)
+        if match:
+            download_name = match.group(1)
+
+        return send_file(
+            BytesIO(response.content),
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name=download_name,
+        )
+    except requests.exceptions.RequestException as e:
+        flash(f"Errore durante la generazione del giustificativo: {e}", 'danger')
+        return redirect(request.referrer or '/')
+
 
 @cliente_bp.route('/api/clients/<int:client_id>', methods=['DELETE'])
 def delete_client_proxy(client_id):

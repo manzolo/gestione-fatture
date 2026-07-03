@@ -12,6 +12,7 @@ class Cliente(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     cognome = db.Column(db.String(100), nullable=False)
     codice_fiscale = db.Column(db.String(16), unique=True, nullable=False)
+    luogo_nascita = db.Column(db.String(255))
     indirizzo = db.Column(db.String(200))
     citta = db.Column(db.String(255))
     cap = db.Column(db.String(5))

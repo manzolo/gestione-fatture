@@ -6,6 +6,9 @@ postgres_data/*
 invoices_data/*
 backups/*
 
+# Template custom con logo e dati personali (vivono solo sul server di produzione)
+custom_template/*.docx
+
 .env
 
 # Python

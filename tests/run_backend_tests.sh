@@ -109,11 +109,37 @@ echo -e "${CYAN}  SEZIONE: Gestione Clienti${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 curl_check GET "$BASE_URL/clients" "" "Lista clienti vuota"
-curl_check POST "$BASE_URL/clients" '{"nome":"Maria","cognome":"Rossi","codice_fiscale":"RSSMRA81A01H501Z","indirizzo":"Via Roma 123","citta":"Firenze","cap":"50100"}' "Crea cliente Mario Rossi"
+curl_check POST "$BASE_URL/clients" '{"nome":"Maria","cognome":"Rossi","codice_fiscale":"RSSMRA81A01H501Z","luogo_nascita":"Borgo San Lorenzo","indirizzo":"Via Roma 123","citta":"Firenze","cap":"50100"}' "Crea cliente Mario Rossi"
 curl_check GET "$BASE_URL/clients" "" "Lista clienti con Mario"
 curl_check GET "$BASE_URL/clients/1" "" "Dettaglio cliente 1"
-curl_check PUT "$BASE_URL/clients/1" '{"nome":"Mario","cognome":"Bianchi","indirizzo":"Via Milano 45"}' "Aggiorna cliente (nome e indirizzo)"
+curl_check PUT "$BASE_URL/clients/1" '{"nome":"Mario","cognome":"Bianchi","luogo_nascita":"Firenze","indirizzo":"Via Milano 45"}' "Aggiorna cliente (nome, luogo di nascita e indirizzo)"
 curl_check GET "$BASE_URL/clients/1" "" "Verifica aggiornamento"
+
+echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${CYAN}  SEZIONE: Giustificativo di presenza${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+function check_giustificativo() {
+  local url=$1
+  local description=$2
+  echo -e "\n${BLUE}🔧 $description${NC}"
+  echo -e "${YELLOW}   [GET] $url${NC}"
+  local tmpfile
+  tmpfile=$(mktemp /tmp/giustificativo_XXXXXX.zip)
+  local http_code
+  http_code=$(curl -s -w "%{http_code}" -o "$tmpfile" "$url")
+  if [[ "$http_code" =~ ^2[0-9][0-9]$ ]] && [[ "$(head -c 2 "$tmpfile")" == "PK" ]]; then
+    echo -e "${GREEN}   ✓ Status: $http_code (ZIP valido, $(du -h "$tmpfile" | cut -f1))${NC}"
+    ((success_count++))
+  else
+    echo -e "${RED}   ✗ Status: $http_code (ZIP non valido)${NC}"
+    ((fail_count++))
+  fi
+  rm -f "$tmpfile"
+}
+
+check_giustificativo "$BASE_URL/clients/1/giustificativo" "Download giustificativo (data/ora correnti)"
+check_giustificativo "$BASE_URL/clients/1/giustificativo?data=2026-01-10&ora_inizio=16:00&ora_fine=17:00" "Download giustificativo con data e orari espliciti"
 
 echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}  SEZIONE: Gestione Fatture${NC}"
