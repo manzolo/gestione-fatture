@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict p15pTINiWZSAxMKluuMLDBWfxV0osGRQUQlbkLgdeC8rTyLpH9GJF6NIh6HqsZC
+\restrict oyiOHtaVlPVpaoIFkWgm5akBwklgxVo9TpS23jE4JCPaUOjZFc727kkV5VKkNQb
 
 -- Dumped from database version 13.23
 -- Dumped by pg_dump version 13.23
@@ -46,7 +46,8 @@ CREATE TABLE public.cliente (
     citta character varying(255),
     cap character varying(5),
     flag_opposizione boolean DEFAULT false,
-    luogo_nascita character varying(255)
+    luogo_nascita character varying(255),
+    data_nascita date
 );
 
 
@@ -276,7 +277,7 @@ ALTER TABLE ONLY public.fattura_progressivo ALTER COLUMN anno SET DEFAULT nextva
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
-c8d0e2f4a6b8
+d9e1f3a5b7c9
 \.
 
 
@@ -284,18 +285,18 @@ c8d0e2f4a6b8
 -- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.cliente (id, nome, cognome, codice_fiscale, indirizzo, citta, cap, flag_opposizione, luogo_nascita) FROM stdin;
-1	Lapo	Schmid	SCHLPA14L24B036G	Via Campomigliaio, 20	Scarperia e San Piero (FI)	50038	f	\N
-2	Stefania	Galeotti	GLTSFN89R42B036T	Via Pietro Nenni, 19	Borgo San Lorenzo (FI)	50032	f	\N
-3	Isabel Maya	Lasagni	LSGSLM12C45B036L	Via Casanuova, 107	Firenzuola (FI)	50033	f	\N
-4	Daniela	Paladini	PLDDNL94M45B036F	Via Molezzano, 61	Vicchio (FI)	50039	f	\N
-5	Giorgia	D’Orilia	DRLGRG03A60B036C	Via Alessandro Pieri Stella, 66/A	Ronta - Borgo San Lorenzo (FI)	50032	f	\N
-6	Paolo	Borselli	BRSPLA97A17B036L	Via Faentina, 144	Ronta - Borgo San Lorenzo (FI)	50032	f	\N
-7	Rita	Piccini	PCCRTI54E44I085O	Via Rabatta, 27	Borgo San Lorenzo (FI)	50032	f	\N
-8	Laura	Paladini	PLDLRA77E67B036M	Via dell’Azzurro, 5	Scarperia e San Piero (FI)	50038	f	\N
-9	Adele	Salimbeni	SLMDLA82S62D612M	Via Solferino, 4	Scarperia e San Piero (FI)	50038	f	\N
-11	Raimondo 	Della Rocca	DLLRND48M05E971M	Via Piave, 41/26	Borgo San Lorenzo (FI)	50032	f	\N
-10	Dario	Bulletti	BLLDRA83L25D575Z	Via Stefaneschi, 39A	Ronta - Borgo San Lorenzo (FI)	50032	f	\N
+COPY public.cliente (id, nome, cognome, codice_fiscale, indirizzo, citta, cap, flag_opposizione, luogo_nascita, data_nascita) FROM stdin;
+1	Lapo	Schmid	SCHLPA14L24B036G	Via Campomigliaio, 20	Scarperia e San Piero (FI)	50038	f	\N	\N
+2	Stefania	Galeotti	GLTSFN89R42B036T	Via Pietro Nenni, 19	Borgo San Lorenzo (FI)	50032	f	\N	\N
+3	Isabel Maya	Lasagni	LSGSLM12C45B036L	Via Casanuova, 107	Firenzuola (FI)	50033	f	\N	\N
+4	Daniela	Paladini	PLDDNL94M45B036F	Via Molezzano, 61	Vicchio (FI)	50039	f	\N	\N
+5	Giorgia	D’Orilia	DRLGRG03A60B036C	Via Alessandro Pieri Stella, 66/A	Ronta - Borgo San Lorenzo (FI)	50032	f	\N	\N
+6	Paolo	Borselli	BRSPLA97A17B036L	Via Faentina, 144	Ronta - Borgo San Lorenzo (FI)	50032	f	\N	\N
+7	Rita	Piccini	PCCRTI54E44I085O	Via Rabatta, 27	Borgo San Lorenzo (FI)	50032	f	\N	\N
+8	Laura	Paladini	PLDLRA77E67B036M	Via dell’Azzurro, 5	Scarperia e San Piero (FI)	50038	f	\N	\N
+9	Adele	Salimbeni	SLMDLA82S62D612M	Via Solferino, 4	Scarperia e San Piero (FI)	50038	f	\N	\N
+11	Raimondo 	Della Rocca	DLLRND48M05E971M	Via Piave, 41/26	Borgo San Lorenzo (FI)	50032	f	\N	\N
+10	Dario	Bulletti	BLLDRA83L25D575Z	Via Stefaneschi, 39A	Ronta - Borgo San Lorenzo (FI)	50032	f	\N	\N
 \.
 
 
@@ -476,5 +477,5 @@ ALTER TABLE ONLY public.costo
 -- PostgreSQL database dump complete
 --
 
-\unrestrict p15pTINiWZSAxMKluuMLDBWfxV0osGRQUQlbkLgdeC8rTyLpH9GJF6NIh6HqsZC
+\unrestrict oyiOHtaVlPVpaoIFkWgm5akBwklgxVo9TpS23jE4JCPaUOjZFc727kkV5VKkNQb
 

@@ -112,7 +112,7 @@ echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━�
 echo -e "${CYAN}  SEZIONE: Gestione Clienti (Proxy)${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
-curl_check POST "$BASE_URL/api/clients" '{"nome":"Test","cognome":"User","codice_fiscale":"TSTUSR80A01H501X","luogo_nascita":"Scarperia"}' "Crea cliente Test"
+curl_check POST "$BASE_URL/api/clients" '{"nome":"Test","cognome":"User","codice_fiscale":"TSTUSR80A01H501X","luogo_nascita":"Scarperia","data_nascita":"1980-01-01"}' "Crea cliente Test"
 curl_check GET "$BASE_URL/api/clients/1" "" "Dettaglio cliente 1"
 #curl_check PUT "$BASE_URL/api/clients/1" '{"nome":"Test","cognome":"Updated","codice_fiscale":"TSTUSR80A01H501X","indirizzo":"Via Test 42"}' "Aggiorna cliente"
 curl_check PUT "$BASE_URL/api/clients/1" '{"nome":"Test","cognome":"Updated","indirizzo":"Via Test 42"}' "Aggiorna cliente (nome e indirizzo)"

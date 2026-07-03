@@ -62,6 +62,17 @@ def handle_database_error(error):
     
     return "Errore del database.", 500
 
+def parse_data_nascita(raw):
+    """Ritorna (date|None, errore|None) dal campo opzionale data_nascita (YYYY-MM-DD)."""
+    raw = (raw or '').strip()
+    if not raw:
+        return None, None
+    try:
+        return datetime.strptime(raw, '%Y-%m-%d').date(), None
+    except ValueError:
+        return None, "La data di nascita deve essere in formato YYYY-MM-DD."
+
+
 @clients_bp.route('/clients', methods=['GET', 'POST'])
 def clients_api():
     if request.method == 'POST':
@@ -107,6 +118,11 @@ def clients_api():
             if cap and not re.match(r'^\d{5}$', cap):
                 return jsonify({"message": "Il CAP deve essere composto da 5 cifre."}), 400
             
+            # Data di nascita opzionale
+            data_nascita, errore_data = parse_data_nascita(data.get('data_nascita'))
+            if errore_data:
+                return jsonify({"message": errore_data}), 400
+
             # Creazione nuovo cliente
             # flag_opposizione: checkbox manda "on"/"true"/true, assente = False
             raw_flag = data.get('flag_opposizione', False)
@@ -117,6 +133,7 @@ def clients_api():
                 cognome=data['cognome'].strip(),
                 codice_fiscale=codice_fiscale,
                 luogo_nascita=data.get('luogo_nascita', '').strip() or None,
+                data_nascita=data_nascita,
                 indirizzo=data.get('indirizzo', '').strip() or None,
                 citta=data.get('citta', '').strip() or None,
                 cap=cap or None,
@@ -152,6 +169,7 @@ def clients_api():
                 'cognome': c.cognome,
                 'codice_fiscale': c.codice_fiscale,
                 'luogo_nascita': c.luogo_nascita,
+                'data_nascita': c.data_nascita.isoformat() if c.data_nascita else None,
                 'indirizzo': c.indirizzo,
                 'citta': c.citta,
                 'cap': c.cap,
@@ -176,6 +194,7 @@ def client_api_detail(client_id):
                 'cognome': client.cognome,
                 'codice_fiscale': client.codice_fiscale,
                 'luogo_nascita': client.luogo_nascita,
+                'data_nascita': client.data_nascita.isoformat() if client.data_nascita else None,
                 'indirizzo': client.indirizzo,
                 'citta': client.citta,
                 'cap': client.cap,
@@ -227,6 +246,11 @@ def client_api_detail(client_id):
                     client.codice_fiscale = data['codice_fiscale'].strip().upper()
                 if 'luogo_nascita' in data:
                     client.luogo_nascita = data['luogo_nascita'].strip() or None
+                if 'data_nascita' in data:
+                    valore, errore_data = parse_data_nascita(data['data_nascita'])
+                    if errore_data:
+                        return jsonify({"message": errore_data}), 400
+                    client.data_nascita = valore
                 if 'indirizzo' in data:
                     client.indirizzo = data['indirizzo'].strip() or None
                 if 'citta' in data:
@@ -347,10 +371,16 @@ def download_giustificativo(client_id):
         if err:
             return err, 400
 
-        # Sesso e data di nascita ricavati dal codice fiscale
+        # Sesso ricavato dal codice fiscale; data di nascita dal campo
+        # anagrafico se presente, altrimenti decodificata dal CF
         dati_cf = decode_codice_fiscale(client.codice_fiscale)
         sesso = dati_cf['sesso'] if dati_cf else None
-        data_nascita = dati_cf['data_nascita'].strftime('%d/%m/%Y') if dati_cf else PUNTINI
+        if client.data_nascita:
+            data_nascita = client.data_nascita.strftime('%d/%m/%Y')
+        elif dati_cf:
+            data_nascita = dati_cf['data_nascita'].strftime('%d/%m/%Y')
+        else:
+            data_nascita = PUNTINI
 
         genere = {
             'M': {'articolo_titolo': 'Il Sig.', 'nato_nata': 'nato', 'presentato_presentata': 'presentato', 'interessato_interessata': 'interessato'},

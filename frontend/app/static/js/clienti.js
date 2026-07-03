@@ -311,6 +311,7 @@ export function initializeClients() {
             document.getElementById('edit-cognome').value = data.cognome;
             document.getElementById('edit-codice_fiscale').value = data.codice_fiscale;
             document.getElementById('edit-luogo_nascita').value = data.luogo_nascita || '';
+            document.getElementById('edit-data_nascita').value = data.data_nascita || '';
             document.getElementById('edit-indirizzo').value = data.indirizzo || '';
             document.getElementById('edit-citta').value = data.citta || '';
             document.getElementById('edit-cap').value = data.cap || '';

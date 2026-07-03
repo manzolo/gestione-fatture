@@ -109,10 +109,10 @@ echo -e "${CYAN}  SEZIONE: Gestione Clienti${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 curl_check GET "$BASE_URL/clients" "" "Lista clienti vuota"
-curl_check POST "$BASE_URL/clients" '{"nome":"Maria","cognome":"Rossi","codice_fiscale":"RSSMRA81A01H501Z","luogo_nascita":"Borgo San Lorenzo","indirizzo":"Via Roma 123","citta":"Firenze","cap":"50100"}' "Crea cliente Mario Rossi"
+curl_check POST "$BASE_URL/clients" '{"nome":"Maria","cognome":"Rossi","codice_fiscale":"RSSMRA81A01H501Z","luogo_nascita":"Borgo San Lorenzo","data_nascita":"1981-01-01","indirizzo":"Via Roma 123","citta":"Firenze","cap":"50100"}' "Crea cliente Mario Rossi"
 curl_check GET "$BASE_URL/clients" "" "Lista clienti con Mario"
 curl_check GET "$BASE_URL/clients/1" "" "Dettaglio cliente 1"
-curl_check PUT "$BASE_URL/clients/1" '{"nome":"Mario","cognome":"Bianchi","luogo_nascita":"Firenze","indirizzo":"Via Milano 45"}' "Aggiorna cliente (nome, luogo di nascita e indirizzo)"
+curl_check PUT "$BASE_URL/clients/1" '{"nome":"Mario","cognome":"Bianchi","luogo_nascita":"Firenze","data_nascita":"1981-01-15","indirizzo":"Via Milano 45"}' "Aggiorna cliente (nome, luogo/data di nascita e indirizzo)"
 curl_check GET "$BASE_URL/clients/1" "" "Verifica aggiornamento"
 
 echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
