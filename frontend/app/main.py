@@ -10,6 +10,16 @@ from .routes.costi_routes import costi_bp
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "una-chiave-segreta-molto-complessa")
 
+# Versione applicazione: valorizzata dal tag di release via INVOICE_VERSION
+# (impostata nel .env del server dal flusso /bump); "dev" in locale.
+APP_VERSION = os.getenv("INVOICE_VERSION", "dev")
+
+
+@app.context_processor
+def inject_app_version():
+    """Rende {{ app_version }} disponibile in tutti i template."""
+    return {"app_version": APP_VERSION}
+
 # Variabile d'ambiente per l'URL del backend
 BACKEND_URL = os.getenv("BACKEND_URL", "http://invoice_backend:5000")
 

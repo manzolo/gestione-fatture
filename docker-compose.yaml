@@ -67,6 +67,7 @@ services:
       TZ: ${TZ:-Europe/Rome}
       BACKEND_URL: http://${BACKEND_HOST}:${BACKEND_PORT}
       SECRET_KEY: ${SECRET_KEY}
+      INVOICE_VERSION: ${INVOICE_VERSION:-dev}
     depends_on:
       invoice_backend:
         condition: service_healthy
