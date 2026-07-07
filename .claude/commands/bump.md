@@ -44,11 +44,13 @@ Se il file manca, FERMATI e dì all'utente di copiarlo da `.claude/deploy.env.ex
    `--exit-status` restituisce non-zero se il workflow fallisce: in quel caso FERMATI (guarda `gh run view <run-id> --log-failed`). Cause tipiche: secret `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN` mancanti o scaduti.
    **Fallback manuale** (solo se la CI è indisponibile): `make docker-push TAG=vX.Y.Z` — lancia in background e monitora fino a "Immagini pubblicate con successo".
 
-4. **Deploy in produzione** (fa backup DB + pull + up -d). Usa le variabili caricate da `.claude/deploy.local.env`:
+4. **Deploy in produzione** (fa backup DB + pull + up -d). Il compose del server pinna le immagini a `${INVOICE_VERSION:-latest}`: imposta prima la versione appena pubblicata in `.env`, poi `make update`. Usa le variabili caricate da `.claude/deploy.local.env`:
    ```
-   ssh -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" "cd $DEPLOY_PATH && make update"
+   ssh -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" "cd $DEPLOY_PATH && \
+     ( grep -q '^INVOICE_VERSION=' .env && sed -i 's/^INVOICE_VERSION=.*/INVOICE_VERSION=vX.Y.Z/' .env || printf 'INVOICE_VERSION=vX.Y.Z\n' >> .env ) && \
+     make update"
    ```
-   Lancia in background e monitora fino a "Started"/"Healthy". Fermati su qualsiasi errore.
+   Lancia in background e monitora fino a "Started"/"Healthy". Fermati su qualsiasi errore. Nota: senza aggiornare `INVOICE_VERSION` il deploy resterebbe pinnato alla versione precedente (il `pull` non prenderebbe la nuova).
 
 5. **Smoke test in prod**: verifica che il codice nuovo sia effettivamente nel container. Almeno controlla lo stato dei container e che backend/frontend siano `healthy`/`Up`. Se la release tocca file frontend specifici, `grep` un marcatore noto dentro `docker exec invoice_frontend ...` (o backend).
 
@@ -59,5 +61,6 @@ Se il file manca, FERMATI e dì all'utente di copiarlo da `.claude/deploy.env.ex
 - Il deploy (passo 4) va fatto SOLO dopo che il run `Release` è concluso con successo, altrimenti il `pull` sul server non trova le nuove immagini.
 - Il workflow `test.yml` (push/PR su `main`) fa solo test; è `release.yml` (tag `v*`) a pubblicare le immagini.
 - Il server non usa git: gira su immagini Docker da registry (`manzolo/invoice_backend`, `manzolo/invoice_frontend`).
+- Il compose del server pinna le immagini a `${INVOICE_VERSION:-latest}` (dal 2026-07-07): la versione live è in `.env` (`INVOICE_VERSION`), il pin dà rollback espliciti (basta cambiare la var e `make update`). Backup del compose in `docker-compose.yaml.bak` sul server.
 - Solo i container con immagine cambiata vengono ricreati (normale che backend resti su se hai toccato solo il frontend).
 - Non stampare né committare mai host/utente/path del server: provengono da `.claude/deploy.local.env` (git-ignored).
