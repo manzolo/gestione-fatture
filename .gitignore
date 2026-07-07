@@ -11,6 +11,10 @@ custom_template/*.docx
 
 .env
 
+# Config locale di deploy (host/utente/path del server) — mai committare
+.claude/*.local.env
+.claude/settings.local.json
+
 # Python
 *.pyc
 __pycache__/
