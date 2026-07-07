@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
+
+from app.timezone import today_local
 
 db = SQLAlchemy()
 
@@ -24,7 +25,7 @@ class Fattura(db.Model):
     anno = db.Column(db.Integer, nullable=False)
     progressivo = db.Column(db.Integer, nullable=False)
     # Aggiunti nuovi campi
-    data_fattura = db.Column(db.Date, nullable=False, default=datetime.now)
+    data_fattura = db.Column(db.Date, nullable=False, default=today_local)
     data_pagamento = db.Column(db.Date)
     metodo_pagamento = db.Column(db.String(50))
     cliente_id = db.Column(db.Integer, db.ForeignKey('cliente.id'), nullable=False)
@@ -49,7 +50,7 @@ class Costo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     descrizione = db.Column(db.String(255), nullable=False)
     anno_riferimento = db.Column(db.Integer, nullable=False)
-    data_pagamento = db.Column(db.Date, nullable=False, default=datetime.now)
+    data_pagamento = db.Column(db.Date, nullable=False, default=today_local)
     totale = db.Column(db.Float, nullable=False)
     pagato = db.Column(db.Boolean, default=False)
     ricorrenza_id = db.Column(db.Integer, db.ForeignKey('costo_ricorrente.id'), nullable=True)

@@ -11,6 +11,7 @@ import tempfile
 import zipfile
 import shutil
 from app.utils import calculate_invoice_totals, calculate_prezzo_base_da_totale, format_numero_sedute, PRESTAZIONE_BASE, CONTRIBUTO_PERCENTUALE, BOLLO_COSTO, BOLLO_SOGLIA
+from app.timezone import now_local
 
 invoices_bp = Blueprint('invoices_bp', __name__)
 
@@ -37,7 +38,7 @@ def _build_pagamento_descrizione(fattura):
 def invoices_api():
     if request.method == 'POST':
         data = request.get_json()
-        current_year = datetime.now().year
+        current_year = now_local().year
         
         # VALIDAZIONE E CONVERSIONE NUMERO_SEDUTE
         try:

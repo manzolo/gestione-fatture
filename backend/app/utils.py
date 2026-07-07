@@ -1,5 +1,7 @@
 from datetime import date
 
+from app.timezone import today_local
+
 # --- Voci e parametri predefiniti ---
 PRESTAZIONE_BASE = 58.82
 CONTRIBUTO_PERCENTUALE = 0.02  # 2% - contributo calcolato sul prezzo base
@@ -19,11 +21,16 @@ def _cf_digit(char: str) -> int:
     return int(_CF_OMOCODIA[char.upper()])
 
 
-def decode_codice_fiscale(codice_fiscale: str):
+def decode_codice_fiscale(codice_fiscale: str, oggi: date = None):
     """
     Decodifica sesso e data di nascita da un codice fiscale italiano.
     Gestisce anche i codici con omocodia. Il luogo di nascita non viene
     decodificato (richiederebbe la tabella dei codici catastali).
+
+    Args:
+        codice_fiscale: il CF da decodificare.
+        oggi: data di riferimento per l'euristica del secolo (default: oggi).
+            Iniettabile per rendere la funzione deterministica nei test.
 
     Ritorna {'sesso': 'M'|'F', 'data_nascita': date} oppure None se il
     codice non è decodificabile.
@@ -32,6 +39,8 @@ def decode_codice_fiscale(codice_fiscale: str):
         cf = (codice_fiscale or '').strip().upper()
         if len(cf) != 16:
             return None
+        if oggi is None:
+            oggi = today_local()
         anno = _cf_digit(cf[6]) * 10 + _cf_digit(cf[7])
         mese = _CF_MESI[cf[8]]
         giorno = _cf_digit(cf[9]) * 10 + _cf_digit(cf[10])
@@ -39,7 +48,7 @@ def decode_codice_fiscale(codice_fiscale: str):
         if giorno > 40:
             giorno -= 40
         # Secolo: se l'anno a due cifre supera quello corrente si assume il 1900
-        anno_corrente = date.today().year % 100
+        anno_corrente = oggi.year % 100
         anno += 2000 if anno <= anno_corrente else 1900
         return {'sesso': sesso, 'data_nascita': date(anno, mese, giorno)}
     except (KeyError, ValueError):

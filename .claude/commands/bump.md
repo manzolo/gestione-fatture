@@ -1,7 +1,7 @@
 ---
-description: Release completa con bump versione automatico (tag → docker-push → deploy in prod)
+description: Release completa con bump versione automatico (tag → CI build/push → deploy in prod)
 argument-hint: "[patch|minor|major | vX.Y.Z]  (default: patch)"
-allowed-tools: Bash(git *), Bash(make *), Bash(ssh *), Bash(docker *)
+allowed-tools: Bash(git *), Bash(make *), Bash(ssh *), Bash(docker *), Bash(gh run:*)
 ---
 
 Esegui il flusso completo di release & deploy dell'invoice-app. Il tipo di bump è: **$ARGUMENTS** (se vuoto, usa `patch`).
@@ -34,11 +34,15 @@ Se il file manca, FERMATI e dì all'utente di copiarlo da `.claude/deploy.env.ex
    git push origin vX.Y.Z
    ```
 
-3. **Build & push immagini Docker** (backend + frontend, tag specifico + latest):
+3. **Attendi la pubblicazione immagini in CI**: il push del tag fa scattare il workflow `Release` (`.github/workflows/release.yml`) che esegue i guard (unit test + check-backup) e poi builda e pusha le immagini (`manzolo/invoice_backend`, `manzolo/invoice_frontend`) con tag `vX.Y.Z` + `latest`. Individua il run del tag e attendine l'esito:
    ```
-   make docker-push TAG=vX.Y.Z
+   # dai qualche secondo alla registrazione del run, poi elenca i run recenti di Release:
+   gh run list --workflow=Release --limit 5 --json databaseId,headBranch,status,conclusion,event,createdAt
+   # individua il run relativo al tag vX.Y.Z (event=push) e osservalo fino alla fine:
+   gh run watch <run-id> --exit-status
    ```
-   Gira lungo: lancia in background e monitora fino a "Immagini pubblicate con successo". Fermati se compaiono `denied`/`unauthorized`/`error`.
+   `--exit-status` restituisce non-zero se il workflow fallisce: in quel caso FERMATI (guarda `gh run view <run-id> --log-failed`). Cause tipiche: secret `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN` mancanti o scaduti.
+   **Fallback manuale** (solo se la CI è indisponibile): `make docker-push TAG=vX.Y.Z` — lancia in background e monitora fino a "Immagini pubblicate con successo".
 
 4. **Deploy in produzione** (fa backup DB + pull + up -d). Usa le variabili caricate da `.claude/deploy.local.env`:
    ```
@@ -51,7 +55,9 @@ Se il file manca, FERMATI e dì all'utente di copiarlo da `.claude/deploy.env.ex
 6. **Riepilogo finale**: tabella con esito di ogni step (tag, immagini, deploy, smoke test) e la versione pubblicata.
 
 ## Note
-- La pipeline CI GitHub fa solo test, NON pusha su Docker Hub: il `make docker-push` qui è l'unico canale verso il registry.
+- Il push immagini avviene in CI sul tag (`.github/workflows/release.yml`), non più con `make docker-push` manuale: quest'ultimo resta come fallback se la CI è indisponibile. NON eseguire entrambi (doppio build).
+- Il deploy (passo 4) va fatto SOLO dopo che il run `Release` è concluso con successo, altrimenti il `pull` sul server non trova le nuove immagini.
+- Il workflow `test.yml` (push/PR su `main`) fa solo test; è `release.yml` (tag `v*`) a pubblicare le immagini.
 - Il server non usa git: gira su immagini Docker da registry (`manzolo/invoice_backend`, `manzolo/invoice_frontend`).
 - Solo i container con immagine cambiata vengono ricreati (normale che backend resti su se hai toccato solo il frontend).
 - Non stampare né committare mai host/utente/path del server: provengono da `.claude/deploy.local.env` (git-ignored).

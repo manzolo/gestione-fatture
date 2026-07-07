@@ -62,6 +62,12 @@ stop: ## 🛑 Ferma e rimuove tutti i container
 	@docker compose -f $(COMPOSE_FILE) rm -f
 	@echo "$(GREEN)✅ Container fermati e rimossi!$(NC)"
 
+.PHONY: up
+up: start ## ⬆️  Alias di start
+
+.PHONY: down
+down: stop ## ⬇️  Alias di stop
+
 .PHONY: restart
 restart: ## 🔄 Riavvia tutti i container e mostra i log
 	@echo "$(YELLOW)🔄 Riavvio dei container...$(NC)"
@@ -224,6 +230,18 @@ shell-frontend: ## 🐚 Apre una shell nel container del frontend
 # COMANDI TEST
 # ============================================================================
 
+.PHONY: test-unit
+test-unit: ## 🧪 Unit test deterministici (pytest, no DB/container)
+	@echo "$(CYAN)╔════════════════════════════════════════╗$(NC)"
+	@echo "$(CYAN)║     🧪 UNIT TEST (logica fiscale)      ║$(NC)"
+	@echo "$(CYAN)╚════════════════════════════════════════╝$(NC)"
+	@cd backend && python3 -m pytest tests/unit
+
+.PHONY: check-backup
+check-backup: ## 🔎 Verifica che backups/backup.sql sia allineato alla head Alembic
+	@echo "$(BLUE)🔎 Controllo allineamento backup.sql / migration...$(NC)"
+	@python3 scripts/check_backup_migration.py
+
 .PHONY: test-setup
 test-setup: ## 🔧 Prepara l'ambiente per i test (ripristina DB)
 	@echo "$(BLUE)🔧 Preparazione ambiente test...$(NC)"
@@ -268,6 +286,8 @@ test-all: ## 🧪 Esegue tutti i test (backend + frontend + sts)
 	@echo "$(CYAN)║     🧪 ESECUZIONE COMPLETA TEST SUITE                 ║$(NC)"
 	@echo "$(CYAN)╚════════════════════════════════════════════════════════╝$(NC)"
 	@echo ""
+	@$(MAKE) test-unit
+	@echo ""
 	@$(MAKE) test-backend
 	@echo ""
 	@$(MAKE) test-frontend
@@ -281,8 +301,8 @@ test-all: ## 🧪 Esegue tutti i test (backend + frontend + sts)
 .PHONY: test-quick
 test-quick: ## ⚡ Test rapidi senza setup del database
 	@echo "$(YELLOW)⚡ Test rapidi (senza reset DB)...$(NC)"
-	@chmod +x ./tests/run_backend_tests.sh ./run_frontend_tests.sh
-	@./tests/run_backend_tests.sh && ./run_frontend_tests.sh
+	@chmod +x ./tests/run_backend_tests.sh ./tests/run_frontend_tests.sh
+	@./tests/run_backend_tests.sh && ./tests/run_frontend_tests.sh
 
 # ============================================================================
 # COMANDI PULIZIA

@@ -7,6 +7,27 @@ on:
     branches: [main]
 
 jobs:
+  unit:
+    name: Unit tests + guards
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: pip install -r backend/requirements-dev.txt
+
+      - name: Check backup.sql is aligned with migration head
+        run: make check-backup
+
+      - name: Run unit tests (fiscal logic, CF, STS mapper)
+        run: make test-unit
+
   test:
     runs-on: ubuntu-latest
 
