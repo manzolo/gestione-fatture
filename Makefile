@@ -9,9 +9,10 @@ BACKEND_IMAGE := $(DOCKER_USER)/invoice_backend
 FRONTEND_IMAGE := $(DOCKER_USER)/invoice_frontend
 DOCKER_TAG := $(or $(TAG),latest)
 
-# Importa variabili d'ambiente
-include .env
-export $(shell grep -v '^\s*#' .env | cut -d= -f1)
+# Importa variabili d'ambiente (opzionale: i target puri come test-unit/check-backup
+# non richiedono .env, così girano anche in CI senza generare il file)
+-include .env
+export $(shell grep -v '^\s*#' .env 2>/dev/null | cut -d= -f1)
 
 # Crea la directory dei backup se non esiste
 $(shell mkdir -p $(BACKUP_DIR))
