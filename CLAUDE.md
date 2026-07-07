@@ -29,15 +29,23 @@ make dev                # Development mode (rebuild + start + logs)
 
 ### Testing
 ```bash
-make test-all          # Run all tests (backend + frontend)
+make test-unit         # Deterministic unit tests (pytest, NO DB/containers) — fast
+make check-backup      # Assert backups/backup.sql matches the Alembic migration head
+make test-all          # unit + backend + frontend + sts (smoke tests need the stack up)
 make test-backend      # Run backend API tests only
 make test-frontend     # Run frontend proxy tests only
 make test-quick        # Quick tests without DB reset
 ```
 
-Test scripts are located in `tests/` directory:
-- `run_backend_tests.sh` - Tests backend REST API endpoints
-- `run_frontend_tests.sh` - Tests frontend proxy routes
+Test pyramid:
+- **Unit** (pytest) — `backend/tests/unit/`: pure fiscal logic (invoice totals / bollo threshold,
+  fractional sessions), `decode_codice_fiscale`, STS mapper, timezone helper. No DB, no Flask,
+  no network (`app/` is a namespace package → importing `app.utils`/`app.sts.mapper` has no side
+  effects). Dev dep: `backend/requirements-dev.txt` (only `pytest`); config in `backend/pyproject.toml`.
+- **Smoke** (bash+curl) — `tests/run_backend_tests.sh`, `tests/run_frontend_tests.sh`, `tests/run_sts_tests.sh`.
+
+CI has two workflows (see `docs/TESTING.md`): `test.yml` (unit job + full-stack smoke job on push/PR
+to `main`) and `release.yml` (build & push images on tag `v*`).
 
 ### Database Operations
 ```bash
@@ -58,8 +66,11 @@ make health            # Check service health
 ```
 
 ### Docker Registry
+Images are built & pushed **by CI** on tag `v*` (`.github/workflows/release.yml` → `manzolo/invoice_backend`,
+`manzolo/invoice_frontend`, tags `vX.Y.Z` + `latest`; secrets `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN`).
+Use the `/bump` skill for a full release. `make docker-push` remains a **manual fallback** only.
 ```bash
-make docker-push       # Publish images to Docker Hub (manzolo/invoice_backend, manzolo/invoice_frontend)
+make docker-push       # Fallback: build + push to Docker Hub locally
 make docker-pull       # Pull images from Docker Hub
 ```
 
@@ -95,6 +106,9 @@ Flask application serving HTML pages with Jinja2 templates and vanilla JS:
   - `costi_routes.py` - Cost management
 - `app/templates/` - Jinja2 HTML templates
 - `app/static/js/` - Vanilla JavaScript (jQuery, Chart.js, Select2)
+- `app/timezone.py` - `now_local()`/`today_local()` (zoneinfo) — mirror of the backend helper
+- **App version**: `main.py` reads `INVOICE_VERSION` (env) into a Jinja context processor
+  (`{{ app_version }}`), shown in the sidebar footer of `index.html`. Defaults to `dev` locally.
 
 **Port:** 80 (exposed externally as FRONTEND_EXTERNAL_PORT:8080)
 
@@ -111,21 +125,38 @@ alembic revision -m "description"
 alembic upgrade head
 ```
 
+**After any migration, regenerate `backups/backup.sql`** (the test fixture — smoke tests restore
+the dump WITHOUT re-running migrations). `make check-backup` (run in CI) fails if the dump's
+`alembic_version` doesn't match the migration head, so a stale dump is caught automatically.
+
 ## Key Business Logic
 
 ### Invoice Calculation (`backend/app/utils.py`)
 ```python
-PRESTAZIONE_BASE = 58.82           # Base consultation fee
-CONTRIBUTO_FISSO_PER_SEDUTA = 1.18 # Fixed contribution per session
+PRESTAZIONE_BASE = 58.82           # Base consultation fee (per session)
+CONTRIBUTO_PERCENTUALE = 0.02      # 2% contribution computed on the base price
 BOLLO_COSTO = 2.00                 # Stamp duty cost
-BOLLO_SOGLIA = 77.47               # Threshold for stamp duty
+BOLLO_SOGLIA = 77.47               # Stamp duty applies if imponibile > 77.47€ (STRICT >)
 ```
 
-Invoice totals are calculated with support for fractional sessions (e.g., 1.5, 2.5):
-- Subtotal = PRESTAZIONE_BASE × numero_sedute
-- Contribution = CONTRIBUTO_FISSO_PER_SEDUTA × numero_sedute
-- Stamp duty applies if total > 77.47€
-- Progressive invoice numbering per year managed via `FatturaProgressivo` model
+`calculate_invoice_totals(numero_sedute, prezzo_base_unitario=None)` supports fractional
+sessions (e.g. 1.5, 2.5):
+- `contributo_unitario = prezzo_base × 0.02`
+- `subtotale_base = prezzo_base × numero_sedute`; `contributo = contributo_unitario × numero_sedute`
+- `totale_imponibile = subtotale_base + contributo`; stamp duty added if `totale_imponibile > 77.47`
+  (strictly greater — exactly 77.47 → no bollo)
+- Progressive invoice numbering per year via `FatturaProgressivo`
+- This logic is locked by unit tests in `backend/tests/unit/` — update them if the rules change.
+
+`decode_codice_fiscale(cf, oggi=None)` decodes gender + birth date (not birth place); `oggi` is
+injectable for the century heuristic (defaults to `today_local()`), which keeps it deterministic in tests.
+
+### Timezone (`backend/app/timezone.py`, mirrored in `frontend/app/timezone.py`)
+Use `now_local()` / `today_local()` (zoneinfo, `TZ` env, default Europe/Rome) instead of naive
+`datetime.now()` / `date.today()` for anything user-facing (e.g. the default invoice date). This
+makes dates correct even if the container runs in UTC — do NOT reintroduce naive calls. Model
+defaults (`data_fattura`, `data_pagamento`) use `today_local`. (`datetime.utcnow()` in `sts_api.py`
+is intentionally UTC.)
 
 ### PDF Generation Workflow
 1. Backend fills DOCX template (`invoice_template.docx`) using docxtpl
@@ -171,6 +202,9 @@ Critical environment variables in `.env`:
 - `FRONTEND_EXTERNAL_PORT` - Frontend external port (default: 8080)
 - `GOTENBERG_URL` - Gotenberg service URL for PDF conversion
 - `SECRET_KEY` - Flask session secret
+- `TZ` - Container timezone (default Europe/Rome); consumed by `app/timezone.py`
+- `INVOICE_VERSION` - Released version tag shown in the frontend; on the prod server it also pins
+  the image tags in compose (`image: manzolo/invoice_*:${INVOICE_VERSION:-latest}`). Defaults to `dev`.
 
 ## Testing Strategy
 
@@ -190,3 +224,8 @@ Before running tests, the database is restored from `backups/backup.sql` to ensu
 - All dates follow ISO format (YYYY-MM-DD) in API, displayed as DD/MM/YYYY in Italian format on frontend
 - Invoice PDFs are stored in `invoices_data/` volume mounted to `/app/backend/invoices`
 - Alembic migrations run automatically on backend container startup
+- **Releases** go through the `/bump` skill: bump tag → CI (`release.yml`) builds & pushes images →
+  deploy sets `INVOICE_VERSION` in the server `.env` and runs `make update`. See `docs/RELEASE.md`.
+- **Prod image pinning**: the production compose (out-of-repo) pins images to
+  `${INVOICE_VERSION:-latest}`; rollback = change `INVOICE_VERSION` and `make update`. Not `:latest`.
+- Reference docs live in `docs/` (ARCHITECTURE, TESTING, RELEASE) and are linked from `README.md`.

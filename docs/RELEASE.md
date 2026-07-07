@@ -31,8 +31,22 @@ I dati del server vivono in `.claude/deploy.local.env` (git-ignored) — mai har
 ## Deploy in produzione
 
 Il server **non usa git**: gira su immagini Docker dal registry. Il deploy fa `make update`
-(backup DB + pull nuove immagini + `up -d`). Solo i container con immagine cambiata vengono
-ricreati. La configurazione (host, path, TZ) vive fuori da questo repo.
+(backup DB + pull nuove immagini + `up -d`). La configurazione (host, path, TZ) vive fuori da questo repo.
+
+### Pinning delle immagini + rollback
+Il compose di produzione pinna le immagini alla versione via env:
+```yaml
+image: manzolo/invoice_backend:${INVOICE_VERSION:-latest}
+image: manzolo/invoice_frontend:${INVOICE_VERSION:-latest}
+```
+La versione live sta in `INVOICE_VERSION` nel `.env` del server. Lo step di deploy di `/bump`
+aggiorna `INVOICE_VERSION` (replace-or-append) prima di `make update`, così il `pull` prende il
+tag giusto. **Rollback**: imposta `INVOICE_VERSION=vX.Y.Z` (versione precedente) e `make update`;
+il fallback `:-latest` evita rotture se la var manca. Backup del compose: `docker-compose.yaml.bak`.
+
+### Versione visibile in UI
+Il frontend legge `INVOICE_VERSION` (Jinja `{{ app_version }}`) e la mostra nel footer della
+sidebar — la versione deployata è verificabile a colpo d'occhio. In locale è `dev`.
 
 ## Guard `backup.sql`
 

@@ -6,7 +6,7 @@ costi, generazione PDF fattura/giustificativo e invio a Sistema Tessera Sanitari
 ## Stack
 
 - **Backend**: Flask + SQLAlchemy (Python 3.12), API REST.
-- **Frontend**: Flask + Jinja2 + JS vanilla (jQuery, Chart.js, Select2), fa da proxy al backend.
+- **Frontend**: Flask + Jinja2 + JS vanilla (jQuery, Chart.js, Select2), fa da proxy al backend. Mostra la versione (`INVOICE_VERSION` → `{{ app_version }}`) nel footer della sidebar.
 - **DB**: PostgreSQL 13, migrazioni Alembic (eseguite all'avvio del backend via `entrypoint.sh`).
 - **PDF**: Gotenberg (converte DOCX → PDF).
 - **Deploy**: Docker Compose.
