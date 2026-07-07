@@ -22,15 +22,14 @@
     text-align: center;
 }
 
-.chart-canvas {
+/* Wrapper con dimensione fissa: è QUI che va data l'altezza, non sul canvas.
+   Chart.js (responsive + maintainAspectRatio:false) dimensiona il canvas al
+   contenitore. Mettere height/padding direttamente sul <canvas> disallinea il
+   buffer di disegno dalla dimensione visualizzata e sfasa l'hit-test del mouse. */
+.chart-canvas-wrapper {
+    position: relative;
     height: 400px;
     width: 100%;
-}
-
-/* Grafici specifici */
-#chartPerMese, 
-#chartPerCliente {
-    height: 400px !important;
     border-radius: 12px;
     background: white;
     padding: 15px;
