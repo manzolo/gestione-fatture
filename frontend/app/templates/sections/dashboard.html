@@ -4,6 +4,10 @@
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="mb-0"><i class="fas fa-chart-line me-3"></i>Panoramica e Report</h2>
             <div class="d-flex align-items-center">
+                <div class="form-check form-switch me-4 mb-0">
+                    <input class="form-check-input" type="checkbox" role="switch" id="comparePrevYearSwitch">
+                    <label class="form-check-label" for="comparePrevYearSwitch">Confronta con anno precedente</label>
+                </div>
                 <label for="yearSelector" class="form-label me-3 mb-0 fw-semibold">Anno:</label>
                 <select class="form-select year-selector" id="yearSelector" style="width: 160px;">
                     <!-- Verrà popolato dinamicamente via JavaScript, ma l'anno corrente sarà preselezionato -->

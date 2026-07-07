@@ -11,6 +11,29 @@ const MESE_MAPPINGS = {
     7: 'Lug', 8: 'Ago', 9: 'Set', 10: 'Ott', 11: 'Nov', 12: 'Dic'
 };
 
+const COMPARE_STORAGE_KEY = 'dashboard_compare_prev_year';
+
+function isCompareEnabled() {
+    return localStorage.getItem(COMPARE_STORAGE_KEY) === '1';
+}
+
+// Badge delta % rispetto all'anno precedente. Con invert=true un aumento è
+// negativo (es. costi: se salgono, badge rosso).
+function buildDeltaBadge(current, prev, { invert = false } = {}) {
+    if (!prev) {
+        return '<span class="badge bg-secondary">n/d</span>';
+    }
+    const pct = ((current - prev) / Math.abs(prev)) * 100;
+    if (Math.abs(pct) < 0.05) {
+        return '<span class="badge bg-secondary">=</span>';
+    }
+    const up = pct > 0;
+    const good = invert ? !up : up;
+    const cls = good ? 'bg-success' : 'bg-danger';
+    const arrow = up ? '▲' : '▼';
+    return `<span class="badge ${cls}">${arrow} ${Math.abs(pct).toFixed(1)}%</span>`;
+}
+
 export async function fetchDashboardStats(year = null, showLoadingNotification = true) {
     // Cancella la richiesta precedente se esiste
     if (currentRequest) {
@@ -24,6 +47,10 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
     if (year === null) {
         year = new Date().getFullYear();
     }
+    year = parseInt(year, 10);
+
+    const compare = isCompareEnabled();
+    const prevYear = year - 1;
 
     const yearText = year ? `Anno ${year}` : 'Tutti gli anni';
     const statsContainer = document.getElementById('dashboard-stats');
@@ -48,10 +75,20 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
         const urlInvoices = year ? `/api/invoices/stats?year=${year}` : '/api/invoices/stats';
         const urlCosts = year ? `/api/costs/stats?year=${year}` : '/api/costs/stats';
 
-        const [invoicesResponse, costsResponse] = await Promise.all([
+        const fetches = [
             fetch(urlInvoices, { signal: controller.signal }),
             fetch(urlCosts, { signal: controller.signal })
-        ]);
+        ];
+
+        // Con il confronto attivo, chiede anche le statistiche dell'anno precedente
+        if (compare) {
+            fetches.push(
+                fetch(`/api/invoices/stats?year=${prevYear}`, { signal: controller.signal }),
+                fetch(`/api/costs/stats?year=${prevYear}`, { signal: controller.signal })
+            );
+        }
+
+        const [invoicesResponse, costsResponse, prevInvoicesResponse, prevCostsResponse] = await Promise.all(fetches);
 
         // Controlla se la richiesta è stata cancellata
         if (controller.signal.aborted) {
@@ -71,6 +108,27 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
         const invoicesData = await invoicesResponse.json();
         const costsData = await costsResponse.json();
 
+        // I dati dell'anno precedente sono opzionali: se falliscono, il resto
+        // della dashboard funziona comunque (badge "n/d", nessun layer nel grafico)
+        let prevInvoicesData = null;
+        let prevCostsData = null;
+        if (compare && prevInvoicesResponse && prevInvoicesResponse.ok) {
+            prevInvoicesData = await prevInvoicesResponse.json();
+        }
+        if (compare && prevCostsResponse && prevCostsResponse.ok) {
+            prevCostsData = await prevCostsResponse.json();
+        }
+
+        const prevHasData = compare && (
+            (prevInvoicesData && (parseInt(prevInvoicesData.totale_fatture) || 0) > 0) ||
+            (prevCostsData && (parseFloat(prevCostsData.totale_annuo) || 0) > 0)
+        );
+        const comparison = prevHasData ? { prevYear, prevInvoicesData, prevCostsData } : null;
+
+        if (compare && !prevHasData && !controller.signal.aborted) {
+            notifications.info(`Nessun dato disponibile per il ${prevYear}: confronto non applicato.`, 4000);
+        }
+
         if (statsContainer && !controller.signal.aborted) {
             // Estrae i dati corretti dalle rispettive API
             const totaleAnnualeFatturato = parseFloat(invoicesData.totale_annuo) || 0;
@@ -79,13 +137,30 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
             const clientiFatturati = parseInt(invoicesData.clienti_con_fatture) || 0;
             const profitto = totaleAnnualeFatturato - totaleCostiAnnuali;
 
+            // Riga delta sotto il valore della card (solo con confronto attivo)
+            let deltaLine = () => '';
+            if (compare) {
+                const prevFatturato = parseFloat(prevInvoicesData?.totale_annuo) || 0;
+                const prevCosti = parseFloat(prevCostsData?.totale_annuo) || 0;
+                const prevValues = {
+                    fatture: parseInt(prevInvoicesData?.totale_fatture) || 0,
+                    clienti: parseInt(prevInvoicesData?.clienti_con_fatture) || 0,
+                    fatturato: prevFatturato,
+                    costi: prevCosti,
+                    profitto: prevFatturato - prevCosti
+                };
+                deltaLine = (key, current, opts) => `
+                    <div class="mb-1">${buildDeltaBadge(current, prevValues[key], opts)} <small class="text-muted">vs ${prevYear}</small></div>`;
+            }
+
             statsContainer.innerHTML = `
                 <div class="col-md-2-4">
                     <div class="card stat-card text-center">
                         <div class="card-body">
                             <i class="fas fa-file-invoice-dollar stat-icon text-primary"></i>
                             <h5 class="card-title mt-2">Totale Fatture</h5>
-                            <p class="card-text fs-4 fw-bold">${totaleFatture}</p>
+                            <p class="card-text fs-4 fw-bold mb-1">${totaleFatture}</p>
+                            ${deltaLine('fatture', totaleFatture)}
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -95,7 +170,8 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
                         <div class="card-body">
                             <i class="fas fa-users stat-icon text-info"></i>
                             <h5 class="card-title mt-2">Clienti Fatturati</h5>
-                            <p class="card-text fs-4 fw-bold">${clientiFatturati}</p>
+                            <p class="card-text fs-4 fw-bold mb-1">${clientiFatturati}</p>
+                            ${deltaLine('clienti', clientiFatturati)}
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -105,7 +181,8 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
                         <div class="card-body">
                             <i class="fas fa-euro-sign stat-icon text-success"></i>
                             <h5 class="card-title mt-2">Fatturato ${year ? 'Annuo' : 'Complessivo'}</h5>
-                            <p class="card-text fs-4 fw-bold text-success">€${totaleAnnualeFatturato.toFixed(2)}</p>
+                            <p class="card-text fs-4 fw-bold text-success mb-1">€${totaleAnnualeFatturato.toFixed(2)}</p>
+                            ${deltaLine('fatturato', totaleAnnualeFatturato)}
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -115,7 +192,8 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
                         <div class="card-body">
                             <i class="fas fa-hand-holding-usd stat-icon text-danger"></i>
                             <h5 class="card-title mt-2">Costi ${year ? 'Annuali' : 'Complessivi'}</h5>
-                            <p class="card-text fs-4 fw-bold text-danger">€${totaleCostiAnnuali.toFixed(2)}</p>
+                            <p class="card-text fs-4 fw-bold text-danger mb-1">€${totaleCostiAnnuali.toFixed(2)}</p>
+                            ${deltaLine('costi', totaleCostiAnnuali, { invert: true })}
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -125,7 +203,8 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
                         <div class="card-body">
                             <i class="fas fa-chart-line stat-icon ${profitto >= 0 ? 'text-success' : 'text-danger'}"></i>
                             <h5 class="card-title mt-2">Profitto ${year ? 'Annuo' : 'Complessivo'}</h5>
-                            <p class="card-text fs-4 fw-bold ${profitto >= 0 ? 'text-success' : 'text-danger'}">€${profitto.toFixed(2)}</p>
+                            <p class="card-text fs-4 fw-bold ${profitto >= 0 ? 'text-success' : 'text-danger'} mb-1">€${profitto.toFixed(2)}</p>
+                            ${deltaLine('profitto', profitto)}
                             <small class="text-muted">${yearText}</small>
                         </div>
                     </div>
@@ -136,7 +215,7 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
         // Renderizza i grafici solo se la richiesta non è stata cancellata
         if (!controller.signal.aborted) {
             setTimeout(() => {
-                renderCharts(invoicesData, costsData);
+                renderCharts(invoicesData, costsData, comparison);
             }, 100);
         }
 
@@ -174,7 +253,7 @@ export async function fetchDashboardStats(year = null, showLoadingNotification =
     }
 }
 
-function renderCharts(invoicesData, costsData) {
+function renderCharts(invoicesData, costsData, comparison = null) {
     if (typeof Chart === 'undefined') {
         console.error('Chart.js non è caricato!');
         notifications.error('Errore: libreria grafici non disponibile.');
@@ -244,8 +323,59 @@ function renderCharts(invoicesData, costsData) {
                 costiValues = sortedYears.map(year => yearlyCosts.get(year) || 0);
             }
 
+            // Layer di confronto: anno precedente come linee tratteggiate
+            // sovrapposte alle barre (solo in vista mensile)
+            let prevYearDatasets = [];
+            if (isSpecificYear && comparison) {
+                const prevMonthlyFatturato = new Array(12).fill(0);
+                const prevMonthlyCosti = new Array(12).fill(0);
+
+                (comparison.prevInvoicesData?.per_mese || []).forEach(item => {
+                    const monthIndex = parseInt(item.mese) - 1;
+                    if (monthIndex >= 0 && monthIndex < 12) {
+                        prevMonthlyFatturato[monthIndex] = parseFloat(item.totale) || 0;
+                    }
+                });
+
+                (comparison.prevCostsData?.per_mese || []).forEach(item => {
+                    const monthIndex = parseInt(item.mese) - 1;
+                    if (monthIndex >= 0 && monthIndex < 12) {
+                        prevMonthlyCosti[monthIndex] = parseFloat(item.totale) || 0;
+                    }
+                });
+
+                prevYearDatasets = [{
+                    type: 'line',
+                    label: `Fatturato ${comparison.prevYear} (€)`,
+                    data: prevMonthlyFatturato,
+                    borderColor: 'rgba(54, 162, 235, 0.9)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.9)',
+                    borderDash: [6, 4],
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    tension: 0.25,
+                    fill: false
+                },
+                {
+                    type: 'line',
+                    label: `Costi ${comparison.prevYear} (€)`,
+                    data: prevMonthlyCosti,
+                    borderColor: 'rgba(255, 99, 132, 0.9)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.9)',
+                    borderDash: [6, 4],
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    tension: 0.25,
+                    fill: false
+                }];
+            }
+
             const dynamicChartTitle = isSpecificYear
-                ? `Fatturato e Costi per Mese - ${invoicesData.anno_selezionato}`
+                ? (comparison
+                    ? `Fatturato e Costi per Mese - ${invoicesData.anno_selezionato} vs ${comparison.prevYear}`
+                    : `Fatturato e Costi per Mese - ${invoicesData.anno_selezionato}`)
                 : 'Fatturato e Costi per Anno';
 
             chartPerMeseInstance = new Chart(chartPerMese, {
@@ -267,7 +397,8 @@ function renderCharts(invoicesData, costsData) {
                         borderColor: 'rgba(255, 99, 132, 1)',
                         borderWidth: 2,
                         borderRadius: 4
-                    }]
+                    },
+                    ...prevYearDatasets]
                 },
                 options: {
                     responsive: true,
@@ -452,6 +583,18 @@ async function setupDashboard() {
         yearSelector.parentNode.replaceChild(newYearSelector, yearSelector);
 
         newYearSelector.addEventListener('change', onYearChange);
+
+        // Switch confronto anno precedente (stato persistito in localStorage)
+        const compareSwitch = document.getElementById('comparePrevYearSwitch');
+        if (compareSwitch) {
+            compareSwitch.checked = isCompareEnabled();
+            compareSwitch.addEventListener('change', () => {
+                localStorage.setItem(COMPARE_STORAGE_KEY, compareSwitch.checked ? '1' : '0');
+                const ys = document.getElementById('yearSelector');
+                const selected = ys ? (ys.value || new Date().getFullYear()) : new Date().getFullYear();
+                fetchDashboardStats(selected, true);
+            });
+        }
 
         // Carica la dashboard con l'anno predefinito (sempre un anno specifico, mai "tutti gli anni")
         const selectedYear = newYearSelector.value || currentYear;
