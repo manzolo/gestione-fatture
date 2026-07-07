@@ -1,0 +1,4 @@
+# Dipendenze SOLO per i test unitari (non incluse nell'immagine di produzione).
+# Gli unit test in tests/unit/ importano funzioni pure di app/ senza DB né rete,
+# quindi qui basta pytest.
+pytest==8.3.4

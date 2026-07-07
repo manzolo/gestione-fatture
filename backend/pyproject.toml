@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+# rootdir = backend/, così `import app.*` funziona come in produzione
+# (app/ è un namespace package: nessun __init__.py, nessun side effect all'import).
+pythonpath = ["."]
+testpaths = ["tests/unit"]
+addopts = "-q"
