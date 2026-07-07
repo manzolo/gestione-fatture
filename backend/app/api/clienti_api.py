@@ -5,6 +5,7 @@ from codicefiscale import isvalid
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from datetime import datetime, timedelta
+from app.timezone import now_local
 from docxtpl import DocxTemplate
 import requests
 import os
@@ -341,7 +342,7 @@ def download_giustificativo(client_id):
         if not os.path.exists(template_path):
             return jsonify({"error": "Template file not found"}), 404
 
-        adesso = datetime.now()
+        adesso = now_local()
 
         # Data della prestazione: parametro opzionale, default oggi
         data_param = request.args.get('data')

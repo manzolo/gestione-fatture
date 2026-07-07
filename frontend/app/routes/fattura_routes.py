@@ -5,6 +5,8 @@ from datetime import datetime
 from io import BytesIO
 from collections import defaultdict
 
+from ..timezone import now_local
+
 # Crea un Blueprint per le rotte delle fatture
 fattura_bp = Blueprint('fattura_bp', __name__)
 
@@ -59,7 +61,7 @@ def fatture():
         invoices=invoices,
         costs=costs,
         recurring_costs=recurring_costs,
-        now=datetime.now()
+        now=now_local()
     )
 
 # --- Proxy API per le fatture e le statistiche ---

@@ -5,6 +5,8 @@ from sqlalchemy import extract, func
 from sqlalchemy.exc import IntegrityError
 import calendar
 
+from app.timezone import today_local
+
 # Crea un Blueprint per le rotte API dei costi
 costi_bp = Blueprint('costi_bp', __name__)
 
@@ -107,7 +109,7 @@ def build_recurring_cost(data):
 
 
 def generate_recurring_costs(until_date=None, commit=True):
-    until_date = until_date or date.today()
+    until_date = until_date or today_local()
     created = 0
     ricorrenze = CostoRicorrente.query.filter_by(attivo=True).all()
 
