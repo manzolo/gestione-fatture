@@ -11,14 +11,14 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_SQLALCHEMY_URL') or 'sqlite:///test.db'
 db.init_app(app)
 
-# Creazione delle directory se non esistono
+# Creazione delle directory se non esistono. exist_ok=True e non un controllo prima:
+# gunicorn importa questo modulo in più worker insieme, e il primo che crea la cartella
+# faceva cadere gli altri con FileExistsError (backend giù dopo il backup del 2026-10-13).
 temp_dir = os.path.join(app.root_path, 'temp')
-if not os.path.exists(temp_dir):
-    os.makedirs(temp_dir)
-    
+os.makedirs(temp_dir, exist_ok=True)
+
 invoices_dir = os.path.join(app.root_path, 'invoices')
-if not os.path.exists(invoices_dir):
-    os.makedirs(invoices_dir)
+os.makedirs(invoices_dir, exist_ok=True)
 
 # Registra i Blueprint
 app.register_blueprint(clients_bp, url_prefix='/api')
