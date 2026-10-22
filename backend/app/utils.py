@@ -8,6 +8,14 @@ CONTRIBUTO_PERCENTUALE = 0.02  # 2% - contributo calcolato sul prezzo base
 BOLLO_COSTO = 2.00
 BOLLO_SOGLIA = 77.47
 
+# Tipi di seduta: chiave salvata in Fattura.tipo_seduta -> suffisso della descrizione
+# e prezzo per seduta proposto nel form (base + contributo, sempre modificabile)
+TIPO_SEDUTA_DEFAULT = 'singola'
+TIPI_SEDUTA = {
+    'singola': {'etichetta': 'Singola', 'suffisso': '', 'prezzo_totale': 60.00},
+    'coppia': {'etichetta': 'Di coppia', 'suffisso': ' di coppia', 'prezzo_totale': 70.00},
+}
+
 # Omocodia: lettere sostitutive delle cifre nelle posizioni numeriche del CF
 _CF_OMOCODIA = {'L': '0', 'M': '1', 'N': '2', 'P': '3', 'Q': '4',
                 'R': '5', 'S': '6', 'T': '7', 'U': '8', 'V': '9'}
@@ -66,6 +74,28 @@ def format_numero_sedute(numero: float) -> str:
     else:
         # Usa :g per rimuovere zeri trailing, sostituisce punto con virgola
         return f"{numero:g}".replace('.', ',')
+
+def normalize_tipo_seduta(valore) -> str:
+    """
+    Restituisce la chiave del tipo di seduta; None o stringa vuota -> TIPO_SEDUTA_DEFAULT.
+    Solleva ValueError se il tipo non esiste in TIPI_SEDUTA.
+    """
+    if valore is None or str(valore).strip() == '':
+        return TIPO_SEDUTA_DEFAULT
+    chiave = str(valore).strip().lower()
+    if chiave not in TIPI_SEDUTA:
+        raise ValueError(f"Tipo di seduta non valido: {valore}")
+    return chiave
+
+def build_descrizione_prestazione(numero_sedute: float, tipo_seduta: str = TIPO_SEDUTA_DEFAULT) -> str:
+    """
+    Descrizione della prestazione per fattura e PDF, es.:
+    - (1, 'singola') -> "n. 1 di Seduta di consulenza psicologica"
+    - (2, 'coppia')  -> "n. 2 di Sedute di consulenza psicologica di coppia"
+    """
+    suffisso = TIPI_SEDUTA[normalize_tipo_seduta(tipo_seduta)]['suffisso']
+    numero_formattato = format_numero_sedute(numero_sedute)
+    return f"n. {numero_formattato} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica{suffisso}"
 
 def calculate_prezzo_base_da_totale(prezzo_totale_unitario: float) -> float:
     """

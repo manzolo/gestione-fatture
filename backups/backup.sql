@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict oyiOHtaVlPVpaoIFkWgm5akBwklgxVo9TpS23jE4JCPaUOjZFc727kkV5VKkNQb
+\restrict xwB4ayaEqiHaFcbe4PW1VjuWD7lbxIa6eDTBpnrBejibFv7UmrkMN4yJFYJHS1b
 
 -- Dumped from database version 13.23
 -- Dumped by pg_dump version 13.23
@@ -175,7 +175,8 @@ CREATE TABLE public.fattura (
     metodo_pagamento character varying(50),
     inviata_sts boolean DEFAULT false,
     protocollo_sts character varying(100),
-    data_invio_sts timestamp without time zone
+    data_invio_sts timestamp without time zone,
+    tipo_seduta character varying(20) DEFAULT 'singola'::character varying NOT NULL
 );
 
 
@@ -277,7 +278,7 @@ ALTER TABLE ONLY public.fattura_progressivo ALTER COLUMN anno SET DEFAULT nextva
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
-d9e1f3a5b7c9
+f2a4c6e8b0d2
 \.
 
 
@@ -320,32 +321,32 @@ COPY public.costo_ricorrente (id, descrizione, totale, frequenza, giorno_scadenz
 -- Data for Name: fattura; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.fattura (id, anno, progressivo, cliente_id, importo_prestazione, bollo, descrizione, totale, numero_sedute, data_fattura, data_pagamento, metodo_pagamento, inviata_sts, protocollo_sts, data_invio_sts) FROM stdin;
-1	2025	3	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-01	2025-04-01	Carta di credito/debito	t	\N	\N
-3	2025	1	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-03-07	2025-03-07	Carta di credito/debito	t	\N	\N
-2	2025	4	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-29	2025-04-29	Carta di credito/debito	t	\N	\N
-5	2025	5	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-06-12	2025-06-12	Carta di credito/debito	t	\N	\N
-6	2025	6	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-16	2025-07-16	Carta di credito/debito	t	\N	\N
-7	2025	7	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-18	2025-07-18	Carta di credito/debito	t	\N	\N
-8	2025	8	4	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-07-18	2025-07-18	Carta di credito/debito	t	\N	\N
-9	2025	9	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-21	2025-08-21	Carta di credito/debito	t	\N	\N
-10	2025	10	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-22	2025-07-22	Carta di credito/debito	t	\N	\N
-11	2025	11	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N
-12	2025	12	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N
-13	2025	13	8	58.82	t	n. 5 di Sedute di consulenza psicologica	302	5	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N
-14	2025	14	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-25	2025-07-25	Carta di credito/debito	t	\N	\N
-15	2025	15	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t	\N	\N
-16	2025	16	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t	\N	\N
-17	2025	17	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-31	2025-07-31	Carta di credito/debito	t	\N	\N
-18	2025	18	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-01	2025-08-01	Carta di credito/debito	t	\N	\N
-19	2025	19	9	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N
-20	2025	20	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N
-21	2025	21	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N
-22	2025	22	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t	\N	\N
-23	2025	23	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t	\N	\N
-4	2025	2	11	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-03-21	2025-03-21	Carta di credito/debito	t	\N	\N
-24	2025	24	10	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-08-11	2025-08-11	Carta di credito/debito	t	\N	\N
-25	2025	25	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-11	2025-08-11	Carta di credito/debito	t	\N	\N
+COPY public.fattura (id, anno, progressivo, cliente_id, importo_prestazione, bollo, descrizione, totale, numero_sedute, data_fattura, data_pagamento, metodo_pagamento, inviata_sts, protocollo_sts, data_invio_sts, tipo_seduta) FROM stdin;
+1	2025	3	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-01	2025-04-01	Carta di credito/debito	t	\N	\N	singola
+3	2025	1	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-03-07	2025-03-07	Carta di credito/debito	t	\N	\N	singola
+2	2025	4	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-04-29	2025-04-29	Carta di credito/debito	t	\N	\N	singola
+5	2025	5	1	58.82	t	n. 2 di Sedute di consulenza psicologica	122	2	2025-06-12	2025-06-12	Carta di credito/debito	t	\N	\N	singola
+6	2025	6	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-16	2025-07-16	Carta di credito/debito	t	\N	\N	singola
+7	2025	7	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-18	2025-07-18	Carta di credito/debito	t	\N	\N	singola
+8	2025	8	4	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-07-18	2025-07-18	Carta di credito/debito	t	\N	\N	singola
+9	2025	9	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-21	2025-08-21	Carta di credito/debito	t	\N	\N	singola
+10	2025	10	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-22	2025-07-22	Carta di credito/debito	t	\N	\N	singola
+11	2025	11	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N	singola
+12	2025	12	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N	singola
+13	2025	13	8	58.82	t	n. 5 di Sedute di consulenza psicologica	302	5	2025-07-24	2025-07-24	Carta di credito/debito	t	\N	\N	singola
+14	2025	14	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-25	2025-07-25	Carta di credito/debito	t	\N	\N	singola
+15	2025	15	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t	\N	\N	singola
+16	2025	16	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-28	2025-07-28	Carta di credito/debito	t	\N	\N	singola
+17	2025	17	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-07-31	2025-07-31	Carta di credito/debito	t	\N	\N	singola
+18	2025	18	3	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-01	2025-08-01	Carta di credito/debito	t	\N	\N	singola
+19	2025	19	9	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N	singola
+20	2025	20	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N	singola
+21	2025	21	6	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-06	2025-08-06	Carta di credito/debito	t	\N	\N	singola
+22	2025	22	7	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t	\N	\N	singola
+23	2025	23	2	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-07	2025-08-07	Carta di credito/debito	t	\N	\N	singola
+4	2025	2	11	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-03-21	2025-03-21	Carta di credito/debito	t	\N	\N	singola
+24	2025	24	10	58.82	t	n. 4 di Sedute di consulenza psicologica	242	4	2025-08-11	2025-08-11	Carta di credito/debito	t	\N	\N	singola
+25	2025	25	5	58.82	f	n. 1 di Seduta di consulenza psicologica	60	1	2025-08-11	2025-08-11	Carta di credito/debito	t	\N	\N	singola
 \.
 
 
@@ -477,5 +478,5 @@ ALTER TABLE ONLY public.costo
 -- PostgreSQL database dump complete
 --
 
-\unrestrict oyiOHtaVlPVpaoIFkWgm5akBwklgxVo9TpS23jE4JCPaUOjZFc727kkV5VKkNQb
+\unrestrict xwB4ayaEqiHaFcbe4PW1VjuWD7lbxIa6eDTBpnrBejibFv7UmrkMN4yJFYJHS1b
 

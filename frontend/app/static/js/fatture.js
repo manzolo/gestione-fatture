@@ -21,6 +21,18 @@ export function initializeInvoices() {
         });
     }
 
+    // Il tipo di seduta propone il suo prezzo per seduta (resta modificabile a mano)
+    document.querySelectorAll('.tipo-seduta-select').forEach(select => {
+        select.addEventListener('change', function () {
+            const prezzo = this.selectedOptions[0]?.dataset.prezzo;
+            const prezzoInput = document.getElementById(this.dataset.prezzoTarget);
+            if (prezzo && prezzoInput) {
+                prezzoInput.value = prezzo;
+                notifications.info(`Prezzo per seduta impostato a ${prezzo.replace('.', ',')} €`, 2000);
+            }
+        });
+    });
+
     // Resetta il form della nuova fattura quando la modale viene aperta
     const addInvoiceModal = document.getElementById('addInvoiceModal');
     const addInvoiceForm = document.getElementById('addInvoiceForm');
@@ -149,6 +161,8 @@ export function initializeInvoices() {
 
                 document.getElementById('edit-data_fattura').value = data.data_fattura;
                 document.getElementById('edit-numero_sedute').value = data.numero_sedute;
+                // Impostato senza 'change': il prezzo salvato non va sovrascritto da quello proposto
+                document.getElementById('edit-tipo_seduta').value = data.tipo_seduta || 'singola';
 
                 // Popola il prezzo totale unitario (dall'API o calcola dal prezzo base)
                 if (data.prezzo_totale_unitario) {

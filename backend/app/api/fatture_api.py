@@ -10,7 +10,7 @@ import json
 import tempfile
 import zipfile
 import shutil
-from app.utils import calculate_invoice_totals, calculate_prezzo_base_da_totale, format_numero_sedute, PRESTAZIONE_BASE, CONTRIBUTO_PERCENTUALE, BOLLO_COSTO, BOLLO_SOGLIA
+from app.utils import calculate_invoice_totals, calculate_prezzo_base_da_totale, format_numero_sedute, build_descrizione_prestazione, normalize_tipo_seduta, PRESTAZIONE_BASE, CONTRIBUTO_PERCENTUALE, BOLLO_COSTO, BOLLO_SOGLIA
 from app.timezone import now_local
 
 invoices_bp = Blueprint('invoices_bp', __name__)
@@ -62,6 +62,11 @@ def invoices_api():
             prezzo_base = calculate_prezzo_base_da_totale(prezzo_totale_unitario)
         except (ValueError, TypeError):
             return jsonify({'message': 'Il prezzo deve essere un numero valido'}), 400
+
+        try:
+            tipo_seduta = normalize_tipo_seduta(data.get('tipo_seduta'))
+        except ValueError as e:
+            return jsonify({'message': str(e)}), 400
         
         progressivo_entry = FatturaProgressivo.query.filter_by(anno=current_year).first()
         if not progressivo_entry:
@@ -74,8 +79,7 @@ def invoices_api():
         # Calcola i totali usando il prezzo base personalizzato
         calcoli = calculate_invoice_totals(numero_sedute, prezzo_base)
 
-        numero_sedute_formattato = format_numero_sedute(numero_sedute)
-        descrizione = f"n. {numero_sedute_formattato} di Sedut{'e' if numero_sedute > 1 else 'a'} di consulenza psicologica"
+        descrizione = build_descrizione_prestazione(numero_sedute, tipo_seduta)
 
         inviata_sts_bool = data.get('inviata_sts', False)
 
@@ -91,6 +95,7 @@ def invoices_api():
             descrizione=descrizione,
             totale=calcoli['totale'],
             numero_sedute=numero_sedute,
+            tipo_seduta=tipo_seduta,
             inviata_sts=inviata_sts_bool
         )
         
@@ -143,6 +148,7 @@ def invoice_api_detail(invoice_id):
             'metodo_pagamento': fattura.metodo_pagamento,
             'cliente_id': fattura.cliente_id,
             'numero_sedute': fattura.numero_sedute,
+            'tipo_seduta': fattura.tipo_seduta,
             'prezzo_unitario': prezzo_base,  # Prezzo base
             'prezzo_totale_unitario': prezzo_totale_unitario,  # Prezzo totale (base + contributo)
             'totale': f"{fattura.totale:.2f}",
@@ -190,6 +196,13 @@ def invoice_api_detail(invoice_id):
                 fattura.importo_prestazione = calculate_prezzo_base_da_totale(prezzo_totale_update)
             except (ValueError, TypeError):
                 return jsonify({'message': 'Il prezzo deve essere un numero valido'}), 400
+
+        # Tipo di seduta: se non fornito resta quello salvato
+        if 'tipo_seduta' in data:
+            try:
+                fattura.tipo_seduta = normalize_tipo_seduta(data.get('tipo_seduta'))
+            except ValueError as e:
+                return jsonify({'message': str(e)}), 400
         
         # Usa importo_prestazione (prezzo base salvato nel database)
         prezzo_base = fattura.importo_prestazione
@@ -197,8 +210,7 @@ def invoice_api_detail(invoice_id):
         fattura.totale = calcoli['totale']
         fattura.bollo = calcoli['bollo_flag']
         fattura.inviata_sts = inviata_sts_bool
-        numero_sedute_formattato = format_numero_sedute(fattura.numero_sedute)
-        fattura.descrizione = f"n. {numero_sedute_formattato} di Sedut{'e' if fattura.numero_sedute > 1 else 'a'} di consulenza psicologica"
+        fattura.descrizione = build_descrizione_prestazione(fattura.numero_sedute, fattura.tipo_seduta)
         db.session.commit()
         return jsonify({'message': 'Fattura aggiornata con successo!'})
 
@@ -222,7 +234,7 @@ def download_invoice_zip(invoice_id):
         prezzo_base = fattura.importo_prestazione
         calcoli = calculate_invoice_totals(fattura.numero_sedute, prezzo_base)
         numero_sedute_formattato = format_numero_sedute(calcoli['numero_sedute'])
-        descrizione_prestazione = f"n. {numero_sedute_formattato} di Sedut{'e' if calcoli['numero_sedute'] > 1 else 'a'} di consulenza psicologica"
+        descrizione_prestazione = build_descrizione_prestazione(calcoli['numero_sedute'], fattura.tipo_seduta)
 
         bollo_descrizione_estesa = ""
         bollo_descrizione_semplice = ""

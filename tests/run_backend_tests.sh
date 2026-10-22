@@ -153,6 +153,47 @@ curl_check GET "$BASE_URL/invoices" "" "Lista fatture"
 curl_check GET "$BASE_URL/invoices/1" "" "Dettaglio fattura"
 curl_check PUT "$BASE_URL/invoices/1" '{"data_fattura":"2025-02-01","data_pagamento":"2025-02-05","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":2,"inviata_sts":true}' "Aggiorna fattura"
 
+# Tipo di seduta: verifica un campo del body JSON dell'ultima risposta
+function expect_json() {
+  local expr=$1
+  local expected=$2
+  local actual
+  actual=$(echo "$LAST_BODY" | jq -r "$expr" 2>/dev/null)
+  if [[ "$actual" == "$expected" ]]; then
+    echo -e "${GREEN}   ✓ $expr = $expected${NC}"
+    ((success_count++))
+  else
+    echo -e "${RED}   ✗ $expr = '$actual' (atteso '$expected')${NC}"
+    ((fail_count++))
+  fi
+}
+
+curl_check GET "$BASE_URL/invoices/1" "" "Fattura esistente: tipo seduta di default"
+expect_json '.tipo_seduta' 'singola'
+expect_json '.descrizione' 'n. 2 di Sedute di consulenza psicologica'
+
+curl_check POST "$BASE_URL/invoices" '{"data_fattura":"2025-03-10","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":1,"tipo_seduta":"coppia","prezzo_totale_unitario":70,"inviata_sts":false}' "Crea fattura seduta di coppia (70 €)"
+coppia_id=$(echo "$LAST_BODY" | jq -r '.id // empty')
+curl_check GET "$BASE_URL/invoices/${coppia_id}" "" "Dettaglio fattura di coppia"
+expect_json '.tipo_seduta' 'coppia'
+expect_json '.descrizione' 'n. 1 di Seduta di consulenza psicologica di coppia'
+expect_json '.prezzo_totale_unitario == 70' 'true'
+expect_json '.totale' '70.00'
+
+curl_check PUT "$BASE_URL/invoices/${coppia_id}" '{"data_fattura":"2025-03-10","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":1,"prezzo_totale_unitario":75,"inviata_sts":false}' "Prezzo di coppia modificato a mano, tipo non inviato"
+curl_check GET "$BASE_URL/invoices/${coppia_id}" "" "Il tipo resta di coppia, il prezzo è quello a mano"
+expect_json '.tipo_seduta' 'coppia'
+expect_json '.prezzo_totale_unitario == 75' 'true'
+
+echo -e "\n${BLUE}🔧 Tipo di seduta sconosciuto (deve dare 400)${NC}"
+bad_code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/json" \
+  -d '{"data_fattura":"2025-03-10","metodo_pagamento":"Contanti","cliente_id":1,"numero_sedute":1,"tipo_seduta":"famiglia"}' "$BASE_URL/invoices")
+if [[ "$bad_code" == "400" ]]; then
+  echo -e "${GREEN}   ✓ Status: 400 (EXPECTED)${NC}"; ((success_count++))
+else
+  echo -e "${RED}   ✗ Status: $bad_code (atteso 400)${NC}"; ((fail_count++))
+fi
+
 echo -e "\n${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${CYAN}  SEZIONE: Gestione Costi${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

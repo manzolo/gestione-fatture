@@ -146,6 +146,10 @@ sessions (e.g. 1.5, 2.5):
 - `totale_imponibile = subtotale_base + contributo`; stamp duty added if `totale_imponibile > 77.47`
   (strictly greater — exactly 77.47 → no bollo)
 - Progressive invoice numbering per year via `FatturaProgressivo`
+- Session types (`TIPI_SEDUTA` in `utils.py`): `singola` (proposed 60 €) and `coppia` (proposed 70 €,
+  description gets " di coppia"). The form proposes the price on change but it stays editable; the
+  dropdown's `data-prezzo` in `invoice_modals.html` mirrors these values. Description is always built by
+  `build_descrizione_prestazione(numero_sedute, tipo_seduta)` (create, update, PDF).
 - This logic is locked by unit tests in `backend/tests/unit/` — update them if the rules change.
 
 `decode_codice_fiscale(cf, oggi=None)` decodes gender + birth date (not birth place); `oggi` is
@@ -184,6 +188,7 @@ Gotenberg URL: `http://invoice_gotenberg:3000` (configured via GOTENBERG_URL env
 - id, anno, progressivo, data_fattura, data_pagamento, metodo_pagamento
 - cliente_id (FK), importo_prestazione, bollo, descrizione, totale
 - numero_sedute (float - supports fractional sessions)
+- tipo_seduta ('singola' | 'coppia', default 'singola') - drives the description suffix ("… di coppia")
 - inviata_sts (boolean - sent to Sistema Tessera Sanitaria, via API or manual)
 - protocollo_sts, data_invio_sts
 

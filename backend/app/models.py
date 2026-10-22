@@ -34,6 +34,7 @@ class Fattura(db.Model):
     descrizione = db.Column(db.String(255), nullable=False)
     totale = db.Column(db.Float, nullable=False)
     numero_sedute = db.Column(db.Float, nullable=False)
+    tipo_seduta = db.Column(db.String(20), nullable=False, default='singola', server_default='singola')
     inviata_sts = db.Column(db.Boolean, default=False)
     protocollo_sts = db.Column(db.String(100), nullable=True)
     data_invio_sts = db.Column(db.DateTime, nullable=True)
